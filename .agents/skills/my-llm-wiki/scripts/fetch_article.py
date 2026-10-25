@@ -58,6 +58,8 @@ def fetch(url: str) -> str:
         ["curl", "-sL", "--max-time", "60", "-A", USER_AGENT, url],
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
     )
     if result.returncode != 0 or not result.stdout.strip():
         raise SystemExit(f"fetch failed for {url}: {result.stderr.strip() or 'empty response'}")
@@ -109,6 +111,8 @@ def main() -> None:
     parser.add_argument("--wiki-dir", required=True, help="Path to wiki-<slug>/.")
     parser.add_argument("--output", default=None, help="Override the raw path (default: raw/article-<slug>.md).")
     args = parser.parse_args()
+    for stream in (sys.stdout, sys.stderr):  # Windows consoles default to cp1252
+        stream.reconfigure(encoding="utf-8")
 
     wiki_dir = Path(args.wiki_dir).expanduser().resolve()
     if not (wiki_dir / "wiki").is_dir():
@@ -126,6 +130,8 @@ def main() -> None:
         or (soup.find("time", attrs={"datetime": True}) or {}).get("datetime")
     )
     body = extract_body(soup)
+    if not body:
+        raise SystemExit(f"no article body found in {args.url} — nothing written")
 
     slug = slugify(args.url.rstrip("/").rsplit("/", 1)[-1]) or slugify(title)
     raw_path = Path(args.output) if args.output else wiki_dir / "raw" / f"article-{slug}.md"
@@ -147,7 +153,7 @@ def main() -> None:
     ]
     if subtitle:
         front += [f"*{subtitle}*", ""]
-    raw_path.write_text("\n".join(front) + body + "\n")
+    raw_path.write_text("\n".join(front) + body + "\n", encoding="utf-8")
 
     receipt = {
         "origin": "article",
@@ -157,13 +163,13 @@ def main() -> None:
         "source_url": args.url,
         "authors": [author] if author else [],
         "published_date": published,
-        "raw_path": str(raw_path.relative_to(wiki_dir)),
+        "raw_path": raw_path.relative_to(wiki_dir).as_posix(),
         "chars": len(body),
     }
     if len(body) < 500:
         receipt["warning"] = "body under 500 chars — paywall, bot wall, or an unmatched body selector"
         print(f"WARN: {receipt['warning']} ({args.url})", file=sys.stderr)
-    print(json.dumps(receipt, indent=2))
+    print(json.dumps(receipt, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

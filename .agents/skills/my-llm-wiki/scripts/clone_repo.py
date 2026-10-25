@@ -14,12 +14,18 @@ never shows up in the vault, the graph, or search. It is a **regenerable cache**
 deleting it is always safe, and re-ingesting the repo refreshes it in place rather
 than skipping it (CONVENTIONS.md § Immutability).
 
+The receipt carries the shared adapter core (SOURCES.md § The adapter contract).
+A repo has no byline or publish date, so `authors` is the owner and
+`published_date` is the date of the HEAD commit — the date of the snapshot.
+
 Usage:
-  uv run --script clone_repo.py --repo https://github.com/<owner>/<repo> --wiki-dir wiki-<slug>
-  uv run --script clone_repo.py --repo <url> --wiki-dir <dir> --branch develop
+  uv run --script clone_repo.py --url https://github.com/<owner>/<repo> --wiki-dir wiki-<slug>
+  uv run --script clone_repo.py --url <url> --wiki-dir <dir> --branch develop
 
 Receipt (stdout):
-  {"owner", "repo", "branch", "clone_path", "commit_sha", "action": "cloned"|"updated"}
+  {"origin": "repo", "original_path": <url>, "title": "<owner>/<repo>", "source_url",
+   "authors": [<owner>], "published_date", "raw_path": "raw/repos/.github-<owner>-<repo>/",
+   "owner", "repo", "branch", "clone_path", "commit_sha", "action": "cloned"|"updated"}
 """
 
 from __future__ import annotations
@@ -41,7 +47,7 @@ REPO_URL_RE = re.compile(
 
 
 def run(cmd: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess:
-    return subprocess.run(cmd, cwd=cwd, check=True, capture_output=True, text=True)
+    return subprocess.run(cmd, cwd=cwd, check=True, capture_output=True, text=True, encoding="utf-8", errors="replace")
 
 
 def parse_repo_url(url: str, branch_override: str | None) -> tuple[str, str, str | None]:
@@ -72,17 +78,22 @@ def current_branch(clone_path: Path) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--repo", required=True, help="GitHub repo URL (may include /tree/<branch>).")
+    # --repo is the old spelling, kept so existing calls keep working.
+    parser.add_argument("--url", "--repo", dest="url", required=True, help="GitHub repo URL (may include /tree/<branch>).")
     parser.add_argument("--wiki-dir", required=True, help="Path to wiki-<slug>/.")
     parser.add_argument("--branch", default=None, help="Branch override (default: the repo's default branch).")
+    parser.add_argument("--output", default=None, help="Override the clone path (default: raw/repos/.github-<owner>-<repo>/).")
     args = parser.parse_args()
+    for stream in (sys.stdout, sys.stderr):  # Windows consoles default to cp1252
+        stream.reconfigure(encoding="utf-8")
 
-    owner, repo, branch = parse_repo_url(args.repo, args.branch)
+    owner, repo, branch = parse_repo_url(args.url, args.branch)
     wiki_dir = Path(args.wiki_dir).expanduser().resolve()
     if not (wiki_dir / "wiki").is_dir():
         raise SystemExit(f"not a wiki dir (no wiki/ inside): {wiki_dir}")
 
-    clone_path = wiki_dir / "raw" / "repos" / f".github-{owner}-{repo}".lower()
+    default_path = wiki_dir / "raw" / "repos" / f".github-{owner}-{repo}".lower()
+    clone_path = Path(args.output).expanduser().resolve() if args.output else default_path
     clone_url = f"https://github.com/{owner}/{repo}.git"
 
     if (clone_path / ".git").is_dir():
@@ -98,19 +109,23 @@ def main() -> None:
         clone(clone_path, clone_url, branch)
         action = "cloned"
 
-    print(
-        json.dumps(
-            {
-                "owner": owner,
-                "repo": repo,
-                "branch": current_branch(clone_path),
-                "clone_path": str(clone_path.relative_to(wiki_dir)),
-                "commit_sha": run(["git", "rev-parse", "HEAD"], cwd=clone_path).stdout.strip(),
-                "action": action,
-            },
-            indent=2,
-        )
-    )
+    rel_path = clone_path.relative_to(wiki_dir).as_posix()
+    receipt = {
+        "origin": "repo",
+        "original_path": args.url,
+        "title": f"{owner}/{repo}",
+        "source_url": f"https://github.com/{owner}/{repo}",
+        "authors": [owner],
+        "published_date": run(["git", "log", "-1", "--format=%cs"], cwd=clone_path).stdout.strip() or None,
+        "raw_path": f"{rel_path}/",
+        "owner": owner,
+        "repo": repo,
+        "branch": current_branch(clone_path),
+        "clone_path": rel_path,
+        "commit_sha": run(["git", "rev-parse", "HEAD"], cwd=clone_path).stdout.strip(),
+        "action": action,
+    }
+    print(json.dumps(receipt, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":

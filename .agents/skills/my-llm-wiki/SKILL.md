@@ -114,11 +114,12 @@ Match every input against the routing table in `SOURCES.md`, first match wins:
 | an existing path on disk | `local` | `raw/<slug>.md` | `source_writer` |
 | `github.com/<owner>/<repo>` or `*.git` | `repo` | `raw/repos/.github-<owner>-<repo>/` | `repo_writer` |
 | `youtube.com` / `youtu.be` | `youtube` | `raw/youtube-<slug>.md` | `source_writer` |
+| URL path ends in `/llms.txt` | `llms-txt` | `raw/llms-<set>/<page-slug>.md` | `docs_selector`, then `source_writer` per page + `docs_writer` |
 | any other `http(s)://` | `article` | `raw/article-<slug>.md` | `source_writer` |
 
-The YouTube adapter is a deliberate skeleton: it raises `NotImplementedError` with
-a pointer to `SOURCES.md § How to add a source`. When a user drops a YouTube URL,
-run it, report the failure plainly, and continue with the other inputs.
+The YouTube slug is the video id, verbatim (`raw/youtube-<id>.md`). If the adapter
+fails (no captions, private video), report the failure plainly and continue with
+the other inputs.
 
 ### 1.1 Collect inputs and dedup
 
@@ -147,6 +148,8 @@ ls wiki-<slug>/raw/ wiki-<slug>/raw/repos/     # everything already ingested, by
   content from `raw/`, say so explicitly and still skip.
 - raw path free → **new**.
 - **repo that already exists → refreshed, not skipped** (`CONVENTIONS.md` §7).
+- **llms.txt already held → never skipped as a whole.** Dedup is per page, inside
+  the script: picked pages already in `raw/llms-<set>/` come back `skipped`.
 
 There is **no cap in this layer.** Layer 01 capped a run at 10 notes because one
 context had to hold all of them; here each raw file is read by its own subagent
@@ -167,9 +170,13 @@ cp "<dir of the input note>/assets/<embedded file>" "wiki-<slug>/raw/assets/"   
 uv run --script .agents/skills/my-llm-wiki/scripts/fetch_article.py \
   --url "<url>" --wiki-dir wiki-<slug>
 
+# llms.txt — spawn agents/docs_selector.md first; it returns the ids to fetch
+uv run --script .agents/skills/my-llm-wiki/scripts/fetch_llms_txt.py \
+  --url "<url>" --wiki-dir wiki-<slug> --pick <ids>
+
 # repo
 uv run --script .agents/skills/my-llm-wiki/scripts/clone_repo.py \
-  --repo "<url>" --wiki-dir wiki-<slug>
+  --url "<url>" --wiki-dir wiki-<slug>
 ```
 
 Keep each receipt — the writers need `original_path`, `title`, `source_url`,
@@ -187,6 +194,9 @@ ls wiki-<slug>/wiki/entities wiki-<slug>/wiki/concepts
 ```
 
 - **File artifacts** → one `agents/source_writer.md` per raw file, in parallel.
+  An llms.txt receipt lists several: one writer per page with `action: fetched`,
+  output at that page's `source_page` — plus one `agents/docs_writer.md` for the
+  receipt's `hub_page`, spawned with them (it reads only the catalog).
 - **Repos** → one `agents/repo_writer.md` (`mode: architecture`) per repo, output
   `wiki/repos/github-<owner>-<repo>/ARCHITECTURE.md`.
 
@@ -200,9 +210,10 @@ writers produced — the receipt is the interface.
 uv run --script .agents/skills/my-llm-wiki/scripts/count_mentions.py --wiki-dir wiki-<slug>
 ```
 
-The `qualifying` lists are the slugs at ≥2 distinct source-like pages — now
-counted across `wiki/sources/` **and** `wiki/repos/*/`, so a repo can be one of the
-two sources that materialize a concept.
+The `qualifying` lists are the slugs at ≥2 distinct **origins** — counted across
+`wiki/sources/`, `wiki/repos/*/` and `wiki/docs/*/`, where one repo or one docs
+set is a single origin however many pages it has (`CONVENTIONS.md` §3). A repo
+can be one of the two witnesses that materialize a concept, never both.
 
 Spawn one `agents/page_writer.md` per qualifying slug **that one of this run's new
 pages touched**, in parallel, passing the `source_pages` the script listed for that
@@ -287,6 +298,8 @@ Read the file, pass its body as the prompt, collect one JSON receipt.
 
 | Agent | Reads | Writes |
 |---|---|---|
+| `agents/docs_selector.md` | one llms.txt catalog, via `fetch_llms_txt.py --list` | nothing — returns the link ids to fetch |
+| `agents/docs_writer.md` | one catalog snapshot `raw/llms-<set>/llms.txt` | one `wiki/docs/llms-<set>/OVERVIEW.md` hub |
 | `agents/source_writer.md` | one `raw/` file — the only agent that may | one `wiki/sources/<slug>.md` |
 | `agents/repo_writer.md` | one clone under `raw/repos/` | one page under `wiki/repos/<repo>/` |
 | `agents/page_writer.md` | the source-like pages for one slug | one `wiki/entities/` or `wiki/concepts/` page |
@@ -295,16 +308,17 @@ Read the file, pass its body as the prompt, collect one JSON receipt.
 
 ## Script reference
 
-All five scripts are PEP 723 single files — `uv` installs their dependencies on
+All six scripts are PEP 723 single files — `uv` installs their dependencies on
 the first run. You run them; the user never does. Paths below are relative to the layer directory.
 
 | Script | Call | Does |
 |---|---|---|
 | `scripts/count_mentions.py` | `uv run --script .agents/skills/my-llm-wiki/scripts/count_mentions.py --wiki-dir wiki-<slug>` | Frontmatter walk over source-like pages → `{slug: [pages]}` + the `qualifying` list at ≥2. JSON on stdout, table on stderr. |
 | `scripts/build_index_md.py` | `uv run --script .agents/skills/my-llm-wiki/scripts/build_index_md.py --wiki-dir wiki-<slug>` | Regenerates `wiki/index.md` and each `wiki/<subdir>/index.md` from frontmatter, then checks OKF conformance. Deterministic: same input, same bytes. |
-| `scripts/clone_repo.py` | `--repo <url> --wiki-dir wiki-<slug>` | Shallow-clones into `raw/repos/.github-<owner>-<repo>/`, or refreshes it. JSON receipt with `commit_sha` and `action`. |
+| `scripts/clone_repo.py` | `--url <url> --wiki-dir wiki-<slug>` | Shallow-clones into `raw/repos/.github-<owner>-<repo>/`, or refreshes it. JSON receipt with `commit_sha` and `action`. |
 | `scripts/fetch_article.py` | `--url <url> --wiki-dir wiki-<slug>` | `curl` → body isolation → markdown at `raw/article-<slug>.md`. Warns when the body looks like a paywall. |
-| `scripts/fetch_youtube.py` | `--url <url> --wiki-dir wiki-<slug>` | Skeleton. Raises `NotImplementedError` — the workshop exercise in `SOURCES.md`. |
+| `scripts/fetch_llms_txt.py` | `--url <url> --wiki-dir wiki-<slug> (--list \| --pick <ids>) [--keywords a,b]` | `--list` prints the catalog with ids and keyword hints, writes nothing. `--pick` fetches those links, one `raw/llms-<set>/<page>.md` each; already-present pages are skipped. The receipt names each page's `source_page` and the set's `hub_page`. |
+| `scripts/fetch_youtube.py` | `--url <url> --wiki-dir wiki-<slug>` | yt-dlp metadata + caption track → timestamped markdown at `raw/youtube-<id>.md`. Fails when the video has no captions. |
 
 No script writes wiki content. They fetch, they count, they render — every word in
 `wiki/` is written by an agent.

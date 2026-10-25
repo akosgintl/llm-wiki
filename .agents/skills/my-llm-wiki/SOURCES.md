@@ -16,7 +16,7 @@ where a source came from. That is what makes adding an origin cheap.
 
 ```json
 {
-  "origin": "local | article | youtube | repo",
+  "origin": "local | article | llms-txt | youtube | repo",
   "original_path": "<the URI as given — provenance, §2.4 of CONVENTIONS.md>",
   "title": "<human title>",
   "source_url": "<url, or null for local files>",
@@ -26,11 +26,27 @@ where a source came from. That is what makes adding an origin cheap.
 }
 ```
 
+Every adapter script emits all seven keys, plus its origin-specific extras (`subtitle`, `chars`, `pages`, `commit_sha`, …). `raw_path` is relative to
+the wiki dir, always with `/`, and ends in `/` when the artifact is a directory.
+A repo has no byline or publish date: `authors` is `[<owner>]` and
+`published_date` is the HEAD commit's date. llms-txt leaves both empty at the
+catalog level.
+
+Every script takes the same core flags: `--url <uri> --wiki-dir <dir>`, plus
+`--output <path>` to override the default raw path. Exit codes follow one rule:
+
+- **exit 1, message on stderr**: nothing usable was written (fetch failed, no
+  body, no captions, no page selected).
+- **exit 0 with `"warning"` in the receipt** (also echoed on stderr): an artifact
+  was written but looks wrong, or nothing new was needed. Read the warning before
+  you spawn a writer.
+
 Two shapes of adapter, distinguished only by what they leave on disk:
 
 | Shape | Raw artifact | Read by |
 |---|---|---|
 | **File adapter** — local, article, youtube | one markdown file (plus, for local notes, the attachments it embeds → `raw/assets/`) | `agents/source_writer.md` |
+| **Catalog adapter** — llms-txt | one directory of markdown files, one per selected page | `agents/source_writer.md`, once per file |
 | **Tree adapter** — repo | one directory | `agents/repo_writer.md` |
 
 The rest of the pipeline sees a page under `wiki/sources/` or `wiki/repos/`, and
@@ -46,6 +62,7 @@ Match the user's input top to bottom; first match wins.
 | a path that exists on disk | `cp` | `raw/<slug>.md` | `source_writer` |
 | `github.com/<owner>/<repo>`, or any `*.git` | `scripts/clone_repo.py` | `raw/repos/.github-<owner>-<repo>/` | `repo_writer` (mode `architecture`) |
 | `youtube.com/watch?v=…`, `youtu.be/…` | `scripts/fetch_youtube.py` | `raw/youtube-<slug>.md` | `source_writer` |
+| a URL whose path ends in `/llms.txt` | `docs_selector`, then `scripts/fetch_llms_txt.py --pick` | `raw/llms-<set>/<page-slug>.md` | `source_writer` per page, plus `docs_writer` for the hub |
 | any other `http(s)://` | `scripts/fetch_article.py` | `raw/article-<slug>.md` | `source_writer` |
 
 Dedup happens **before** the adapter runs: compute the raw path, `ls` it, skip if
@@ -72,17 +89,64 @@ If the receipt carries `"warning": "body under 500 chars…"`, **stop and tell t
 user**: you hit a paywall, a bot wall, or an unmatched body selector. Writing a
 source page from 300 characters of cookie banner is worse than not ingesting.
 
+**llms-txt** — a catalog, not a document. Select by judgment, then fetch only
+the picks, one raw file per page.
+
+1. Spawn `agents/docs_selector.md` with the catalog URL, the wiki dir, the
+   overview's `description`, the existing entity/concept slugs, the user's words
+   about what they want, and a `budget` (default 10). It runs `--list` itself and
+   returns `pick: [ids]`.
+2. Fetch the picks:
+
+   ```bash
+   uv run --script <skill>/scripts/fetch_llms_txt.py --url "<url>" --wiki-dir wiki-<NNN>-<slug> \
+     --pick <ids from the selector>
+   ```
+
+3. One `source_writer` per page whose `action` is `fetched`, with
+   `origin: llms-txt`, the page's own `source_url` and `title` as metadata, and
+   its `source_page` (`wiki/docs/llms-<set>/<page-slug>.md`) as output.
+4. One `agents/docs_writer.md` for the set's hub, the receipt's `hub_page`: a map
+   of the whole catalog, so a later question can fetch what ingest skipped
+   (`CONVENTIONS.md` §15, `QUERY.md` Q.6b).
+
+**Why an agent picks, not the script.** `--list` prints a keyword `hint` per link:
+the wiki slug plus `--keywords`, IDF-weighted over the catalog (so "software" in a
+dev-docs site is worth almost nothing), doubled in the link name, plus a bonus
+when a whole phrase ("software factory") appears adjacent. It finds the obvious
+links. It cannot find the right ones: docs a `software-factory` wiki wants talk
+about agents, CI and code generation, not "software factories". Embeddings would
+close part of that gap at the cost of a model dependency in a repo that has
+none; the harness is already an LLM, so the selector reads titles and notes and
+judges. Without `--pick`, the script fetches the top `--max-pages` by hint — a
+fallback, not the path.
+
+**Identity is per page**, `raw/llms-<set>/<page-slug>.md`, with the page
+slug from the link's URL path. A second run against the same catalog — a bigger
+budget, a new intent — fetches only the new picks and reports the rest
+`skipped`. `llms.txt` in the same folder is a snapshot of the catalog,
+overwritten on every run; it is not a source and no writer reads it.
+
 **repo** — shallow clone, then a different writer.
 
 ```bash
-uv run --script <skill>/scripts/clone_repo.py --repo "<url>" --wiki-dir wiki-<slug>
+uv run --script <skill>/scripts/clone_repo.py --url "<url>" --wiki-dir wiki-<slug>
 ```
 
 The receipt's `action` is `cloned` or `updated`. Pass `clone_path`, `commit_sha`,
 `branch`, `owner` and `repo` straight to `repo_writer`.
 
-**youtube** — a skeleton that raises `NotImplementedError` on purpose. Running it
-fails loudly with a pointer to the section below. That is the exercise.
+**youtube** — yt-dlp reads the metadata and the caption track; no media is
+downloaded. The raw file is split into `## <m:ss>` sections, so a source page can
+cite `[[raw/youtube-<id>#12:30|cite]]`. The slug is the video id, verbatim.
+
+```bash
+uv run --script <skill>/scripts/fetch_youtube.py --url "<url>" --wiki-dir wiki-<slug>
+```
+
+Manual subtitles win over auto-captions; pass `--lang` for a language other than
+`en`. The receipt adds `video_id`, `channel`, `duration` and `transcript`
+(`manual-en`, `auto-en`, …). A video with no captions fails with a non-zero exit.
 
 ## How to add a source — worked on YouTube
 

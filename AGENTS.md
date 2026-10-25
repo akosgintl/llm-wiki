@@ -19,7 +19,7 @@ There is no application code. The only code is the skill's helper scripts.
   PAGES.md                    # template + receipt for every page type
   SOURCES.md                  # adapter contract, routing table, adding an origin
   QUERY.md                    # query path Q.1–Q.8
-  agents/                     # subagent prompts (source/repo/page/overview writers)
+  agents/                     # subagent prompts (docs selector; source/repo/docs/page/overview writers)
   scripts/                    # PEP 723 single-file Python scripts, run with uv
 .claude/skills -> ../.agents/skills          # symlink, so Claude Code finds the skill
 wiki-<NNN>-<slug>/
@@ -48,8 +48,9 @@ symlinks.
 - **Query mode never edits ingest-owned pages** (`sources/`, `entities/`,
   `concepts/`, `overview.md`, `repos/*/ARCHITECTURE.md`). Record problems in
   `wiki/open-questions.md` instead. See `CONVENTIONS.md` §13.
-- **Entity/concept pages exist only at ≥2 source-like mentions.** Use
-  `count_mentions.py` to get the count; never count by hand.
+- **Entity/concept pages exist only at ≥2 distinct origins** (one repo or one
+  docs set = one origin). Use `count_mentions.py` to get the count; never count
+  by hand.
 - **Never commit repo clones.** `wiki-*/raw/repos/` is gitignored.
 - **Edit the skill only under `.agents/skills/my-llm-wiki/`.** Never replace a
   symlink with a copy.
@@ -65,7 +66,7 @@ uv run --script .agents/skills/my-llm-wiki/scripts/count_mentions.py --wiki-dir 
 
 # adapters
 uv run --script .agents/skills/my-llm-wiki/scripts/fetch_article.py --url <url> --wiki-dir <wiki-dir>
-uv run --script .agents/skills/my-llm-wiki/scripts/clone_repo.py --repo <url> --wiki-dir <wiki-dir>
+uv run --script .agents/skills/my-llm-wiki/scripts/clone_repo.py --url <url> --wiki-dir <wiki-dir>
 ```
 
 There is no test suite. After changing a script, run `build_index_md.py` and
