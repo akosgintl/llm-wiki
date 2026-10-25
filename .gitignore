@@ -221,3 +221,6 @@ __marimo__/
 
 # LLM wiki: repo clones are regenerable raw caches
 wiki-*/raw/repos/
+
+# git worktrees (Claude Code convention)
+.claude/worktrees/
