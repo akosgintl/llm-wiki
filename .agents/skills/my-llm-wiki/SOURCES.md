@@ -61,6 +61,7 @@ Match the user's input top to bottom; first match wins.
 |---|---|---|---|
 | a path that exists on disk | `cp` | `raw/<slug>.md` | `source_writer` |
 | `github.com/<owner>/<repo>`, or any `*.git` | `scripts/clone_repo.py` | `raw/repos/.github-<owner>-<repo>/` | `repo_writer` (mode `architecture`) |
+| `youtube.com/playlist?list=…` | `scripts/fetch_youtube.py --list`, then the video recipe per `new` video | `raw/youtube-<id>.md` per video | `source_writer` per video |
 | `youtube.com/watch?v=…`, `youtu.be/…` | `scripts/fetch_youtube.py` | `raw/youtube-<slug>.md` | `source_writer` |
 | a URL whose path ends in `/llms.txt` | `docs_selector`, then `scripts/fetch_llms_txt.py --pick` | `raw/llms-<set>/<page-slug>.md` | `source_writer` per page, plus `docs_writer` for the hub |
 | any other `http(s)://` | `scripts/fetch_article.py` | `raw/article-<slug>.md` | `source_writer` |
@@ -147,6 +148,23 @@ uv run --script <skill>/scripts/fetch_youtube.py --url "<url>" --wiki-dir wiki-<
 Manual subtitles win over auto-captions; pass `--lang` for a language other than
 `en`. The receipt adds `video_id`, `channel`, `duration` and `transcript`
 (`manual-en`, `auto-en`, …). A video with no captions fails with a non-zero exit.
+
+**youtube playlist** — a list of videos, not a source. Expand it, then ingest each
+video exactly as above.
+
+```bash
+uv run --script <skill>/scripts/fetch_youtube.py --url "<playlist url>" --wiki-dir wiki-<slug> --list [--limit N]
+```
+
+The listing writes nothing. Each video carries `status`: `new` (fetch it),
+`skipped` (`raw/youtube-<id>.md` exists) or `unavailable` (private or deleted).
+Confirm the `new` count with the user before fetching, then run the video recipe
+once per `new` video with its `url`, and one `source_writer` per transcript.
+Identity stays per video, so re-ingesting a playlist only adds what is new, and
+a video reached through two playlists is ingested once.
+
+A `watch?v=…&list=…` URL is a video that happens to sit in a playlist: it routes
+to the single video. Ingest the whole playlist only when the user says so.
 
 ## How to add a source — worked on YouTube
 

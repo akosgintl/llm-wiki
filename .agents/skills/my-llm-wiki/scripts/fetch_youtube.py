@@ -18,13 +18,24 @@ Track choice: manual subtitles in `--lang` first, then the auto-captions in
 `--lang`, then the auto-captions in the video's own language. A translated
 auto-caption track is never used when an original one exists.
 
+Playlists are a list, not a source: `--list` expands one into its videos and
+writes nothing, the way `fetch_llms_txt.py --list` lists a catalog. Each video is
+then fetched on its own and keeps its own identity, so a playlist re-run only
+adds the videos not yet in raw/.
+
 Usage:
   uv run --script fetch_youtube.py --url https://www.youtube.com/watch?v=<id> --wiki-dir wiki-<slug>
+  uv run --script fetch_youtube.py --url https://www.youtube.com/playlist?list=<id> --wiki-dir wiki-<slug> --list
 
 Receipt (stdout):
   {"origin": "youtube", "original_path": <url>, "title", "source_url",
    "authors": [...], "published_date", "raw_path", "video_id", "channel",
    "duration", "transcript", "chars", ["warning"]}
+
+Listing (stdout, --list):
+  {"playlist_id", "title", "channel", "source_url", "count", "new", "skipped",
+   "videos": [{"index", "video_id", "url", "title", "duration", "raw_path",
+               "status": "new|skipped|unavailable"}]}
 """
 
 from __future__ import annotations
@@ -41,6 +52,7 @@ from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError
 
 VIDEO_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
+PLAYLIST_ID = re.compile(r"^[A-Za-z0-9_-]{10,}$")
 
 # Path prefixes that carry the id as the next segment: /shorts/<id>, /live/<id>, ...
 ID_PATH_PREFIXES = {"shorts", "live", "embed", "v", "e"}
@@ -59,8 +71,64 @@ def video_id(url: str) -> str:
         elif len(parts) >= 2 and parts[0] in ID_PATH_PREFIXES:
             candidate = parts[1]
     if not candidate or not VIDEO_ID.match(candidate):
-        raise SystemExit(f"no YouTube video id in {url}")
+        hint = " (a playlist: pass --list to expand it)" if playlist_id(url) else ""
+        raise SystemExit(f"no YouTube video id in {url}{hint}")
     return candidate
+
+
+def playlist_id(url: str) -> str | None:
+    """The `list=` id of /playlist?list=… or /watch?v=…&list=…, else None."""
+    parsed = urlparse(url if "://" in url else f"https://{url}")
+    candidate = (parse_qs(parsed.query).get("list") or [None])[0]
+    return candidate if candidate and PLAYLIST_ID.match(candidate) else None
+
+
+def list_playlist(url: str, wiki_dir: Path, limit: int | None) -> dict:
+    """Expand a playlist into its videos without fetching any of them. Status is
+    `skipped` when raw/youtube-<id>.md already exists (CONVENTIONS.md §4)."""
+    pid = playlist_id(url)
+    if not pid:
+        raise SystemExit(f"no YouTube playlist id (list=…) in {url}")
+    source_url = f"https://www.youtube.com/playlist?list={pid}"
+    opts = {"quiet": True, "no_warnings": True, "skip_download": True, "extract_flat": "in_playlist"}
+    if limit:
+        opts["playlistend"] = limit
+    with YoutubeDL(opts) as ydl:
+        try:
+            info = ydl.extract_info(source_url, download=False)
+        except DownloadError as err:
+            raise SystemExit(f"playlist fetch failed for {url}: {err}") from None
+
+    videos = []
+    for index, entry in enumerate(info.get("entries") or [], start=1):
+        vid = (entry or {}).get("id")
+        if not vid or not VIDEO_ID.match(vid):
+            continue
+        raw = f"raw/youtube-{vid}.md"
+        # Flat entries of private/deleted videos keep their id but lose the title
+        # and duration; fetching them would only fail, so they are flagged here.
+        title = entry.get("title")
+        unavailable = title in {"[Private video]", "[Deleted video]"}
+        status = "unavailable" if unavailable else "skipped" if (wiki_dir / raw).exists() else "new"
+        videos.append({
+            "index": index,
+            "video_id": vid,
+            "url": f"https://www.youtube.com/watch?v={vid}",
+            "title": title,
+            "duration": timestamp(entry["duration"]) if entry.get("duration") else None,
+            "raw_path": raw,
+            "status": status,
+        })
+    return {
+        "playlist_id": pid,
+        "title": info.get("title"),
+        "channel": info.get("channel") or info.get("uploader"),
+        "source_url": source_url,
+        "count": len(videos),
+        "new": sum(v["status"] == "new" for v in videos),
+        "skipped": sum(v["status"] == "skipped" for v in videos),
+        "videos": videos,
+    }
 
 
 def timestamp(seconds: float) -> str:
@@ -134,8 +202,10 @@ def sections(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--url", required=True, help="YouTube video URL.")
+    parser.add_argument("--url", required=True, help="YouTube video URL, or a playlist URL with --list.")
     parser.add_argument("--wiki-dir", required=True, help="Path to wiki-<slug>/.")
+    parser.add_argument("--list", action="store_true", help="Expand the URL's playlist into its videos; writes nothing.")
+    parser.add_argument("--limit", type=int, default=None, help="With --list: only the first N videos.")
     parser.add_argument("--lang", default="en", help="Preferred transcript language (default: en).")
     parser.add_argument("--section-seconds", type=int, default=60, help="Target section length (default: 60).")
     parser.add_argument("--output", default=None, help="Override the raw path (default: raw/youtube-<id>.md).")
@@ -146,6 +216,10 @@ def main() -> None:
     wiki_dir = Path(args.wiki_dir).expanduser().resolve()
     if not (wiki_dir / "wiki").is_dir():
         raise SystemExit(f"not a wiki dir (no wiki/ inside): {wiki_dir}")
+
+    if args.list:
+        print(json.dumps(list_playlist(args.url, wiki_dir, args.limit), indent=2, ensure_ascii=False))
+        return
 
     vid = video_id(args.url)
     source_url = f"https://www.youtube.com/watch?v={vid}"

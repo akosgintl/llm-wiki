@@ -113,13 +113,15 @@ Match every input against the routing table in `SOURCES.md`, first match wins:
 |---|---|---|---|
 | an existing path on disk | `local` | `raw/<slug>.md` | `source_writer` |
 | `github.com/<owner>/<repo>` or `*.git` | `repo` | `raw/repos/.github-<owner>-<repo>/` | `repo_writer` |
+| `youtube.com/playlist?list=…` | `youtube` | `raw/youtube-<id>.md` per video | `fetch_youtube.py --list`, then `source_writer` per video |
 | `youtube.com` / `youtu.be` | `youtube` | `raw/youtube-<slug>.md` | `source_writer` |
 | URL path ends in `/llms.txt` | `llms-txt` | `raw/llms-<set>/<page-slug>.md` | `docs_selector`, then `source_writer` per page + `docs_writer` |
 | any other `http(s)://` | `article` | `raw/article-<slug>.md` | `source_writer` |
 
 The YouTube slug is the video id, verbatim (`raw/youtube-<id>.md`). If the adapter
 fails (no captions, private video), report the failure plainly and continue with
-the other inputs.
+the other inputs. A playlist expands into its videos first; each video is then an
+input of its own, deduped by its own raw path (`SOURCES.md` § youtube playlist).
 
 ### 1.1 Collect inputs and dedup
 
@@ -318,7 +320,7 @@ the first run. You run them; the user never does. Paths below are relative to th
 | `scripts/clone_repo.py` | `--url <url> --wiki-dir wiki-<slug>` | Shallow-clones into `raw/repos/.github-<owner>-<repo>/`, or refreshes it. JSON receipt with `commit_sha` and `action`. |
 | `scripts/fetch_article.py` | `--url <url> --wiki-dir wiki-<slug>` | `curl` → body isolation → markdown at `raw/article-<slug>.md`. Warns when the body looks like a paywall. |
 | `scripts/fetch_llms_txt.py` | `--url <url> --wiki-dir wiki-<slug> (--list \| --pick <ids>) [--keywords a,b]` | `--list` prints the catalog with ids and keyword hints, writes nothing. `--pick` fetches those links, one `raw/llms-<set>/<page>.md` each; already-present pages are skipped. The receipt names each page's `source_page` and the set's `hub_page`. |
-| `scripts/fetch_youtube.py` | `--url <url> --wiki-dir wiki-<slug>` | yt-dlp metadata + caption track → timestamped markdown at `raw/youtube-<id>.md`. Fails when the video has no captions. |
+| `scripts/fetch_youtube.py` | `--url <url> --wiki-dir wiki-<slug> [--list [--limit N]]` | yt-dlp metadata + caption track → timestamped markdown at `raw/youtube-<id>.md`. Fails when the video has no captions. `--list` expands a playlist into its videos with a `new`/`skipped`/`unavailable` status each, and writes nothing. |
 
 No script writes wiki content. They fetch, they count, they render — every word in
 `wiki/` is written by an agent.
