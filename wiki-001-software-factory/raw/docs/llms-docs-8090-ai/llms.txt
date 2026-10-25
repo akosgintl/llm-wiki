@@ -1,0 +1,182 @@
+# Docs
+
+- [8090 Software Factory](/): Guides and reference for 8090 Software Factory.
+- Docs: Product guides and concepts
+  - General
+    - [Introduction](/general/introduction): Learn how 8090 Software Factory brings product, engineering, and business teams together around shared context.
+    - [Quickstart](/general/quickstart): Set up your organization and first project, then take one feature from requirements to a work order your coding agent can build.
+  - Connections
+    - [Codebase Connection](/codebase/overview): Connect a GitHub or GitLab repository so agents can search, read, and stay in sync with your code.
+    - [MCP Servers](/connections/mcp-servers): Connect external services and tools to your account so the 8090 Software Factory agent can use them.
+    - [Slack](/connections/slack): Connect your Slack account to work with the 8090 Software Factory agent directly from Slack.
+    - [Coding Agent Connection](/connections/connect-coding-agent): Connect any coding agent that supports MCP to an 8090 Software Factory project to pull Work Orders and update them from your editor.
+  - Modules
+    - [Requirements](/modules/requirements): Define, debate, and refine product requirements in a collaborative, agent-assisted workspace.
+    - [Blueprints](/modules/blueprints): Translate product requirements into human-readable technical specifications that guide implementation.
+    - [Work Orders](/modules/work-orders): Create structured, traceable implementation tasks grounded in requirements and blueprints.
+    - [Feedback](/modules/feedback): Collect customer feedback, organize recurring themes, and connect product signals to delivery work.
+  - Agents
+    - [Agent chat](/agents/agent-chat): Work with the 8090 Software Factory agent in the side panel. Keep several chats open, pick a model, and give the agent the context it needs.
+    - [Knowledge Base](/modules/knowledge-base): Turn project knowledge into context that feeds your assembly line.
+    - [Skills](/modules/skills): Save reusable instructions your project agent loads on demand, so your team's guidance becomes durable shared knowledge.
+    - [Automations](/modules/automations): Run the project agent automatically on a trigger, with scoped permissions and explicit MCP Server access.
+  - Administration
+    - [Organization Management](/administration/organizations): Manage organization members, invitations, seats, projects, models, and shared skills and templates.
+    - [Usage & Billing](/administration/usage): Manage seats, track organization token usage, and handle billing.
+    - [Model Pricing](/administration/model-pricing): Per-token rates for every model, long-context, US-hosted, and fast mode rates, legacy models, scheduled rate changes, and a worked monthly example.
+  - Roles & Access Control
+    - [Roles & Access Control](/roles-and-access-control/overview): How organization roles and project roles combine to decide what each person can do in 8090 Software Factory.
+    - [Organization Roles](/roles-and-access-control/org-roles): The View, Member, and Admin organization roles, and what each one can do.
+    - [Project Roles](/roles-and-access-control/project-roles): The three built-in project roles and what each one allows.
+    - [Custom Roles](/roles-and-access-control/custom-roles): Build reusable project roles from a base plus per-module access, defined once for the whole organization.
+    - [Permissions Reference](/roles-and-access-control/permissions-reference): What each module's access level allows, and how project API keys inherit permissions.
+    - [View Seats](/roles-and-access-control/view-seats): The free View seat, Viewer-only project access, and what a View user can still do.
+  - Resources
+    - [Changelog](/resources/changelog): 8090 Software Factory release history, including features, improvements, and fixes.
+    - [Roadmap](/resources/roadmap): What we're building next in 8090 Software Factory. Stages show maturity, not dates.
+    - [Keyboard shortcuts](/resources/keyboard-shortcuts): Shortcuts for search, the agent, editing, and reviewing tracked changes. Rebind them in Settings.
+    - [Support & Community](/resources/support-community): Get 8090 Software Factory help, join the community, and follow product updates.
+- Learn: Best practices and guides
+  - Best practices
+    - [Requirements Writing Guide](/opinions/requirements-writing-guide): How to write clear, structured, and testable product and feature requirements.
+    - [Blueprint Writing Guide](/opinions/blueprint-writing-guide): The 8090 Software Factory specification for authoring clear and consistent technical blueprints.
+    - [Work Order Writing Guide](/opinions/work-order-writing-guide): How to create focused, executable work orders connected to requirements and blueprints.
+    - [Migrating from Jira](/opinions/jira-migration): A recommended approach for moving active Jira projects into the 8090 Software Factory knowledge graph.
+    - [Reverse engineering](/opinions/reverse-engineering): Turn a connected repository into a populated 8090 Software Factory project of requirements and blueprints, reconciled against the real code.
+    - [Agent Skill](/opinions/agent-skill): Install and use the 8090 Software Factory agent skill to execute work orders consistently.
+- Developers: API reference and integration guides
+  - [API reference](/api-reference): Authenticate and call the 8090 Software Factory REST API from your own tools, scripts, and automations.
+  - Agent conversations
+    - [List agent conversations](/api-reference/agent-conversations/list-agent-conversations): Return the agent conversations accessible to the API key in its project, ordered by last-updated time from newest to oldest. A conversation is accessible when it belongs to the key's creator; conversations belonging to other users are not accessible regardless of the creator's project role. Subagent conversations are excluded from the list but can still be read directly by id. Supplying a query matches conversation titles, user-authored text, assistant response text, tool names, and tool statuses. Results are cursor-paginated: pass the returned next_cursor back unchanged, with the same query and page_size, for the following page. Returns an empty list when nothing matches.
+    - [Read an agent conversation](/api-reference/agent-conversations/read-an-agent-conversation): Return a conversation's user-visible content committed at the time of the request, in chronological order, together with whether the conversation currently has an active turn. Hidden reasoning, system-only content, credentials, and implementation metadata are always excluded; tool calls, inputs, and outputs appear only when include_tool_activity is true. When the content exceeds the response limit, the most recent portion is returned along with a continuation reference — pass it as before_event_id to read the immediately preceding portion. A conversation that originated from an automation also reports its automation and run metadata.
+  - Automations
+    - [Create an automation](/api-reference/automations/create-an-automation): Create an automation in the project bound to the API key. The automation is created with the requested enabled state (enabled by default) and owned by the key's creator — that user's permissions and connected integrations are what it runs with. Integration access is never granted implicitly: omit integration_grants for no external integration access. Omit model to select the recommended model at run time. The request applies immediately; there is no separate confirmation step.
+    - [Delete an automation](/api-reference/automations/delete-an-automation): Delete an automation so it no longer runs. Only the automation's creator may delete it; Super Admin standing does not override this. Built-in automations cannot be deleted; disable them instead. The request applies immediately; there is no separate confirmation step.
+    - [List automations](/api-reference/automations/list-automations): Return the automations configured in the project bound to the API key, with each automation's trigger configuration, prompt, tool kit, integration grants, model, enabled state, owner, and successful, failed, and total completed runs over the last 30 days. Optionally filter by enabled state and a partial, case-insensitive automation name match; filters determine which automations and per-automation run totals are returned. A project's automation set is intentionally bounded, so this endpoint returns the complete list rather than paginating. Returns an empty list when no automations match.
+    - [List available integrations](/api-reference/automations/list-available-integrations): Return the connected integrations available to an automation owner, so their identifiers can be supplied as integration_grants. Omit automation_id when creating an automation to use the API key's creator. When editing an existing automation, supply automation_id to use that automation's owner, including when a Super Admin edits on the owner's behalf. Returns an empty list when the owner has no connected integrations.
+    - [Read an automation](/api-reference/automations/read-an-automation): Return one automation's full configuration: name, trigger configuration, prompt, tool kit selection, integration grants, model selection, enabled state, owner, and successful, failed, and total completed runs over the last 30 days. Detailed run history is not included here — navigate from the automation to its runs, and from a run to its conversation.
+    - [Update an automation](/api-reference/automations/update-an-automation): Update any combination of an automation's name, trigger configuration, prompt, tool kit selection, integration grants, model selection, and enabled state. Only the fields you supply change. Supplying integration_grants replaces the automation's grants entirely; an empty list revokes all integration access. Setting enabled to false prevents new trigger-driven runs while letting any active run finish. Configuration edits use the same project permissions as the web app. Changes to integration grants, model selection, or model configuration additionally require the automation's owner or a Super Admin in the organization. Built-in automations allow only their enabled state to be changed.
+  - Blueprints
+    - [Apply a tracked suggestion to blueprint content](/api-reference/blueprints/apply-a-tracked-suggestion-to-blueprint-content): Apply an oldText/newText suggestion to the current blueprint document through the collaborative editor, creating tracked insertion/deletion marks.
+    - [Create blueprint comment](/api-reference/blueprints/create-blueprint-comment): Create a new comment thread on one blueprint.
+    - [Create blueprint](/api-reference/blueprints/create-blueprint): Create a blueprint in a category given by `category_id` or `category_name`, optionally under a parent blueprint. Feature blueprints cannot be created here; they come from feature requirements documents.
+    - [Delete blueprint](/api-reference/blueprints/delete-blueprint): Soft-delete a blueprint document. Feature blueprints cannot be deleted via this endpoint; delete their parent feature via the requirements API instead.
+    - [Get blueprint comment thread](/api-reference/blueprints/get-blueprint-comment-thread): Return one comment thread, with all of its messages, on a blueprint.
+    - [Get blueprint version](/api-reference/blueprints/get-blueprint-version): Return one specific blueprint version in the scoped project.
+    - [Get blueprint](/api-reference/blueprints/get-blueprint): Return the latest blueprint content for one blueprint in the scoped project.
+    - [List blueprint categories](/api-reference/blueprints/list-blueprint-categories): Return the project's blueprint categories with the number of blueprints in each. The feature blueprints category is locked.
+    - [List blueprint code links](/api-reference/blueprints/list-blueprint-code-links): Return the repository files and line ranges linked to one blueprint, with each file's note. Files in repositories the API key user cannot access are hidden and counted in `inaccessible_file_count`.
+    - [List blueprint comments](/api-reference/blueprints/list-blueprint-comments): Return simplified thread-first comments for one blueprint.
+    - [List blueprint versions](/api-reference/blueprints/list-blueprint-versions): Return version history for one blueprint in the scoped project.
+    - [List blueprints](/api-reference/blueprints/list-blueprints): Return blueprints in the API key project scope.
+    - [Move blueprint](/api-reference/blueprints/move-blueprint): Move a blueprint to a new parent, position, or category. When `parent_id` is provided the destination category is inferred from the parent. When moving to root level in a different category, supply `category_id` explicitly.
+    - [Rename blueprint](/api-reference/blueprints/rename-blueprint): Change the title of a blueprint. Feature blueprints cannot be renamed here; rename the feature requirements document instead.
+    - [Resolve blueprint comment thread](/api-reference/blueprints/resolve-blueprint-comment-thread): Resolve one comment thread on a blueprint. When `reason` is not blank, it is added as a closing reply after the thread is resolved. Resolving your own comment or an agent comment needs resolve permission; resolving another user's comment also needs edit permission. Threads of suggested changes cannot be resolved here.
+    - [Save blueprint content](/api-reference/blueprints/save-blueprint-content): Persist complete markdown content for a blueprint in the API key project scope. Markdown is converted server-side to ProseMirror; invalid markdown returns a 400 error.
+    - [Search blueprints](/api-reference/blueprints/search-blueprints): Find blueprints whose title or markdown content contains a literal, case-insensitive string. Each result lists the matching lines with context.
+    - [Set blueprint code links for one file](/api-reference/blueprints/set-blueprint-code-links-for-one-file): Replace every code link between a blueprint and one file in a connected repository. Supply all line ranges for the file (1 to 100), and links to other files are unchanged. Returns 404 when the API key user cannot access the file's repository, and 502 when the git provider is unavailable for the access check; retry later.
+  - Feedback items
+    - [Assign label to feedback item](/api-reference/feedback-items/assign-label-to-feedback-item): Add a project label to a feedback item and return the item's labels. An archived label returns 400.
+    - [Create feedback item comment](/api-reference/feedback-items/create-feedback-item-comment): Add a markdown comment to a feedback item as the API key's user. Blank content returns 400.
+    - [Create feedback item](/api-reference/feedback-items/create-feedback-item): Create a feedback item in the API key project on behalf of an end user. Upload attachments first through a presigned URL, then reference their file keys.
+    - [Delete feedback item](/api-reference/feedback-items/delete-feedback-item): Permanently delete a feedback item with its theme quotes, attachments, and comments.
+    - [Get feedback item](/api-reference/feedback-items/get-feedback-item): Return one feedback item with its markdown content, attachments, and connected context: linked themes, work orders, and feature requirements documents.
+    - [Link feedback item to work order](/api-reference/feedback-items/link-feedback-item-to-work-order): Link a work order in the same project to a feedback item. Linking a work order that is already linked changes nothing.
+    - [List feedback item comments](/api-reference/feedback-items/list-feedback-item-comments): Return every comment on a feedback item. The list is not paginated.
+    - [List feedback item labels](/api-reference/feedback-items/list-feedback-item-labels): Return the project labels assigned to a feedback item.
+    - [List feedback items](/api-reference/feedback-items/list-feedback-items): Return a page of feedback items in the API key project. Filter by status, free text, end-user email, or label, and sort by any listed field.
+    - [Read feedback attachment content](/api-reference/feedback-items/read-feedback-attachment-content): Return one page of a text attachment's durable UTF-8 content. When `next_position` is set, pass its values as `start_line`, `start_byte`, and `end_line` to read the next page. A non-text or undecodable attachment returns 422.
+    - [Remove label from feedback item](/api-reference/feedback-items/remove-label-from-feedback-item): Remove a label from a feedback item and return the item's remaining labels. A label that is not assigned returns 404.
+    - [Unlink feedback item from work order](/api-reference/feedback-items/unlink-feedback-item-from-work-order): Remove the link between a feedback item and a work order. A link that does not exist returns 404.
+    - [Update feedback item](/api-reference/feedback-items/update-feedback-item): Update a feedback item's title or status, or use the published historical-cleanup fields to replace markdown content or attachments.
+  - Feedback themes
+    - [Assign feedback theme](/api-reference/feedback-themes/assign-feedback-theme): Set the theme's assignee by `user_id` or `email`. The user must be an active project member, or the request returns 400.
+    - [Assign label to feedback theme](/api-reference/feedback-themes/assign-label-to-feedback-theme): Add a project label to a feedback theme and return the theme's labels. An archived label returns 400.
+    - [Create feedback theme comment](/api-reference/feedback-themes/create-feedback-theme-comment): Add a markdown comment to a feedback theme as the API key's user. Blank content returns 400.
+    - [Create feedback theme](/api-reference/feedback-themes/create-feedback-theme): Create a feedback theme with a title, type, priority, and markdown description. The feature requirements document and assignee are optional.
+    - [Delete feedback theme](/api-reference/feedback-themes/delete-feedback-theme): Soft-delete a feedback theme. It no longer appears in lists or reads.
+    - [Get feedback theme](/api-reference/feedback-themes/get-feedback-theme): Return one feedback theme with its markdown description, assignee, and connected context: linked feedback items, work orders, and feature requirements document.
+    - [Link feedback item to theme](/api-reference/feedback-themes/link-feedback-item-to-theme): Link a feedback item to a theme as a quote. `text_excerpt` defaults to the item's full content. An item that is already linked to the theme returns 409.
+    - [Link feedback theme to feature requirements document](/api-reference/feedback-themes/link-feedback-theme-to-feature-requirements-document): Set or replace the theme's feature requirements document. A document that is not a feature requirements document returns 400.
+    - [Link feedback theme to work order](/api-reference/feedback-themes/link-feedback-theme-to-work-order): Link a work order in the same project to a theme. A work order that is already linked returns 409.
+    - [List feedback theme comments](/api-reference/feedback-themes/list-feedback-theme-comments): Return every comment on a feedback theme. The list is not paginated.
+    - [List feedback theme labels](/api-reference/feedback-themes/list-feedback-theme-labels): Return the project labels assigned to a feedback theme.
+    - [List feedback themes](/api-reference/feedback-themes/list-feedback-themes): Return every matching theme in the API key project. The list is not paginated. Filter by status, text, type, priority, assignee, feature, label, number, or creation date, and sort by any listed field.
+    - [Remove label from feedback theme](/api-reference/feedback-themes/remove-label-from-feedback-theme): Remove a label from a feedback theme and return the theme's remaining labels. A label that is not assigned returns 404.
+    - [Unassign feedback theme](/api-reference/feedback-themes/unassign-feedback-theme): Clear the theme's assignee.
+    - [Unlink feature requirements document from theme](/api-reference/feedback-themes/unlink-feature-requirements-document-from-theme): Clear the theme's feature requirements document. A theme with no linked feature returns 404.
+    - [Unlink feedback item from theme](/api-reference/feedback-themes/unlink-feedback-item-from-theme): Remove a feedback item's quote from a theme and return the removed quote. An item that is not linked returns 404.
+    - [Unlink work order from theme](/api-reference/feedback-themes/unlink-work-order-from-theme): Remove the link between a work order and a theme. A link that does not exist returns 404.
+    - [Update feedback theme](/api-reference/feedback-themes/update-feedback-theme): Partially update a theme's title, type, priority, status, or description. Send at least one field, or the request returns 400.
+  - Health
+    - [Check API health](/api-reference/health/check-api-health): Confirms that the External API is reachable and accepts your API key. Returns `{"status": "healthy"}`.
+  - Knowledge base
+    - [Create Knowledge Base document comment](/api-reference/knowledge-base/create-knowledge-base-document-comment): Create a new comment thread on a document-backed Knowledge Base resource, optionally anchored to exact text in the document.
+    - [Create Knowledge Base resource](/api-reference/knowledge-base/create-knowledge-base-resource): Create a Knowledge Base resource from multipart file upload or JSON markdown content. The folder_path form/body field is deprecated but still accepted; omit it to create the resource at the root.
+    - [Delete Knowledge Base folder by path](/api-reference/knowledge-base/delete-knowledge-base-folder-by-path): Recursively delete a non-root Knowledge Base folder by path. Deprecated path-based operation; prefer deleting folders by resource ID.
+    - [Delete Knowledge Base resource](/api-reference/knowledge-base/delete-knowledge-base-resource): Soft-delete one Knowledge Base resource by ID. Resources nested under it move up to its parent.
+    - [Download Knowledge Base resource content](/api-reference/knowledge-base/download-knowledge-base-resource-content): Return raw Knowledge Base resource content with stored content type and attachment disposition.
+    - [Get Knowledge Base document comment thread](/api-reference/knowledge-base/get-knowledge-base-document-comment-thread): Return one comment thread, with all of its messages, on a Knowledge Base document.
+    - [Get Knowledge Base document version](/api-reference/knowledge-base/get-knowledge-base-document-version): Return one saved version of a document-backed Knowledge Base resource, including its markdown content as of that version.
+    - [Get Knowledge Base resource](/api-reference/knowledge-base/get-knowledge-base-resource): Return Knowledge Base resource metadata and connected context.
+    - [List Knowledge Base document comments](/api-reference/knowledge-base/list-knowledge-base-document-comments): Return thread-first comments for one document-backed Knowledge Base resource.
+    - [List Knowledge Base document versions](/api-reference/knowledge-base/list-knowledge-base-document-versions): Return the saved version history of one document-backed Knowledge Base resource, newest first. File and folder resources have no version history and return 400.
+    - [List Knowledge Base resources](/api-reference/knowledge-base/list-knowledge-base-resources): Return Knowledge Base resources in the API key project scope, optionally filtered by name or type.
+    - [Move Knowledge Base resource](/api-reference/knowledge-base/move-knowledge-base-resource): Move a Knowledge Base resource under another resource, or to the root when parent_id is null, at an optional 0-indexed position among its new siblings. A resource cannot be moved under itself or one of its descendants.
+    - [Resolve Knowledge Base document comment thread](/api-reference/knowledge-base/resolve-knowledge-base-document-comment-thread): Mark a comment thread on a Knowledge Base document as resolved. When reason is not blank, it is added as a closing reply after the thread is resolved. Resolving your own comment or an agent comment needs resolve permission; resolving another user's comment also needs edit permission. Threads that belong to a suggested change return 400; accept or reject the suggestion in the document instead.
+    - [Update Knowledge Base resource](/api-reference/knowledge-base/update-knowledge-base-resource): Update Knowledge Base resource name or document markdown content.
+  - Requirements
+    - [Apply a tracked suggestion to requirements content](/api-reference/requirements/apply-a-tracked-suggestion-to-requirements-content): Apply an oldText/newText suggestion to the current requirements document through the collaborative editor, creating tracked insertion/deletion marks.
+    - [Create requirements comment](/api-reference/requirements/create-requirements-comment): Create a new comment thread on one requirements document.
+    - [Create requirements document](/api-reference/requirements/create-requirements-document): Create a FEATURE or OVERVIEW requirements document.
+    - [Delete requirements document](/api-reference/requirements/delete-requirements-document): Soft-delete a requirements document. Documents nested under it move up to its parent.
+    - [Get requirements comment thread](/api-reference/requirements/get-requirements-comment-thread): Return one comment thread, with all of its messages, on a requirements document.
+    - [Get requirements document version](/api-reference/requirements/get-requirements-document-version): Return one specific requirements document version in the scoped project.
+    - [Get requirements document](/api-reference/requirements/get-requirements-document): Return the latest requirements document content for one scoped document.
+    - [List requirements comments](/api-reference/requirements/list-requirements-comments): Return simplified thread-first comments for one requirements document.
+    - [List requirements document versions](/api-reference/requirements/list-requirements-document-versions): Return version history for one requirements document in the scoped project.
+    - [List requirements documents](/api-reference/requirements/list-requirements-documents): Return requirements documents in the API key project scope, optionally filtered by document type or title.
+    - [Move requirements document](/api-reference/requirements/move-requirements-document): Move a requirements document under a new parent in the same requirements tree, or to the top level when `parent_id` is null, at an optional 0-indexed `position`.
+    - [Rename requirements document](/api-reference/requirements/rename-requirements-document): Change the title of a requirements document and return the updated document.
+    - [Resolve requirements comment thread](/api-reference/requirements/resolve-requirements-comment-thread): Resolve one comment thread on a requirements document. When `reason` is not blank, it is added as a closing reply after the thread is resolved. Resolving your own comment or an agent comment needs resolve permission; resolving another user's comment also needs edit permission. Threads of suggested changes cannot be resolved here.
+    - [Save requirements document](/api-reference/requirements/save-requirements-document): Persist complete markdown content for a requirements document in the API key project scope. Markdown is converted server-side to ProseMirror; invalid markdown returns a 400 error.
+    - [Search requirements documents](/api-reference/requirements/search-requirements-documents): Find requirements documents whose title or markdown content contains a literal, case-insensitive string. Each result lists the matching lines with context.
+  - Skills
+    - [Apply a tracked skill edit](/api-reference/skills/apply-a-tracked-skill-edit): Apply an old-text/new-text edit through the collaborative editor, preserving skill validation rules.
+    - [Create skill comment](/api-reference/skills/create-skill-comment): Create a comment thread on a skill document, optionally anchored to exact text.
+    - [Create skill](/api-reference/skills/create-skill): Create a project skill from full markdown. The markdown must open with a front-matter block that holds a `description:` line, or the request returns 400. A `category` whose module is turned off for the project returns 400, and nothing is created.
+    - [Delete skill](/api-reference/skills/delete-skill): Delete a project skill. Its children move up one level. Writing-rules and built-in skills cannot be deleted.
+    - [Get skill comment thread](/api-reference/skills/get-skill-comment-thread): Return one comment thread on a skill document.
+    - [Get skill version](/api-reference/skills/get-skill-version): Return one specific version of a skill document.
+    - [Get skill](/api-reference/skills/get-skill): Return one skill's metadata and markdown. Optionally return a line range, or the version that was current at `as_of`.
+    - [List skill comments](/api-reference/skills/list-skill-comments): Return thread-first comments for one skill document.
+    - [List skill versions](/api-reference/skills/list-skill-versions): Return the version history of one skill document, newest first.
+    - [List skills](/api-reference/skills/list-skills): Return the project's skills: project skills, writing-rules skills, and read-only built-in skills. Use `source` to tell them apart. Repository-defined skills are not included. Skills of a module that is turned off for the project (Tests or Knowledge Base), and built-in skills whose feature is turned off, are not listed, and every skill route returns 404 for them.
+    - [Move skill](/api-reference/skills/move-skill): Nest a skill under another skill in the same category, or move it to the category root. Writing-rules and built-in skills cannot be moved.
+    - [Rename skill](/api-reference/skills/rename-skill): Change a skill's title. Its stable identifier does not change.
+    - [Resolve skill comment thread](/api-reference/skills/resolve-skill-comment-thread): Resolve a comment thread on a skill document. A non-blank `reason` is posted as a reply after the thread is resolved. Resolving your own comment or an agent comment needs resolve permission; resolving another user's comment also needs edit permission. Threads linked to a tracked change return 400.
+    - [Save skill](/api-reference/skills/save-skill): Replace a skill document's complete markdown, front matter included. A save that breaks a valid front-matter block returns 400; built-in skills return 400.
+  - Users
+    - [List users](/api-reference/users/list-users): Return project members in the API key scope, optionally filtered by name or email.
+  - Work orders
+    - [Create a custom work order status](/api-reference/work-orders/create-a-custom-work-order-status): Creates a custom status in the project's workflow. The status is placed last in its category; its name must not match an existing or built-in status.
+    - [Create a project label](/api-reference/work-orders/create-a-project-label): Creates a label that work orders, feedback items, and feedback themes in the project share. A title that matches an existing label, archived or not, returns 409.
+    - [Create a work order comment](/api-reference/work-orders/create-a-work-order-comment): Adds a markdown comment to a work order as the API key's user. Any attached Knowledge Base resources must belong to the project, or the request returns 404.
+    - [Create the next phase](/api-reference/work-orders/create-the-next-phase): Creates the project's next delivery phase. The phase number is one more than the highest existing phase number; the request has no body.
+    - [Create work orders in a batch](/api-reference/work-orders/create-work-orders-in-a-batch): Runs 1 to 100 `CreateWorkOrder` operations as one all-or-nothing batch. If any operation fails, nothing is saved and the request returns 422 with each operation's result.
+    - [Delete a work order comment](/api-reference/work-orders/delete-a-work-order-comment): Deletes a comment from a work order. Only the comment's author can delete it; another user's comment returns 403.
+    - [Delete a work order](/api-reference/work-orders/delete-a-work-order): Soft-deletes a work order and cleans up its relationships. The work order no longer appears in lists or reads.
+    - [Get a work order by number](/api-reference/work-orders/get-a-work-order-by-number): Returns one work order by its project-scoped number, with its markdown description and connected context.
+    - [Get a work order](/api-reference/work-orders/get-a-work-order): Returns one work order with its markdown description and connected context: linked requirements, blueprints, Knowledge Base resources, parent, and children.
+    - [Link pull request to work order](/api-reference/work-orders/link-pull-request-to-work-order): Links a pull request or merge request from a repository connected to the project. Identify it by `url`, or by `number` with an optional GitHub `repository`.
+    - [List phases](/api-reference/work-orders/list-phases): Lists the project's delivery phases. The list is not paginated.
+    - [List project labels](/api-reference/work-orders/list-project-labels): Lists the project's labels in title order. The list is not paginated. Use `archived` to return only archived or only active labels.
+    - [List work order comments](/api-reference/work-orders/list-work-order-comments): Lists every comment on a work order. The list is not paginated.
+    - [List work order statuses](/api-reference/work-orders/list-work-order-statuses): Lists the project's work order statuses in display order: the built-in statuses plus the project's custom statuses, each with its category.
+    - [List work orders](/api-reference/work-orders/list-work-orders): Lists the project's work orders with optional filters, free-text search, and sorting. All filters are optional and combine with AND.
+    - [Read a work order's effective status](/api-reference/work-orders/read-a-work-order-s-effective-status): Return the assigned built-in or custom status with its stable key, name, category, and anchor.
+    - [Replace work order description](/api-reference/work-orders/replace-work-order-description): Fully replaces the work order's markdown description. The supplied `markdown_content` overwrites the existing content in its entirety — this is not a partial update or patch.
+    - [Search work orders](/api-reference/work-orders/search-work-orders): Finds work orders by exact `work_order_number` or by `query` text in the title or description, most recently updated first. Send at least one; the number takes precedence. The response has only `items`, so request pages until one is short.
+    - [Unlink pull request from work order](/api-reference/work-orders/unlink-pull-request-from-work-order): Removes a linked pull request or merge request. Identify it with the same `url`, or `number` and optional `repository`, query parameters used to link it.
+    - [Update a work order comment](/api-reference/work-orders/update-a-work-order-comment): Changes the markdown content or attached Knowledge Base resources of a comment. Only the comment's author can update it; another user's comment returns 403.
+    - [Update work orders in a batch](/api-reference/work-orders/update-work-orders-in-a-batch): Runs 1 to 100 update operations, such as `UpdateTitle` or `UpdateStatus`, as one all-or-nothing batch. Create operations are rejected. If any operation fails, nothing is saved and the request returns 422 with each operation's result.

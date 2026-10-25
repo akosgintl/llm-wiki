@@ -1,71 +1,103 @@
 ---
 type: entity
 title: GitHub
-description: "GitHub is the code forge and event source that Warp's software-factory material uses for triggers, pull requests, CI and git-synced factory definitions."
+description: "GitHub is the code forge that factory products use as event source, PR destination, review gate and optional home for git-synced factory definitions."
 aliases: []
 sources:
-  - "[[wiki/docs/llms-docs-warp-dev/factories-integrations-github]]"
+  - "[[wiki/docs/llms-docs-8090-ai/codebase-overview]]"
+  - "[[wiki/docs/llms-docs-8090-ai/connections-connect-coding-agent]]"
+  - "[[wiki/docs/llms-docs-8090-ai/general-introduction]]"
+  - "[[wiki/docs/llms-docs-8090-ai/modules-work-orders]]"
+  - "[[wiki/docs/llms-docs-8090-ai/opinions-reverse-engineering]]"
+  - "[[wiki/docs/llms-docs-factory-com/delegations-index]]"
+  - "[[wiki/docs/llms-docs-factory-com/droid-exec-overview]]"
+  - "[[wiki/docs/llms-docs-factory-com/software-factory-automations]]"
+  - "[[wiki/docs/llms-docs-factory-com/software-factory-overview]]"
+  - "[[wiki/docs/llms-docs-port-io/agent-management-skills-overview]]"
+  - "[[wiki/docs/llms-docs-port-io/guides-all-trigger-ai-coding-assistants-from-port]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-api-and-sdk-demo-sentry-monitoring-with-sdk]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-automations]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-connect-your-factory]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-deployment-patterns]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-factory-agents-creating-custom-agents]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-factory-agents]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-factory-as-code]]"
-  - "[[wiki/docs/llms-docs-warp-dev/factories-webhooks]]"
-  - "[[wiki/docs/llms-docs-warp-dev/factories-measure-and-improve]]"
-  - "[[wiki/docs/llms-docs-warp-dev/factories-troubleshooting]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-factory-dashboard]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-factory-mcp]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-factory-skills]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-integrations-github]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-integrations-gitlab]]"
-  - "[[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-integrations-linear]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-integrations-slack]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-measure-and-improve-self-improvement]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-measure-and-improve]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-quickstart]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-self-hosting-private-container-registry]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-troubleshooting]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-webhooks-vercel]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories-webhooks]]"
+  - "[[wiki/docs/llms-docs-warp-dev/factories]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/configure-boards-and-rules]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/configure-github]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/using-intake]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/using-reviews]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/using-work-and-approvals]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/what-is-factory]]"
   - "[[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]"
+  - "[[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]"
 related:
   - "[[wiki/entities/warp-factories]]"
+  - "[[wiki/entities/mastra-factory]]"
   - "[[wiki/entities/gitlab]]"
   - "[[wiki/concepts/factory-as-code]]"
   - "[[wiki/concepts/webhook]]"
   - "[[wiki/concepts/human-in-the-loop]]"
   - "[[wiki/concepts/software-factory]]"
 created: 2026-10-25T00:00:00Z
-timestamp: 2026-10-25T00:00:00Z
-source_count: 25
+timestamp: 2026-10-25T18:32:14Z
+source_count: 42
 ---
 
 # GitHub
 
-> Code forge that plays three roles in the wiki's sources: event source for agent work, place where agent output lands as PRs, and optional home for git-synced factory definitions.
+> Code forge that every factory product in the wiki integrates: event source for agent work, destination for agent PRs, and (for Warp) optional config store.
 
 ## Definition
 
-In this wiki GitHub appears almost entirely through Warp Factories. It is one of several work sources (with Slack, Linear, GitLab, Jira and others) and the most fully supported code host. [[wiki/docs/llms-docs-warp-dev/factories-connect-your-factory]]
+Across five origins GitHub is the best-supported code host, usually via a vendor-installed GitHub App. Warp, 8090, Factory, Mastra and Port all treat it as one of several work sources next to GitLab, Slack, Linear and Jira. [[wiki/docs/llms-docs-warp-dev/factories-connect-your-factory]], [[wiki/docs/llms-docs-8090-ai/codebase-overview]], [[wiki/docs/llms-factory-mastra-ai/configure-github]]
 
-Voice warning: the docs set and both Warp repos (`warp-factory-examples`, `common-skills`) are all by Warp. Where Warp is the only corroboration, that is one vendor voice, not independent evidence.
+Voice warning: the Warp docs and both Warp repos are one vendor voice. The other four sets (8090, Factory, Port, Mastra) are each their own origin.
 
 ## Key claims
 
-**Trigger and event source**
-- A Warp GitHub App installation serves both the platform integration and factories. Selected repos produce events: issues, PRs (including merge-queue add/remove), reviews, push, check suites and workflow runs. [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]]
-- New factories get default automations for mentions and assignments, issue/PR labeled, review submitted, PR closed or merged. [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]], [[wiki/docs/llms-docs-warp-dev/factories-connect-your-factory]]
-- Routing is label-driven: a `factory:<alias>` label plus an @warp mention picks the factory. Only new content counts as a mention; edits and code blocks are ignored. [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]]
-- Filters (repo, branches, paths, labels, people, reviews, workflow results) AND together. GitHub triggers skip bot events by default (`skip_bots` = `all`) to avoid feedback loops. [[wiki/docs/llms-docs-warp-dev/factories-automations]], [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]], [[wiki/docs/llms-docs-warp-dev/factories-troubleshooting]]
-- GitHub is also a signed-webhook sender (`signature` auth mode). [[wiki/docs/llms-docs-warp-dev/factories-webhooks]]
-- Example repo automations use provider `github` for mention/assign, `issue_labeled`, PR opened, closed/merged and `workflow_run_completed`. [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
+**Event source and intake**
+- Warp: a GitHub App feeds issues, PRs, reviews, push, check suites and workflow runs into automations; a `factory:<alias>` label plus @warp mention routes work. Bot events are skipped by default. [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]], [[wiki/docs/llms-docs-warp-dev/factories-automations]], [[wiki/docs/llms-docs-warp-dev/factories-troubleshooting]]
+- Mastra: each issue after connection becomes a Work item, each PR a Review item. Epics and sub-issues are ignored. A Platform-backed App or a self-owned App (`GITHUB_APP_*`) is used. [[wiki/docs/llms-factory-mastra-ai/configure-github]], [[wiki/docs/llms-factory-mastra-ai/using-intake]]
+- Mastra: closing an issue maps to Done or Canceled; merging a PR completes its Review card. [[wiki/docs/llms-factory-mastra-ai/using-work-and-approvals]]
+- Factory: GitHub is an automation trigger; custom GitHub automations run in GitHub Actions and need a setup PR merged first. [[wiki/docs/llms-docs-factory-com/software-factory-automations]]
 
-**PRs and CI**
-- Factory output returns as comments, branches and PRs in the originating thread. Branch protection and required reviews still apply, so the human gate is ordinary GitHub policy. [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]]
-- Example: a failed `workflow_run_completed` on `main` makes the agent open a fix PR if small, else an issue. [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]]
-- One branch and PR live in one repo, so multi-repo changes need one PR per repo. [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
-- PR metrics (PRs merged, cycle time, autonomy) need a connected code host such as the GitHub App. [[wiki/docs/llms-docs-warp-dev/factories-measure-and-improve]]
-- `common-skills` runs GitHub Actions that open lockfile PRs in downstream repos on each merge to `main`, using a dedicated GitHub App token. Its `review-pr` skill is built for CI: it writes `review.json` and a workflow publishes it. [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
+**Code index and traceability**
+- 8090 indexes a connected repo per branch and reindexes on push. Drift Bot reviews PRs against Blueprints and Requirements. PRs link to Work Orders via `WO-123`-style IDs. [[wiki/docs/llms-docs-8090-ai/codebase-overview]], [[wiki/docs/llms-docs-8090-ai/modules-work-orders]]
+
+**PRs, CI and the human gate**
+- Output returns as branches and PRs; branch protection and required reviews are the human gate. [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]], [[wiki/docs/llms-factory-mastra-ai/using-reviews]]
+- Factory: GitHub blocks self-approval, but the requester can still approve a Factory-authored PR. [[wiki/docs/llms-docs-factory-com/delegations-index]]
+- Port: workflows dispatch GitHub Actions that run Copilot, Claude Code or Gemini CLI and open PRs. [[wiki/docs/llms-docs-port-io/guides-all-trigger-ai-coding-assistants-from-port]]
+- Factory ships `droid-action` for PR review. Warp's `common-skills` repo uses Actions for lockfile PRs and CI review. [[wiki/docs/llms-docs-factory-com/droid-exec-overview]], [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
 
 **Definitions as code**
-- Definitions can live in a team-owned GitHub repo; merges to the production branch update the factory. [[wiki/docs/llms-docs-warp-dev/factories-factory-as-code]]
-- A `warp/factory-config` check validates and dry-runs definition PRs and can be required in branch protection. [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
-- The examples repo's own CI (`validate.yml`) validates every example on PR, push and a weekly cron. [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
+- Warp: definitions, agents and skills can live in a team GitHub repo; merges to the production branch apply them, and a `warp/factory-config` check validates PRs. [[wiki/docs/llms-docs-warp-dev/factories-factory-as-code]], [[wiki/docs/llms-docs-warp-dev/factories-factory-skills]], [[wiki/docs/llms-docs-warp-dev/factories-factory-agents-creating-custom-agents]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
+- Port syncs skills from GitHub through its Ocean integration. [[wiki/docs/llms-docs-port-io/agent-management-skills-overview]]
 
 ## Tensions
 
-- GitHub vs GitLab: GitHub supports definition hosting; GitLab does not yet, so definitions must be Warp-managed or GitHub-hosted. Only the Warp docs say this. [[wiki/docs/llms-docs-warp-dev/factories-integrations-gitlab]], [[wiki/docs/llms-docs-warp-dev/factories-factory-as-code]]
+- GitHub vs GitLab: Warp says GitLab cannot yet host definitions. 8090 and Factory treat both as peers but with different auth: GitLab needs a token plus a role or plan. Only vendor docs say this. [[wiki/docs/llms-docs-warp-dev/factories-integrations-gitlab]], [[wiki/docs/llms-docs-8090-ai/codebase-overview]], [[wiki/docs/llms-docs-factory-com/delegations-index]]
 
 ## Relationships
 
-- **Warp Factories**: GitHub is its main work source and definition host. [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]]
-- **GitLab**: parallel but less complete integration. [[wiki/docs/llms-docs-warp-dev/factories-integrations-gitlab]]
-- **Human in the loop**: merge and review gates are GitHub branch protection. [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]]
+- **Warp Factories**, **Mastra Factory**: GitHub is the main work source. [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]], [[wiki/docs/llms-factory-mastra-ai/what-is-factory]]
+- **GitLab**: parallel, less complete integration. [[wiki/docs/llms-docs-warp-dev/factories-integrations-gitlab]]
+- **Human in the loop**: merge and review gates are GitHub policy. [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]]
 
-> Synthesis: GitHub is the factory's event bus, review gate and config store, but every source here is Warp-authored (docs plus two Warp repos), so the picture is one vendor's account.
+> Synthesis: GitHub is the shared substrate of the factory category, but every claim is vendor-authored; Warp contributes most pages and counts as one voice.

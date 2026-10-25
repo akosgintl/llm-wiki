@@ -4,6 +4,8 @@ title: Codex
 description: Codex is OpenAI's coding agent, which software-factory setups use as a swappable agent harness alongside Claude Code.
 aliases: []
 sources:
+  - "[[wiki/docs/llms-docs-8090-ai/connections-connect-coding-agent]]"
+  - "[[wiki/docs/llms-docs-8090-ai/general-quickstart]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-factory-agents-configuration]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-factory-as-code]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-factory-mcp]]"
@@ -20,8 +22,8 @@ related:
   - "[[wiki/concepts/factory-as-code]]"
   - "[[wiki/concepts/agent-skill]]"
 created: 2026-10-25T15:14:45Z
-timestamp: 2026-10-25T16:30:00Z
-source_count: 7
+timestamp: 2026-10-25T18:30:00Z
+source_count: 9
 ---
 
 # Codex
@@ -31,6 +33,8 @@ source_count: 7
 ## Definition
 
 In every source, Codex is a coding-agent harness that can run headless inside a factory. No source explains Codex itself; they describe how a factory plugs it in. Warp's docs list it as one of three supported harnesses (Warp Agent, Claude Code, Codex), chosen per agent. [[wiki/docs/llms-docs-warp-dev/factories-factory-agents-configuration]]
+
+8090's Software Factory docs treat it as one of several MCP-capable coding agents that can connect to a project (Cursor, Claude Code, Claude Desktop, Codex, others). [[wiki/docs/llms-docs-8090-ai/connections-connect-coding-agent]], [[wiki/docs/llms-docs-8090-ai/general-quickstart]]
 
 The podcast uses it in practice: Boundary's in-house factory runs Claude Code or Codex in headless mode. [[wiki/sources/youtube-tGbjIvvYuHE]]
 
@@ -45,6 +49,8 @@ The podcast uses it in practice: Boundary's in-house factory runs Claude Code or
 - Codex calls its provider directly from the execution environment. The Warp Agent instead routes model requests through Warp. [[wiki/docs/llms-docs-warp-dev/factories-infrastructure-and-security]]
 - Codex is an example client for Factory MCP, which lets a local agent send tasks to a factory and pull tasks down. [[wiki/docs/llms-docs-warp-dev/factories-factory-mcp]]
 - Other CLI agents cannot be the execution host but can exchange work through Factory MCP. [[wiki/docs/llms-docs-warp-dev/factories-infrastructure-and-security]]
+- 8090 Software Factory exposes an OAuth-protected MCP server; Codex connects through a provided script that edits `~/.codex/config.toml`, with browser sign-in and no API key. [[wiki/docs/llms-docs-8090-ai/connections-connect-coding-agent]], [[wiki/docs/llms-docs-8090-ai/general-quickstart]]
+- Over that connection a Codex session can pull Work Orders, read linked Requirements and Blueprints, and report status. Destructive actions need user confirmation, so an agent that cannot show confirmations cannot do them. [[wiki/docs/llms-docs-8090-ai/connections-connect-coding-agent]]
 - Shared skills (`.agents/skills/<name>/SKILL.md`) are installed for a set of harnesses including Codex, so one skill library serves all of them. [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
 - Dex queues about 15 overnight prompts of implement, review and Codex-review steps for large features. The episode also has a tangent comparing Codex and Claude models. [[wiki/sources/youtube-tGbjIvvYuHE]]
 
@@ -58,4 +64,4 @@ The podcast uses it in practice: Boundary's in-house factory runs Claude Code or
 - **Factory as code**: harness choice is declared in agent files. [[wiki/concepts/factory-as-code]]
 - **Agent skill**: skills are shared across harnesses including Codex. [[wiki/concepts/agent-skill]]
 
-> Synthesis: Corroborated across three origins, but the Warp docs set and the two Warp repos are one vendor voice, so the Warp-specific claims (harness `type`, auth, example 03, skills install) have no independent support; only the podcast, a separate voice, shows Codex used as a harness. No source evaluates Codex, they only treat it as swappable.
+> Synthesis: Corroborated across four origins, but the Warp docs set and the two Warp repos are one vendor voice, so the Warp-specific claims (harness `type`, auth, example 03, skills install) have no independent support. The 8090 docs (two pages, one origin) independently show Codex as an MCP client, but only as a listed integration target. Only the podcast, a separate voice, shows Codex used as a harness. No source evaluates Codex, they only treat it as swappable.

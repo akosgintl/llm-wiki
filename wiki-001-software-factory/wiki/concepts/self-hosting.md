@@ -27,6 +27,8 @@ sources:
   - "[[wiki/docs/llms-docs-warp-dev/factories-self-hosting-troubleshooting]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-self-hosting]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-warp-hosting]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/deployment]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/what-is-factory]]"
   - "[[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]"
 related:
   - "[[wiki/concepts/agent-runner]]"
@@ -35,8 +37,8 @@ related:
   - "[[wiki/concepts/factory-as-code]]"
   - "[[wiki/concepts/git-worktree]]"
 created: 2026-10-25T00:00:00Z
-timestamp: 2026-10-25T00:00:00Z
-source_count: 24
+timestamp: 2026-10-25T18:31:55Z
+source_count: 26
 ---
 
 # Self-hosting
@@ -45,7 +47,7 @@ source_count: 24
 
 ## Definition
 
-In this wiki the concept is defined by one voice: Warp. All 24 source pages come from the Warp docs set or from Warp's own example repo, so nothing here is independent corroboration. Warp's docs put it as: "You control the compute, network access, runtime secrets, and execution workspaces while Warp tracks each run." [[wiki/docs/llms-docs-warp-dev/factories-self-hosting]] It needs an Enterprise plan. [[wiki/docs/llms-docs-warp-dev/factories-infrastructure-and-security]]
+Two vendors define the concept here. Warp supplies 24 of the 26 source pages (its docs set plus its own example repo), so within Warp nothing is independent corroboration. Mastra Factory's docs (2 pages, one origin) give a second, differently shaped take; see Tensions. Warp's docs put it as: "You control the compute, network access, runtime secrets, and execution workspaces while Warp tracks each run." [[wiki/docs/llms-docs-warp-dev/factories-self-hosting]] It needs an Enterprise plan. [[wiki/docs/llms-docs-warp-dev/factories-infrastructure-and-security]]
 
 The model is a split between a control plane that is always Warp's and an execution plane that is either a Warp-hosted sandbox or a worker you run. [[wiki/docs/llms-docs-warp-dev/factories-infrastructure-and-security]], [[wiki/docs/llms-docs-warp-dev/factories-deployment-patterns]] Warp-hosted is the default and suits repos and services reachable from the public internet; a private network is the reason to self-host. [[wiki/docs/llms-docs-warp-dev/factories-warp-hosting]]
 
@@ -68,7 +70,11 @@ The model is a split between a control plane that is always Warp's and an execut
 
 **Operations.** Workers export OpenTelemetry metrics (Prometheus, OTLP). [[wiki/docs/llms-docs-warp-dev/factories-self-hosting-monitoring]] A healthy worker connection says nothing about task network, egress or credentials. [[wiki/docs/llms-docs-warp-dev/factories-self-hosting-troubleshooting]]
 
+**Mastra Factory variant.** Three setups: full Mastra platform (default), a local server using platform auth, database and sandboxes, or fully self-hosted with your own auth provider, database and sandbox provider. Auth, storage and sandboxes are configured independently of where the server runs. [[wiki/docs/llms-factory-mastra-ai/what-is-factory]], [[wiki/docs/llms-factory-mastra-ai/deployment]] Self-host needs a persistent Node.js process, PostgreSQL with pgvector, an HTTPS streaming endpoint, stable encryption and state-signing secrets, and network access to a cloud sandbox provider; projects are created with `--no-platform`. The credential encryption key must be preserved. [[wiki/docs/llms-factory-mastra-ai/deployment]] Factory clones the target repo into an isolated sandbox per session and never edits the local checkout. [[wiki/docs/llms-factory-mastra-ai/what-is-factory]]
+
 ## Tensions
+
+- What gets self-hosted differs by vendor. Warp self-hosts only the execution worker and keeps the control plane as Warp's, on an Enterprise plan. [[wiki/docs/llms-docs-warp-dev/factories-self-hosting]], [[wiki/docs/llms-docs-warp-dev/factories-infrastructure-and-security]] Mastra's fully self-hosted option moves the server, auth and database to you, with sandboxes still from a cloud provider. [[wiki/docs/llms-factory-mastra-ai/deployment]] The two usages of the term are not the same scope.
 
 - "Your infrastructure" is a partial boundary: the overview stresses control of compute and workspaces, while the security page states that run content still transits Warp. [[wiki/docs/llms-docs-warp-dev/factories-self-hosting]], [[wiki/docs/llms-docs-warp-dev/factories-infrastructure-and-security]]
 - Inference differs by harness: the Warp Agent calls models through Warp, while Claude Code and Codex call their providers directly from the execution environment. [[wiki/docs/llms-docs-warp-dev/factories-infrastructure-and-security]]
@@ -82,4 +88,4 @@ The model is a split between a control plane that is always Warp's and an execut
 - **Factory as code**: `workerHost` and runner files select the host. [[wiki/concepts/factory-as-code]]
 - **Git worktree**: per-task isolation on Direct. [[wiki/concepts/git-worktree]]
 
-> Synthesis: Every origin here is Warp's own voice (the docs set plus Warp's example repo), so this is the vendor's deployment model, not a field-tested one. Read the control-plane/execution-plane split as the central idea.
+> Synthesis: Two vendor voices, both documenting their own products: Warp (docs plus its example repo, one voice) and Mastra (one docs set). Neither is field-tested evidence. Warp's control-plane/execution-plane split is the central idea; Mastra shows the alternative of swapping auth, storage and sandboxes independently.

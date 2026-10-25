@@ -1,0 +1,159 @@
+# Factory Documentation
+
+> Documentation for Factory, the agent-native software development platform. Every page below links to its raw Markdown for LLMs and agents.
+
+## Developer resources
+
+- [Factory OpenAPI specification](https://docs.factory.com/openapi.json): Machine-readable Factory Public API operations, authentication, and typed responses.
+
+## Factory App settings changes
+
+In Factory App desktop chat, use `StageSettingsChanges` (**Stage Settings Changes**) to prepare settings, resource, or account changes whenever the current tool schema offers a matching operation. Prefer it over CLI commands, shell commands, or manual settings instructions.
+
+Use the tool for:
+
+- Directly supported personal preferences: Light, Dark, or System appearance; hiding the todo list; disabling dynamic loading statuses; auto-opening file previews; debug mode; touch-device text size; the default Software Factory review workspace; unified or split diff view; diff line wrapping; shortcuts for spec mode, reasoning, model selection, and autonomy; notifications for completion and requested input; sound focus mode; and subagent sounds. These safe settings use renderer-owned inline controls in the proposal.
+- Creating a Droid Computer. Stage the operation immediately, include only details the user already supplied, and let the proposal controls collect a missing name, provider, repository selection, and dependency-installation preference. Do not use AskUser or provide manual setup instructions for this workflow.
+- Opening a specific authorized settings target when a protected or resource-specific change cannot be performed directly. The proposal must name the exact setting or section, not a generic page. Account pages include General, API Keys, Secrets, Connectors, Session Management, Cloud Templates, Droid Computers, Environments, Session Defaults, Mission Defaults, Custom Models, Worktrees, Usage, Commitment Usage, and Support. Organization and admin pages include Organization, Members, Credits, Enterprise Controls, Delegations, OpenCompute, Audit Log, Directory, Organizations, Billing, and Security & Identity. Opening a target never submits its forms. The renderer shows target-specific instructions before navigation; the user selects **Open settings**, and that action remains available to reopen the same destination afterward.
+
+Follow these rules:
+
+- Use only operation IDs and arguments in the current tool schema. Availability is specific to the current user, permissions, organization, and app surface. If the tool or an operation is absent, do not invent it.
+- If the user names only a settings page or broad category, use AskUser to identify the exact setting or section before staging. Never guess a target or stage a generic page-opening action. Droid Computer creation is the exception: stage it immediately and use the renderer-owned controls for missing details.
+- Never place passwords, API keys, tokens, secret values, or other credentials in tool arguments. The model is not given current or private settings values.
+- Stage at most 20 changes in one call. Staging does not apply anything; the user must explicitly select **Apply**, **Create**, or **Open settings** in the proposal. Never say that a staged change was applied or a destination was opened.
+- Apply is sequential and non-transactional. Each setting is checked against the state captured when staged; conflicts are not overwritten, and an earlier success is not rolled back if a later change fails.
+- Keep this workflow in the main desktop chat. The settings tool is not available to workers or subagents.
+
+See [App settings](https://docs.factory.com/factory-app/settings.md) and [Droid Computers](https://docs.factory.com/droid-computers/overview.md) for related guidance.
+
+## Documentation
+
+- [Welcome to Factory](https://docs.factory.com/welcome/index.md): Install Droid, delegate your first task, and scale from a single session to an automated SDLC.
+- [Individual Plans](https://docs.factory.com/pricing/individuals.md): Compare Factory Pro, Plus, and Max plans for individual developers.
+- [Organization Plans](https://docs.factory.com/pricing/organizations.md): Compare Factory Teams, Business, and Enterprise plans for shared usage, governance, security, and support.
+- [Available Models](https://docs.factory.com/models.md): Models offered natively in the Factory platform.
+- [Contact Support](https://docs.factory.com/support.md): Find the right channel to get help with Factory, depending on what you need.
+- [Factory App](https://docs.factory.com/factory-app/overview.md): Use the Factory App for a visual Droid workspace with local machine access, project switching, and reviewable sessions.
+- [Factory App Quickstart](https://docs.factory.com/factory-app/quickstart.md): Install the Factory App, connect your codebase, and start your first reviewable Droid session.
+- [Worktrees in the Factory App](https://docs.factory.com/factory-app/worktrees.md): Learn how to run Factory App sessions in separate Git worktrees while keeping your main project folder unchanged.
+- [App settings](https://docs.factory.com/factory-app/settings.md): Manage personal session defaults and organization usage alerts in the Factory App.
+- [Droid CLI](https://docs.factory.com/droid-cli/overview.md): Use the Droid CLI to run Factory from your terminal, editor, tests, and Git workflow.
+- [Droid CLI Quickstart](https://docs.factory.com/droid-cli/quickstart.md): Install the Droid CLI, start an interactive terminal session, and delegate your first reviewable coding task.
+- [Settings](https://docs.factory.com/droid-cli/settings.md): Configure how droid behaves and integrates with your workflow.
+- [Image generation](https://docs.factory.com/droid-cli/image-generation.md): Generate and edit images from a Droid session, and choose the image model that fits the job.
+- [Output styles](https://docs.factory.com/droid-cli/output-styles.md): Control how Droid structures and writes responses in interactive CLI sessions.
+- [Droid CLI Reference](https://docs.factory.com/droid-cli/cli-reference.md): Complete reference for the Droid CLI, including commands and flags
+- [Droid Sessions API](https://docs.factory.com/api-reference/sessions.md): Create and drive Droid sessions: manage their lifecycle, settings, and messages.
+- [Droid Exec (Headless)](https://docs.factory.com/droid-exec/overview.md): Non-interactive execution mode for CI/CD pipelines and automation scripts.
+- [Lint autofix with Droid Exec](https://docs.factory.com/droid-exec/recipes/lint-autofix.md): Fix violations of one ESLint rule across a whole codebase in parallel with droid exec, verify each file, and open a pull request with the results.
+- [Organize imports with Droid Exec](https://docs.factory.com/droid-exec/recipes/organize-imports.md): Group, sort, and clean up imports across every package in a monorepo with droid exec, then type-check each package before you commit.
+- [Error messages with Droid Exec](https://docs.factory.com/droid-exec/recipes/error-messages.md): Rewrite error messages across services so they are consistent, descriptive, and actionable, using droid exec and a shared style guide.
+- [Dependency scan with Droid Exec](https://docs.factory.com/droid-exec/recipes/dependency-secret-scan.md): A weekly GitHub Actions workflow that sweeps for committed secrets, audits dependencies for known vulnerabilities, proposes safe upgrades, tests them without credentials, and opens a pull request.
+- [Docs and tests with Droid Exec](https://docs.factory.com/droid-exec/recipes/daily-docs-tests.md): A nightly GitHub Actions workflow that updates docstrings and READMEs and writes missing unit tests for code changed in the last seven days, runs the tests without credentials, and opens a pull request.
+- [Droid Python SDK](https://docs.factory.com/sdk/python.md): Use the Factory Droid SDK for Python to build custom agents, workflows, and product integrations.
+- [Droid TypeScript SDK](https://docs.factory.com/sdk/typescript.md): Use the Factory Droid SDK for TypeScript to build custom agents, workflows, and product integrations.
+- [Delegations](https://docs.factory.com/delegations/index.md): Delegate work to Droid from Slack, Linear, Jira, and Microsoft Teams with shared instructions, plugins, identity, and compute.
+- [Slack](https://docs.factory.com/delegations/slack.md): Connect Factory to Slack and delegate work from channels and direct messages using your organization's agent profile.
+- [Linear](https://docs.factory.com/delegations/linear.md): Connect your Linear workspace to Factory and delegate issues to Droid using your organization's agent profile.
+- [Jira](https://docs.factory.com/delegations/jira.md): Install Factory for Jira, link your Jira Cloud site, and delegate issues to Droid using your organization's agent profile.
+- [Microsoft Teams](https://docs.factory.com/delegations/microsoft-teams.md): Connect Microsoft Teams to Factory and delegate work from channel mentions using your organization's agent profile.
+- [IDE Integrations](https://docs.factory.com/ide-integrations.md): Run Droid from VS Code, Cursor, Windsurf, JetBrains IDEs, Zed, or any editor terminal.
+- [Software Factory](https://docs.factory.com/software-factory/overview.md): Use Software Factory to manage the automations that cover your software delivery lifecycle.
+- [Triage](https://docs.factory.com/software-factory/triage.md): Classify inbound work, reduce duplicates, and route items to the right owner or workflow.
+- [Local Code Review](https://docs.factory.com/software-factory/code-review.md): Use the /review command to analyze local code changes with AI-powered review workflows
+- [Automated Code Review](https://docs.factory.com/software-factory/code-review-ci.md): Set up automated pull request and merge request reviews with Droid
+- [Security Review](https://docs.factory.com/software-factory/security-review.md): Run security-focused PR reviews and full-codebase audits with Droid using STRIDE, OWASP, and supply-chain methodology.
+- [Automated QA](https://docs.factory.com/software-factory/automated-qa.md): Set up end-to-end automated quality assurance that tests your application as a real user would, across web, CLI, and API surfaces, with visual evidence, CI integration, and failure learning built in.
+- [Droid Control](https://docs.factory.com/software-factory/droid-control.md): Terminal, browser, and desktop automation. Record demos, verify behavior claims, and run QA flows.
+- [Release](https://docs.factory.com/software-factory/release.md): Track deployment gates and ship workflows as they become available.
+- [AutoWiki](https://docs.factory.com/software-factory/wiki/overview.md): AutoWiki generates comprehensive, structured Wikis for your repositories.
+- [Initialize a Wiki](https://docs.factory.com/software-factory/wiki/generate.md): Use the /wiki command to generate a comprehensive Wiki with AutoWiki from the Droid CLI.
+- [Wiki Browser](https://docs.factory.com/software-factory/wiki/web-viewer.md): Browse, search, and manage Wikis from the Factory App.
+- [Automatic Refresh](https://docs.factory.com/software-factory/wiki/auto-refresh.md): Use /install-wiki to set up a CI action that regenerates a Wiki on every push to the default branch.
+- [AutoWiki API](https://docs.factory.com/api-reference/wiki.md): Generate and manage AutoWiki runs: create runs, browse pages, search, and export.
+- [Incident Response](https://docs.factory.com/software-factory/incident-response.md): Set up Droid to respond to production alerts in Slack and resolve or investigate incidents autonomously.
+- [Custom Automations](https://docs.factory.com/software-factory/automations.md): Create, configure, and monitor automations that run Droid on a schedule, from Slack messages, on GitHub events, or from inbound webhooks.
+- [CI Automations API](https://docs.factory.com/api-reference/automations-ci.md): Manage CI automation workflows: scan repositories, list jobs, and open workflow PRs.
+- [Agent Readiness](https://docs.factory.com/agent-readiness/overview.md): Understand the Agent Readiness Model across Factory App, Droid CLI, dashboard, and API surfaces.
+- [Readiness Report Command](https://docs.factory.com/agent-readiness/readiness-report.md): Evaluate your repository's agent readiness with the /readiness-report slash command.
+- [Readiness Dashboard](https://docs.factory.com/agent-readiness/dashboard.md): Track and analyze your organization's Agent Readiness scores in the Factory App.
+- [Agent Readiness Reports API](https://docs.factory.com/api-reference/readiness-reports.md): REST API for programmatic access to Factory agent readiness reports.
+- [Agent Effectiveness](https://docs.factory.com/agent-effectiveness/overview.md): Measure how much faster your engineering organization ships with Factory, and connect agent spend to the work it produces.
+- [Enable Agent Effectiveness](https://docs.factory.com/agent-effectiveness/setup.md): Connect your integrations and turn on Advanced Analytics to enable Agent Effectiveness.
+- [Effectiveness Dashboard](https://docs.factory.com/agent-effectiveness/dashboard.md): Explore the Throughput, Output, and Attribution views for Agent Effectiveness in the Factory App.
+- [Cost & Productivity](https://docs.factory.com/agent-effectiveness/cost-and-productivity.md): Control LLM spend with model policy and autonomy defaults, and measure Droid's productivity impact with the measurement surfaces you already have.
+- [Factory Missions](https://docs.factory.com/missions/overview.md): Use Factory Missions to plan and execute large, multi-feature projects with structured orchestration. Describe your goal, collaborate on the plan, and let Droid manage the work.
+- [Planning & Validation](https://docs.factory.com/missions/planning.md): The planning phase is where Missions deliver the most value. Learn how to scope features and milestones, set validation frequency, and estimate cost and duration.
+- [Running in the CLI](https://docs.factory.com/missions/running-cli.md): Once a plan is approved, Droid enters Mission Control. Monitor progress, unblock workers, and redirect the orchestrator from the terminal.
+- [Running in the Factory App](https://docs.factory.com/missions/running-app.md): Use Factory Missions in the Factory App to plan and execute large, multi-feature projects with structured orchestration.
+- [Missions Configuration & Reference](https://docs.factory.com/missions/reference.md): Configuration inheritance, headless execution with droid exec --mission, mission settings, and enterprise access policy.
+- [Droid Computers](https://docs.factory.com/droid-computers/overview.md): Persistent compute environments hosted and managed by Factory for Droid.
+- [Droid Computers API](https://docs.factory.com/api-reference/computers.md): Provision and manage Factory computers: create, inspect, refresh, restart, and delete.
+- [Cloud Templates](https://docs.factory.com/droid-computers/cloud-templates.md): Deprecated cloud-hosted templates that mirror your local dev setup.
+- [Environments](https://docs.factory.com/environments/overview.md): Build reusable cloud development environments so Droids start with your repositories and tools ready.
+- [Environment prerequisites](https://docs.factory.com/environments/prerequisites.md): Check access, connect source control, and configure runtime secrets before using Environments.
+- [Create an Environment](https://docs.factory.com/environments/create.md): Choose a source, clone repositories, and prepare tools with Environment build steps.
+- [Manage Environment builds](https://docs.factory.com/environments/manage.md): Inspect build status, refresh an Environment, repair failures, and manage defaults.
+- [Run Droids on an Environment](https://docs.factory.com/environments/run-droids.md): Start independent cloud sessions and use Environment baselines for Computers, Delegations, Automations, and Missions.
+- [Troubleshoot Environments](https://docs.factory.com/environments/troubleshooting.md): Resolve repository access problems, failed builds, missing launch targets, and runtime secret issues.
+- [Remote Control](https://docs.factory.com/remote-control.md): Connect your computer so Droid can work on it from the web or other devices.
+- [OpenCompute](https://docs.factory.com/opencompute/overview.md): Provision Environment sandboxes on demand in your own cloud accounts or data centers.
+- [Factory Router](https://docs.factory.com/model-independence/factory-router.md): Automatically select the best model for each task.
+- [Custom Models (BYOK)](https://docs.factory.com/model-independence/byok.md): Connect your own API keys, use open source models, or run local models
+- [Autonomy Level](https://docs.factory.com/autonomy-and-safety/auto-run.md): Choose Off, Low, Medium, or High to control what Droid can do without repeated confirmations.
+- [Permission rules](https://docs.factory.com/autonomy-and-safety/permission-rules.md): Allow, require approval for, or block shell commands with tested rules and preview policy decisions before execution.
+- [Interaction Modes](https://docs.factory.com/autonomy-and-safety/specification-mode.md): Choose Normal, Spec, or Mission Mode, then set Autonomy Level for how much Droid can do without approval.
+- [Droid Shield](https://docs.factory.com/autonomy-and-safety/droid-shield.md): Automatic secret detection to prevent accidental exposure of credentials in your git commits and pushes.
+- [Sandbox](https://docs.factory.com/autonomy-and-safety/sandbox.md): OS-level sandboxing isolates Droid from your filesystem and network using kernel-enforced policies.
+- [AGENTS.md](https://docs.factory.com/harness/agents-md.md): Give Droid durable project instructions, commands, and guardrails with AGENTS.md.
+- [Connectors](https://docs.factory.com/harness/connectors.md): Connect third-party apps so Droid can use their tools in sessions, with managed authentication and organization-level controls.
+- [Model Context Protocol (MCP)](https://docs.factory.com/harness/mcp.md): Connect your own tools with Model Context Protocol
+- [Custom droids (subagents)](https://docs.factory.com/harness/subagents.md): Define specialized subagents with their own system prompt, model, and tool policy that Droid delegates focused tasks to in a fresh context window.
+- [Skills](https://docs.factory.com/harness/skills.md): Create reusable SKILL.md workflows that Droid can discover, invoke, and share across projects.
+- [Custom Slash Commands](https://docs.factory.com/harness/custom-slash-commands.md): Extend the CLI with reusable Markdown prompts or executable scripts that run from the chat input.
+- [Plugins](https://docs.factory.com/harness/plugins.md): Use and build shareable Droid packages for skills, commands, droids, output styles, hooks, and MCP servers.
+- [Hooks](https://docs.factory.com/harness/hooks.md): Run deterministic shell commands at Droid lifecycle events for validation, policy, context injection, and automation.
+- [Factory for Enterprise](https://docs.factory.com/enterprise/index.md): Deploy, secure, govern, and observe Droid across cloud, hybrid, and fully airgapped environments.
+- [Deployment Patterns](https://docs.factory.com/enterprise/network-and-deployment.md): Choose cloud, hybrid, EU, and airgapped deployment patterns, then configure network access for Droid.
+- [Deploy the Factory App on Windows](https://docs.factory.com/enterprise/windows-msix-deployment.md): Install and manage the Factory App on Windows with MSIX.
+- [Airgapped Deployment](https://docs.factory.com/enterprise/airgapped-deployment.md): Run Droid inside an isolated network with no outbound internet connectivity, using your own model endpoints, settings, and collectors.
+- [Data Flows & Privacy](https://docs.factory.com/enterprise/privacy-and-data-flows.md): Understand where code, prompts, model traffic, and telemetry move across cloud, hybrid, and airgapped Droid deployments.
+- [Agent Safety & Controls](https://docs.factory.com/enterprise/llm-safety-and-agent-controls.md): Control Droid with permission rules, hooks, sandboxing, IP restrictions, and Droid Shield secret scanning in high-security environments.
+- [Security](https://docs.factory.com/enterprise/security.md): How the Droid CLI protects code and data with local execution, command approval, sandboxing, and enterprise controls.
+- [Identity & Access](https://docs.factory.com/enterprise/identity-and-access.md): Manage who can run Droid with SSO, Directory Sync, roles, service accounts, and Factory API keys.
+- [Organization Model](https://docs.factory.com/enterprise/organization-model.md): Understand how enterprise accounts, organization hierarchy, identity, policy, billing, and data residency fit together in Factory.
+- [Structuring and managing organizations](https://docs.factory.com/enterprise/structuring-and-managing-organizations.md): Create organizations, assign users, configure Directory Sync mappings, manage usage limits, and plan migration under one enterprise root.
+- [Admin Console](https://docs.factory.com/enterprise/enterprise-admin-console.md): Manage enterprise-wide directory, organization hierarchy, billing, SSO, domain verification, and Directory Sync from one Factory surface.
+- [User Groups](https://docs.factory.com/enterprise/user-groups.md): Apply monthly usage limits to every member of an identity provider group across the organizations you choose.
+- [Self-Managed Source Control](https://docs.factory.com/enterprise/self-managed-scm.md): Connect Factory to a self-hosted GitHub Enterprise Server or GitLab instance with identity-scoped repository access.
+- [Enterprise Controls & Managed Settings](https://docs.factory.com/enterprise/hierarchical-settings-and-org-control.md): Manage Droid defaults and hard policy controls for models, tools, safety, network access, retention, and telemetry.
+- [Personas](https://docs.factory.com/enterprise/personas.md): Configure which work personas members can choose during onboarding and recommend connectors per persona for a personalized activation experience.
+- [Internal Plugin Marketplaces](https://docs.factory.com/enterprise/internal-plugin-marketplaces.md): Centralize approved Droid plugins across your organization with internal marketplaces and managed settings.
+- [Organization Management API](https://docs.factory.com/api-reference/organization.md): Administer organization members and usage limits, and review enterprise control history.
+- [Service Accounts API](https://docs.factory.com/api-reference/service-accounts.md): Manage service accounts and their API keys: create, list, update, rotate, and revoke.
+- [Telemetry & Analytics](https://docs.factory.com/enterprise/telemetry/index.md): Measure Droid adoption, activity, and cost by exporting OpenTelemetry metrics to your own collector or reading Factory's hosted Analytics API.
+- [Telemetry Data Reference](https://docs.factory.com/enterprise/telemetry/data-reference.md): Reference for every metric, span, and attribute Droid exports over OpenTelemetry, in both the droid.* and GenAI semantic convention formats.
+- [Telemetry Privacy Controls](https://docs.factory.com/enterprise/telemetry/privacy.md): Control whether Droid telemetry carries per-user identity or message content, and see exactly what reaches Factory versus your own collector.
+- [Factory Analytics API](https://docs.factory.com/api-reference/analytics.md): REST API for organization and personal usage, Factory Standard Credits consumption, tool usage, and productivity metrics.
+- [Compliance & Audit](https://docs.factory.com/enterprise/compliance-audit-and-monitoring.md): Map Droid activity to audit, compliance, and monitoring workflows with Trust Center resources, audit events, and telemetry.
+- [Audit Log](https://docs.factory.com/enterprise/audit-log.md): Organization-level audit events that record who did what in your Factory organization.
+
+## API Reference
+
+- [Factory API](https://docs.factory.com/api-reference.md): Machine-readable contract for the Factory Public API at api.factory.ai, not the factory.com website form endpoints. Authenticate with a Factory API key or JWT bearer token. Documented error responses use the shared FactoryApiError JSON schema.
+- [Environments API](https://docs.factory.com/api-reference/environments.md): Manage Environments, provider sources, default selection, and build status and diagnostics.
+
+## Changelog
+
+- [Full Changelog](https://docs.factory.com/changelog/release-notes.md): Every notable change across the Factory App, Droid CLI, and other product surfaces, newest first.
+- [Feature Maturity](https://docs.factory.com/changelog/feature-maturity.md): How Factory labels feature maturity, and how releases and versioning work.
+
+## Other
+
+- [Agent Arena](https://docs.factory.com/benchmarks/agent-arena.md): Agent Arena results and methodology for AI coding agents.
+- [Legacy Bench](https://docs.factory.com/benchmarks/legacy-bench.md): Legacy-Bench results and methodology for AI agents working on legacy software.
+- [NextJS](https://docs.factory.com/benchmarks/nextjs-eval.md): Next.js Evals results and methodology for AI coding agents.
+- [Review Benchmark](https://docs.factory.com/benchmarks/review-benchmark.md): Review Benchmark results and methodology for AI code review models.
+- [Terminal Bench](https://docs.factory.com/benchmarks/terminal-bench.md): Terminal Bench results and methodology for AI coding agents.
+- [Docs visual elements preview](https://docs.factory.com/preview/visual-elements.md): Draft gallery of new docs components for dense content pages, each shown against the bullet or card pattern it replaces.

@@ -14,48 +14,72 @@ sources:
   - "[[wiki/docs/llms-docs-warp-dev/factories]]"
   - "[[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]"
   - "[[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]"
+  - "[[wiki/docs/llms-docs-8090-ai/modules-skills]]"
+  - "[[wiki/docs/llms-docs-8090-ai/opinions-agent-skill]]"
+  - "[[wiki/docs/llms-docs-8090-ai/general-introduction]]"
+  - "[[wiki/docs/llms-docs-8090-ai/general-quickstart]]"
+  - "[[wiki/docs/llms-docs-8090-ai/modules-knowledge-base]]"
+  - "[[wiki/docs/llms-docs-8090-ai/modules-work-orders]]"
+  - "[[wiki/docs/llms-docs-factory-com/harness-skills]]"
+  - "[[wiki/docs/llms-docs-factory-com/harness-subagents]]"
+  - "[[wiki/docs/llms-docs-factory-com/missions-overview]]"
+  - "[[wiki/docs/llms-docs-factory-com/droid-exec-overview]]"
+  - "[[wiki/docs/llms-docs-port-io/agent-management-skills-overview]]"
+  - "[[wiki/docs/llms-docs-port-io/agent-management-overview]]"
+  - "[[wiki/docs/llms-docs-port-io/glossary]]"
+  - "[[wiki/docs/llms-docs-port-io/solutions-agentops-overview]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/configure-custom-skills]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/configure-boards-and-rules]]"
 related:
   - "[[wiki/concepts/factory-as-code]]"
   - "[[wiki/concepts/agent-harness]]"
   - "[[wiki/concepts/agent-evals]]"
   - "[[wiki/concepts/mcp]]"
   - "[[wiki/concepts/software-factory]]"
+  - "[[wiki/concepts/knowledge-base]]"
+  - "[[wiki/concepts/control-plane]]"
 created: 2026-10-25T00:00:00Z
-timestamp: 2026-10-25T00:00:00Z
-source_count: 10
+timestamp: 2026-10-25T18:31:43Z
+source_count: 26
 ---
 
 # Agent skill
 
-> A folder anchored by `SKILL.md` that teaches an agent one repeatable procedure.
+> A named instruction package whose `description` is a trigger; the agent loads the full body only when a task matches.
 
 ## Definition
 
-Warp's docs say a skill gives an agent a repeatable procedure, such as a security review or incident runbook, and extends its instructions without changing its prompt. [[wiki/docs/llms-docs-warp-dev/factories-factory-skills]] The common-skills repo shows the concrete format: one directory per skill, a `SKILL.md` with YAML frontmatter (`name`, `description`), and optional `references/`, `scripts/`, `assets/` so the main body stays short. The `description` is the trigger text a harness matches against the request. [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
+Warp's docs say a skill gives an agent a repeatable procedure, such as a security review or incident runbook, and extends its instructions without changing its prompt. [[wiki/docs/llms-docs-warp-dev/factories-factory-skills]] The common-skills repo shows the concrete format: one directory per skill, a `SKILL.md` with YAML frontmatter (`name`, `description`), and optional `references/`, `scripts/`, `assets/`. [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]] Factory's Droid and Mastra Factory use the same convention. [[wiki/docs/llms-docs-factory-com/harness-skills]], [[wiki/docs/llms-factory-mastra-ai/configure-custom-skills]] 8090 defines it as a modular bundle of instructions, scripts and resources loaded at runtime. [[wiki/docs/llms-docs-8090-ai/opinions-agent-skill]]
 
-Framings differ slightly by layer. In the docs a skill is a unit of factory configuration, scoped to all agents or one. In common-skills it is a distributable package pinned by lockfile. In the examples repo it is shared knowledge beside agents and automations. [[wiki/docs/llms-docs-warp-dev/factories-factory-skills]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
+Framings differ by layer. Warp: a unit of factory configuration. Factory: the middle ground between always-on `AGENTS.md` and one-off prompts. [[wiki/docs/llms-docs-factory-com/harness-skills]] 8090: a product-managed, team-shared standards store inside the platform, distinct from the installable coding-agent skill. [[wiki/docs/llms-docs-8090-ai/modules-skills]] Port: a catalog entity (not a file on disk) loaded through a `load_skill` MCP tool, claiming the open Agent Skills spec. [[wiki/docs/llms-docs-port-io/agent-management-skills-overview]]
 
-Corroboration caveat: all ten sources are Warp's own voice (docs set plus two Warp repos). Agreement between them is one vendor's account, not independent confirmation.
+Corroboration caveat: the 26 pages come from six origins (Warp docs, two Warp repos, 8090, Factory, Port, Mastra), all vendor voices. The Warp docs and both Warp repos are one vendor.
 
 ## Key claims
 
-- Skills are scoped by path: `skills/<name>/SKILL.md` applies to every agent in a factory; `agents/<agent>/skills/<name>/SKILL.md` applies to one. [[wiki/docs/llms-docs-warp-dev/factories-factory-skills]], [[wiki/docs/llms-docs-warp-dev/factories-factory-agents-creating-custom-agents]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
-- Skills carry instructions, not access. Credentials and MCP connections are configured separately. [[wiki/docs/llms-docs-warp-dev/factories-factory-skills]]
-- Skill sources in a factory: role and integration skills (GitHub for default agents, Slack for the foreman, Linear or Jira if chosen), Warp bundled skills (`oz-platform`, `factory-files`, `factory-mcp`), and team custom skills that extend rather than replace them. [[wiki/docs/llms-docs-warp-dev/factories-factory-skills]], [[wiki/docs/llms-docs-warp-dev/factories-factory-agents]]
-- Custom agents have no built-in skills; a custom skill is how one is taught its job. [[wiki/docs/llms-docs-warp-dev/factories-factory-skills]], [[wiki/docs/llms-docs-warp-dev/factories-factory-agents-creating-custom-agents]]
-- Skills are definition files, so changes follow the factory's PR review and config checks. [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]], [[wiki/docs/llms-docs-warp-dev/factories-factory-as-code]], [[wiki/docs/llms-docs-warp-dev/factories]]
-- Self-improvement loop: a Scorer flagging a recurring failure can lead to a follow-up run that updates the responsible skill, delivered as a PR for human review. [[wiki/docs/llms-docs-warp-dev/factories-factory-skills]], [[wiki/docs/llms-docs-warp-dev/factories-measure-and-improve-self-improvement]]
-- API: `skill_spec` (`owner/repo:skill-name`) uses a skill as an agent run's base prompt. Conversation data reports loads as `read_skill` actions, so team skill use can be measured. 14 bundled skill IDs are documented, though the catalog is not an availability manifest. [[wiki/docs/llms-docs-warp-dev/factories-api-and-sdk]]
-- Distribution: common-skills ships 27 skills, installs them via the `skills` npm CLI, pins them in a consumer `skills-lock.json` (directory hashes verified), and a GitHub Actions workflow opens auto-merging lockfile PRs downstream on each merge to `main`. [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
-- `.agents/skills/` is the cross-harness location; Claude Code reaches it via symlink. [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
-- Skills can encode orchestration (`saga`, `council`), headless CI contracts (`review-pr` writes `review.json`, never posts), and factory migration (`migrate-to-factory` ports skills into a factory repo, treating source content as untrusted). [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
-- Skills are themselves evaluated: `skill-doctor` scores local transcripts on four rubrics and drafts SKILL.md edits. [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
+- Description is the routing surface. Factory: load name and description first, body only on match (progressive disclosure). 8090: "write it as a trigger, not a summary". Port: the description is the trigger. [[wiki/docs/llms-docs-factory-com/harness-skills]], [[wiki/docs/llms-docs-8090-ai/modules-skills]], [[wiki/docs/llms-docs-port-io/agent-management-skills-overview]]
+- Warp scope by path: `skills/<name>/SKILL.md` for all agents, `agents/<agent>/skills/<name>/SKILL.md` for one. [[wiki/docs/llms-docs-warp-dev/factories-factory-skills]], [[wiki/docs/llms-docs-warp-dev/factories-factory-agents-creating-custom-agents]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
+- Mastra path: `src/mastra/public/factory-skills/<name>/SKILL.md`; directory name must match `name`; server restart needed; not listed in the UI. [[wiki/docs/llms-factory-mastra-ai/configure-custom-skills]]
+- Skills carry instructions, not access. Warp keeps credentials and MCP separate; 8090 says "the skill provides the workflow, while MCP provides access". [[wiki/docs/llms-docs-warp-dev/factories-factory-skills]], [[wiki/docs/llms-docs-8090-ai/opinions-agent-skill]]
+- Factory has a precedence order for same-name skills (organization plugin, mission, project, personal, built-in; automation overrides all). `allowed-tools` is review metadata, not a sandbox. A custom droid is the enforced boundary; a skill is an inline instruction set. [[wiki/docs/llms-docs-factory-com/harness-skills]], [[wiki/docs/llms-docs-factory-com/harness-subagents]]
+- Governance: Warp skills are definition files under PR review. [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]], [[wiki/docs/llms-docs-warp-dev/factories-factory-as-code]], [[wiki/docs/llms-docs-warp-dev/factories]] 8090 adds versioning with agent/person attribution, an org Skills Library, and Skill Rules that block writes until the current skill is read (in-product agent only, not MCP clients). [[wiki/docs/llms-docs-8090-ai/modules-skills]] Port syncs from GitHub and tracks adoption; AgentOps treats skill sprawl and forking as a problem. [[wiki/docs/llms-docs-port-io/agent-management-skills-overview]], [[wiki/docs/llms-docs-port-io/agent-management-overview]], [[wiki/docs/llms-docs-port-io/solutions-agentops-overview]]
+- Skills drive workflows: 8090 built-ins (Extract Work Orders, Phase Planning, Knowledge Base upkeep) and an installable skill running read, plan, implement, verify with a per-work-order scratch folder; Factory Missions plan the skills each milestone needs; Mastra boards can `invokeSkill`. [[wiki/docs/llms-docs-8090-ai/modules-work-orders]], [[wiki/docs/llms-docs-8090-ai/modules-knowledge-base]], [[wiki/docs/llms-docs-8090-ai/opinions-agent-skill]], [[wiki/docs/llms-docs-factory-com/missions-overview]], [[wiki/docs/llms-factory-mastra-ai/configure-boards-and-rules]]
+- Self-improvement: a Scorer flagging a recurring failure can lead to a PR updating the skill; `skill-doctor` scores skills directly. [[wiki/docs/llms-docs-warp-dev/factories-measure-and-improve-self-improvement]], [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
+- Warp API: `skill_spec` (`owner/repo:skill-name`) sets a skill as base prompt; loads show as `read_skill` actions. [[wiki/docs/llms-docs-warp-dev/factories-api-and-sdk]]
+- Distribution: common-skills ships 27 skills via the `skills` npm CLI with a hash-verified `skills-lock.json` and auto-merging lockfile PRs. 8090 installs with `npx skills add`. `.agents/skills/` is the cross-harness path; Factory also reads it. [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]], [[wiki/docs/llms-docs-8090-ai/opinions-agent-skill]], [[wiki/docs/llms-docs-factory-com/harness-skills]]
+- Size: keep Port skill instructions under about 5000 tokens, detail in references. [[wiki/docs/llms-docs-port-io/agent-management-skills-overview]]
+
+## Tensions
+
+- Storage: file-based in repos (Warp, Factory, Mastra) versus catalog entities (Port) or in-product records (8090). [[wiki/docs/llms-docs-factory-com/harness-skills]], [[wiki/docs/llms-docs-port-io/agent-management-skills-overview]], [[wiki/docs/llms-docs-8090-ai/modules-skills]]
+- Enforcement: 8090 Skill Rules force a skill read before writes; Factory says skills are not a security boundary and enforcement needs a custom droid. [[wiki/docs/llms-docs-8090-ai/modules-skills]], [[wiki/docs/llms-docs-factory-com/harness-skills]]
 
 ## Relationships
 
-- **Factory as code**: skills are one file type in the factory definition tree. [[wiki/concepts/factory-as-code]]
-- **Agent harness**: harnesses (Warp, Claude Code, Codex) load skills from the shared directory. [[wiki/concepts/agent-harness]]
-- **Agent evals**: Scorers drive skill edits; `skill-doctor` scores skills directly. [[wiki/concepts/agent-evals]]
-- **MCP**: a separate access layer that skills assume but do not provide. [[wiki/concepts/mcp]]
+- **Factory as code**: skills are one file type in the definition tree. [[wiki/concepts/factory-as-code]]
+- **Agent harness**: Warp, Claude Code, Droid and others load skills. [[wiki/concepts/agent-harness]]
+- **Agent evals**: Scorers drive skill edits. [[wiki/concepts/agent-evals]]
+- **MCP**: the access layer skills assume; Port and 8090 also deliver skills over it. [[wiki/concepts/mcp]]
+- **Control plane**: Port governs skills as inventory. [[wiki/concepts/control-plane]]
 
-> Synthesis: skills are treated as packages (path-scoped, PR-reviewed, lockfile-pinned, eval-driven), but every source is Warp, so this wiki cannot yet say how other vendors define them.
+> Synthesis: the SKILL.md-plus-trigger-description pattern is shared across vendors, while storage, enforcement and governance differ; the six origins are all vendors with a product to sell.

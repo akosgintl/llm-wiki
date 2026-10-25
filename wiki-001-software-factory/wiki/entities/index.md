@@ -2,9 +2,13 @@
 
 # Entities
 
-- [[wiki/entities/claude-code|Claude Code]] — Anthropic's coding agent, used in this wiki as a harness that factories run per role, an MCP client, and a consumer of .agents/skills.
+- [[wiki/entities/claude-code|Claude Code]] — Anthropic's coding agent, used across the wiki as a harness that factories run per role, an MCP client, a consumer of .agents/skills, and a headless runner behind Port workflows.
 - [[wiki/entities/codex|Codex]] — Codex is OpenAI's coding agent, which software-factory setups use as a swappable agent harness alongside Claude Code.
-- [[wiki/entities/github|GitHub]] — GitHub is the code forge and event source that Warp's software-factory material uses for triggers, pull requests, CI and git-synced factory definitions.
-- [[wiki/entities/linear|Linear]] — Issue tracker that Warp Factories supports as a work source, where issues and comments trigger a factory and progress is written back to the issue.
-- [[wiki/entities/slack|Slack]] — Slack is the team chat tool that Warp Factories uses as an intake and status surface, and that Warp's example skills use as a feedback sink.
+- [[wiki/entities/github|GitHub]] — GitHub is the code forge that factory products use as event source, PR destination, review gate and optional home for git-synced factory definitions.
+- [[wiki/entities/gitlab|GitLab]] — GitLab is a code forge that the wiki's software-factory docs support as a work source and repository host, with a thinner integration than GitHub.
+- [[wiki/entities/jira|Jira]] — Atlassian issue tracker that Warp Factories, Factory Delegations and Port's ticket-resolution pattern all use as a work source from which tickets trigger AI agents.
+- [[wiki/entities/linear|Linear]] — Issue tracker that agent-factory products (Warp Factories, Factory, Mastra Factory) support as a work source, where issues and comments trigger agents and progress is written back to the issue.
+- [[wiki/entities/microsoft-teams|Microsoft Teams]] — Microsoft's chat platform, supported by both Warp Factories and Factory's Delegations as a channel where @-mentions hand work to cloud coding agents.
+- [[wiki/entities/sentry|Sentry]] — Sentry is an error-monitoring and alerting service that the surveyed software-factory docs treat as an external event source whose alerts can start agent runs.
+- [[wiki/entities/slack|Slack]] — Slack is the team chat tool that several software-factory products use as an intake, delegation and status surface, and that Warp's example skills use as a feedback sink.
 - [[wiki/entities/warp-factories|Warp Factories]] — Warp's hosted product for running a team of cloud agents, coordinated by a foreman, that turns issues, tickets and chat messages into reviewed pull requests.

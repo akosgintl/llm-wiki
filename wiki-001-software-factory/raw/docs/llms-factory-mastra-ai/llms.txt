@@ -1,0 +1,31 @@
+# Mastra Factory
+
+## Docs
+
+- [Get started](https://factory.mastra.ai/index.md)
+- [What's Factory?](https://factory.mastra.ai/what-is-factory.md)
+- Core concepts
+  - [Intake](https://factory.mastra.ai/using/intake.md)
+  - [Work items](https://factory.mastra.ai/using/work-and-approvals.md)
+  - [Review items](https://factory.mastra.ai/using/reviews.md)
+  - [Sessions](https://factory.mastra.ai/using/sessions.md)
+- Configuration
+  - [Models](https://factory.mastra.ai/configure/models.md)
+  - [GitHub](https://factory.mastra.ai/configure/github.md)
+  - [GitLab](https://factory.mastra.ai/configure/gitlab.md)
+  - [Linear](https://factory.mastra.ai/configure/linear.md)
+  - [Jira](https://factory.mastra.ai/configure/jira.md)
+  - [incident.io](https://factory.mastra.ai/configure/incidentio.md)
+  - [Slack](https://factory.mastra.ai/configure/slack.md)
+  - [Auth](https://factory.mastra.ai/configure/auth.md)
+  - [Sandboxes](https://factory.mastra.ai/configure/sandboxes.md)
+  - [Storage](https://factory.mastra.ai/configure/storage.md)
+  - [Boards and rules](https://factory.mastra.ai/configure/boards-and-rules.md)
+  - [Custom skills](https://factory.mastra.ai/configure/custom-skills.md)
+- [Deployment](https://factory.mastra.ai/deployment.md)
+- [Skill](https://factory.mastra.ai/skill.md)
+- [Troubleshooting](https://factory.mastra.ai/troubleshooting.md)
+- Reference
+  - [Environment variables](https://factory.mastra.ai/reference/environment-variables.md)
+  - [MastraFactory API](https://factory.mastra.ai/reference/mastra-factory-api.md)
+  - [create-factory](https://factory.mastra.ai/reference/create-factory.md)

@@ -1,9 +1,21 @@
 ---
 type: concept
 title: Human-in-the-loop
-description: Designing an agent pipeline so people approve the decisions that matter (specs, merges, escalations) while agents do the rest.
+description: Designing an agent pipeline so people approve the decisions that matter (specs, plans, merges, escalations) while agents do the rest.
 aliases: []
 sources:
+  - "[[wiki/docs/llms-docs-8090-ai/connections-connect-coding-agent]]"
+  - "[[wiki/docs/llms-docs-8090-ai/modules-automations]]"
+  - "[[wiki/docs/llms-docs-8090-ai/modules-work-orders]]"
+  - "[[wiki/docs/llms-docs-8090-ai/opinions-reverse-engineering]]"
+  - "[[wiki/docs/llms-docs-factory-com/delegations-index]]"
+  - "[[wiki/docs/llms-docs-factory-com/droid-exec-overview]]"
+  - "[[wiki/docs/llms-docs-factory-com/missions-overview]]"
+  - "[[wiki/docs/llms-docs-port-io/getting-started-agentic-sdlc-pillars]]"
+  - "[[wiki/docs/llms-docs-port-io/solutions-agentops-overview]]"
+  - "[[wiki/docs/llms-docs-port-io/solutions-autonomous-ticket-resolution-agentic-initiatives]]"
+  - "[[wiki/docs/llms-docs-port-io/solutions-autonomous-ticket-resolution-overview]]"
+  - "[[wiki/docs/llms-docs-port-io/workflows-concepts]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-api-and-sdk-demo-sentry-monitoring-with-sdk]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-connect-your-factory]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-factory-agents]]"
@@ -19,6 +31,12 @@ sources:
   - "[[wiki/docs/llms-docs-warp-dev/factories-quickstart]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-troubleshooting]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/configure-boards-and-rules]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/using-intake]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/using-reviews]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/using-sessions]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/using-work-and-approvals]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/what-is-factory]]"
   - "[[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]"
   - "[[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]"
   - "[[wiki/sources/youtube-tGbjIvvYuHE]]"
@@ -30,52 +48,39 @@ related:
   - "[[wiki/concepts/agentic-merge-queue]]"
   - "[[wiki/concepts/foreman-agent]]"
 created: 2026-10-25T15:15:38Z
-timestamp: 2026-10-25T16:00:00Z
-source_count: 18
+timestamp: 2026-10-25T18:31:57Z
+source_count: 36
 ---
 
 # Human-in-the-loop
 
-> People stay in charge of a few chosen checkpoints; agents run everything between them.
+> People hold a few chosen checkpoints; agents run everything between them.
 
 ## Definition
 
-In a software factory, human-in-the-loop means agents triage, plan, implement and review, but a person approves the spec, answers clarifying questions and presses merge. Warp's docs name three default pauses: spec approval, clarifying questions and merging. [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]], [[wiki/docs/llms-docs-warp-dev/factories]]
-
-The `warp-factory-examples` foreman prompt encodes the same gate as text: "A human is always responsible for merging. Never merge, and never approve a spec on a human's behalf." [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
-
-The Boundary podcast frames the same idea as a target: "95% automatic", not fully automatic, with a human shepherd and a human merge press. [[wiki/sources/youtube-tGbjIvvYuHE]]
+Vendors converge on the same shape: agents triage, plan, implement and review, while a person approves the spec or plan, answers questions and presses merge. Warp names three default pauses: spec approval, clarifying questions, merging. [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]], [[wiki/docs/llms-docs-warp-dev/factories]] Mastra lists four waits: start a run, accept a non-bug task, approve a plan, merge. [[wiki/docs/llms-factory-mastra-ai/what-is-factory]], [[wiki/docs/llms-factory-mastra-ai/using-work-and-approvals]] Port draws checkpoints at Plan, Build and Review. [[wiki/docs/llms-docs-port-io/solutions-autonomous-ticket-resolution-overview]] The Boundary podcast targets "95% automatic", not fully automatic. [[wiki/sources/youtube-tGbjIvvYuHE]]
 
 ## Key claims
 
-- Spec approval and clarifying questions are workflow policy in the foreman's editable instructions; merging is enforced by repository branch protection and permissions. [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]], [[wiki/docs/llms-docs-warp-dev/factories-factory-agents]], [[wiki/docs/llms-docs-warp-dev/factories]]
-- Agents never merge: implement "never merges", review "doesn't approve or merge", and the review verdict is advisory. [[wiki/docs/llms-docs-warp-dev/factories-factory-agents]], [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]]
-- Factory branches and PRs obey normal repository rules (branch protection, required reviews). [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]], [[wiki/docs/llms-docs-warp-dev/factories-troubleshooting]]
-- Work from Slack still ends at a pull request for a person; the SDK Sentry demo ends in a draft PR "instead of silent autonomous changes". [[wiki/docs/llms-docs-warp-dev/factories-integrations-slack]], [[wiki/docs/llms-docs-warp-dev/factories-api-and-sdk-demo-sentry-monitoring-with-sdk]]
-- Human attention is queued: the inbox holds questions, spec reviews, PR reviews, blocked and failed items for tasks the user started. [[wiki/docs/llms-docs-warp-dev/factories-factory-inbox]], [[wiki/docs/llms-docs-warp-dev/factories-factory-dashboard]]
-- Autonomy is measured as the share of merged PRs needing no human code push. [[wiki/docs/llms-docs-warp-dev/factories-factory-dashboard]]
-- Self-improvement proposals arrive as PRs with a reviewer (default team admins) and "nothing is adopted on its own". [[wiki/docs/llms-docs-warp-dev/factories-measure-and-improve-self-improvement]], [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]]
-- Access comes from configuration and credentials, never from instructions; factory roles do not control spec or PR review. [[wiki/docs/llms-docs-warp-dev/factories-factory-agents]], [[wiki/docs/llms-docs-warp-dev/factories-infrastructure-and-security]]
-- A person can take work over: Factory MCP pulls a task to a local machine and hands it back, but does not lock the task. [[wiki/docs/llms-docs-warp-dev/factories-connect-your-factory]]
-- Humans can steer mid-run: replies continue a work item, live follow-up works while the sandbox is active, and Stop run is immediate. [[wiki/docs/llms-docs-warp-dev/factories-connect-your-factory]], [[wiki/docs/llms-docs-warp-dev/factories-factory-dashboard]], [[wiki/docs/llms-docs-warp-dev/factories-troubleshooting]]
-- Slack, GitLab and Linear can start work, and the commenter need not be a team member in GitLab, so repository gates matter. [[wiki/docs/llms-docs-warp-dev/factories-integrations-gitlab]], [[wiki/docs/llms-docs-warp-dev/factories-integrations-slack]], [[wiki/docs/llms-docs-warp-dev/factories-integrations-linear]]
-- The quickstart advises a small, verifiable first request ending in a PR. [[wiki/docs/llms-docs-warp-dev/factories-quickstart]]
-- Boundary's loop fixes CodeRabbit comments, stops after 3 iterations to ask a human, and a human presses merge. Untrusted user feedback is deduped and repro'd before a human shepherd is assigned. [[wiki/sources/youtube-tGbjIvvYuHE]]
-- In the example SDLC factory the spec agent opens a spec PR and waits for human approval, and the foreman hands over final PR links for a human to merge. Example 04 (review only) makes findings advisory. [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
-- The `saga` skill has a human-in-the-loop shape: plan with user approval, worker loop, final validation with the user. [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
-- The headless `review-pr` skill never posts to GitHub; a workflow publishes its `review.json`, so output is separated from publishing. `migrate-to-factory` is scope-fenced (no secrets, schedules, live registration) and treats source content as untrusted. [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
-- The factory validator reports exit 2 as "NOT validated, not a pass", so an unchecked config is never read as approved. [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
+- Agents never merge. Warp's implement agent "never merges" and review is advisory; the foreman prompt forbids merging or approving a spec for a human. [[wiki/docs/llms-docs-warp-dev/factories-factory-agents]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
+- Agent output and human decision stay separate. Mastra: a finished review run is not a merge, and neither closes the issue. 8090 coding agents end at "In Review" for a teammate. The headless `review-pr` skill never posts; a workflow publishes it. [[wiki/docs/llms-factory-mastra-ai/using-reviews]], [[wiki/docs/llms-docs-8090-ai/connections-connect-coding-agent]], [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
+- Merge is enforced by repository rules. Warp, Factory.com ("the requester can still approve a Factory-authored pull request") and Port's criticality-routed policy (auto-merge low-risk, human for tier-1) all lean on this. [[wiki/docs/llms-docs-warp-dev/factories-integrations-github]], [[wiki/docs/llms-docs-factory-com/delegations-index]], [[wiki/docs/llms-docs-port-io/solutions-autonomous-ticket-resolution-agentic-initiatives]]
+- Attention is queued: Warp's inbox, Mastra's Overview and sessions show questions, plans and failures. Humans steer mid-run and take work over. [[wiki/docs/llms-docs-warp-dev/factories-factory-inbox]], [[wiki/docs/llms-factory-mastra-ai/using-sessions]], [[wiki/docs/llms-docs-warp-dev/factories-connect-your-factory]], [[wiki/docs/llms-docs-factory-com/missions-overview]]
+- Autonomy is a dial: Mastra's Auto-start runs and Auto-approve plans (off while learning); Droid exec's read-only default and `--auto` tiers; Warp measures merged PRs needing no human push. [[wiki/docs/llms-factory-mastra-ai/using-intake]], [[wiki/docs/llms-docs-factory-com/droid-exec-overview]], [[wiki/docs/llms-docs-warp-dev/factories-factory-dashboard]]
+- Approval nodes can be built in: Port's workflow input node pauses for a human; Mastra transition policies enforce approval. [[wiki/docs/llms-docs-port-io/workflows-concepts]], [[wiki/docs/llms-factory-mastra-ai/configure-boards-and-rules]]
+- Destructive actions need confirmation: 8090 agents that cannot show confirmations cannot delete or edit automations. 8090 reverse engineering offers cooperative or autonomous runs and never overwrites human edits. [[wiki/docs/llms-docs-8090-ai/connections-connect-coding-agent]], [[wiki/docs/llms-docs-8090-ai/opinions-reverse-engineering]]
+- Self-improvement proposals arrive as PRs; "nothing is adopted on its own". [[wiki/docs/llms-docs-warp-dev/factories-measure-and-improve-self-improvement]]
 
 ## Tensions
 
-- **Where the gate lives.** Warp says spec approval is a prompt policy the team can change, while merge is a repository permission. The podcast shows a hard-coded loop cap (3 iterations) and a human merge press. The docs gate by configuration; the talk gates by code. [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]], [[wiki/sources/youtube-tGbjIvvYuHE]]
-- **Humans out of some loops.** `complain` and `suggestion-box` skills let agents submit anonymous Slack feedback unprompted, and common-skills CI auto-squash-merges lockfile PRs once checks pass after requesting the source author's review. These are bot workflows, not factory agents, so they do not contradict "agents never merge", but they show human review is not universal even inside Warp. [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
-- **Soft gate.** Prompt-level spec approval is not enforced like branch protection, so it is weaker. [[wiki/docs/llms-docs-warp-dev/factories-factory-agents]]
+- **Where the gate lives.** Warp: spec approval is editable prompt policy, merge is repository permission. Mastra: "a prompt alone does not enforce human approval; a transition policy does." The podcast gates by code (3-iteration cap). Prompt-level gates are the weaker kind. [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]], [[wiki/docs/llms-factory-mastra-ai/configure-boards-and-rules]], [[wiki/sources/youtube-tGbjIvvYuHE]]
+- **Gates traded for scoping.** 8090 Automations run unattended: Allow-only tools, comment-only output, no approval. [[wiki/docs/llms-docs-8090-ai/modules-automations]]
+- **Humans out of some loops.** Warp's common-skills CI auto-squash-merges lockfile PRs after checks pass; these are bot workflows, not factory agents. [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
 
 ## Relationships
 
-- **Software factory**: the checkpoints are part of its lifecycle. [[wiki/concepts/software-factory]]
-- **Factory as code**: gate policy lives in definition files, and changes go through PR review. [[wiki/concepts/factory-as-code]]
-- **Agent evals**: scorers and benchmarks decide what to hand back to humans. [[wiki/concepts/agent-evals]]
+- **Software factory**: checkpoints are part of its lifecycle. [[wiki/concepts/software-factory]]
+- **Factory as code**: gate policy lives in definition files. [[wiki/concepts/factory-as-code]]
+- **Agent evals**: scorers decide what goes back to humans. [[wiki/concepts/agent-evals]]
 
-> Synthesis: Corroboration is thin. Seventeen pages are one vendor voice: the Warp docs set plus two Warp-authored repos (`warp-factory-examples`, `common-skills`). The repos show the docs' stance implemented in prompts and CI, which is consistency within one vendor, not independent confirmation. The only outside view is one podcast of two vendors (Human Layer and Boundary), so the shared "humans merge" stance reflects vendor product positions.
+> Synthesis: Six vendor voices (Warp docs plus its two repos, 8090, Factory.com, Port, Mastra) plus one podcast agree that humans merge. Agreement between competing vendors is mild corroboration, but all are product docs, and the Warp docs and repos share one author.

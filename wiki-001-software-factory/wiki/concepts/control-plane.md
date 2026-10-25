@@ -4,6 +4,8 @@ title: Control plane
 description: The orchestration layer of a software factory that dispatches work, records sessions, and governs permissions and spend, kept separate from the compute that runs agents.
 aliases: []
 sources:
+  - "[[wiki/docs/llms-docs-port-io/agent-management-overview]]"
+  - "[[wiki/docs/llms-docs-port-io/solutions-agentops-overview]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-deployment-patterns]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-infrastructure-and-security]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-self-hosting-data-storage]]"
@@ -20,9 +22,12 @@ related:
   - "[[wiki/concepts/foreman-agent]]"
   - "[[wiki/concepts/agent-evals]]"
   - "[[wiki/concepts/human-in-the-loop]]"
+  - "[[wiki/concepts/agent-skill]]"
+  - "[[wiki/concepts/mcp]]"
+  - "[[wiki/concepts/knowledge-graph]]"
 created: 2026-10-25T15:14:42Z
-timestamp: 2026-10-25T16:00:00Z
-source_count: 5
+timestamp: 2026-10-25T18:31:00Z
+source_count: 7
 ---
 
 # Control plane
@@ -37,7 +42,9 @@ In Warp's docs it is a concrete product boundary. Runs, identity/config, observa
 
 Warp's example repo shows the same boundary from the configuration side. The repo holds only a declarative factory definition (YAML and Markdown). Warp's server syncs it, owns the schema and validates it. [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
 
-Synthesis note: the three docs pages and the example repo are all Warp's voice, so they count as one origin for corroboration. The podcast is the only independent origin, and its speakers also sell or build control planes.
+Port's docs use the term for a governance layer rather than a dispatcher. Port sits as "the management layer above your agent platforms, repositories and AI gateways", and it calls cloud-managed agent platforms (Bedrock/AgentCore, Azure AI Foundry, Cursor Cloud Agents) "vendor control planes". Its role is registry, certification, enforcement and optimization of agents, skills and MCP servers, not running them. [[wiki/docs/llms-docs-port-io/agent-management-overview]], [[wiki/docs/llms-docs-port-io/solutions-agentops-overview]]
+
+Synthesis note: the three Warp docs pages and the example repo are all Warp's voice, so they count as one origin. The two Port pages are a second vendor origin. The podcast is a third, and its speakers also sell or build control planes. All three origins have a product interest.
 
 ## Key claims
 
@@ -52,11 +59,14 @@ Synthesis note: the three docs pages and the example repo are all Warp's voice, 
 - Self-hosting is one setting: `agentDefaults.workerHost` plus a matching runner. Warp coordinates and runs execute on customer compute. This matches the docs' split. [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]], [[wiki/docs/llms-docs-warp-dev/factories-deployment-patterns]] (same vendor)
 - Governance sits in the control-plane config: `credentialStrategy`, per-agent secret lists, scorers that sample a percentage of runs, and a prompt rule that humans always merge. [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
 - The talk argues no open-source control plane exists because each company defines issues and workflows differently and code is cheap to write. [[wiki/sources/youtube-tGbjIvvYuHE]]
+- Port's AgentOps frames four governance practices on a shared Context Lake: inventory (one registry with owners, permissions, dependencies), certification (scorecards, promotion gates), enforcement (non-human identity, scoped access, audit, kill switch) and optimization (ROI tracking). Factory-grade agents must be registered, owned, scoped, audited and stoppable. [[wiki/docs/llms-docs-port-io/solutions-agentops-overview]]
+- Port's registry can trigger agents from events (a new vulnerability, a nightly scan) inside workflows, and its MCP connectors restrict which tools of external MCP servers agents may use, with the same permissions and audit trail as the rest of the platform. [[wiki/docs/llms-docs-port-io/agent-management-overview]]
 
 ## Tensions
 
 - Buy versus build: the podcast urges composition over inheritance, where buying one layer does not force buying the rest. [[wiki/sources/youtube-tGbjIvvYuHE]] Warp's docs present the control plane as always Warp-operated, with only execution and storage movable. [[wiki/docs/llms-docs-warp-dev/factories-infrastructure-and-security]] Both are vendor-side views.
 - Where orchestration logic lives: the talk's control plane is code the team writes (hard-coded while loops, a web app). [[wiki/sources/youtube-tGbjIvvYuHE]] In Warp's examples it is mostly a single foreman prompt in a synced config repo, with the server owning the schema. [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
+- Scope of the layer: the talk and Warp's docs put dispatch and session records in the control plane next to execution. Port describes a governance layer that mostly does not run agents and sits above several agent platforms. [[wiki/sources/youtube-tGbjIvvYuHE]], [[wiki/docs/llms-docs-port-io/solutions-agentops-overview]], [[wiki/docs/llms-docs-port-io/agent-management-overview]] Port also names other vendors' platforms as control planes, so the term covers both layers.
 
 ## Relationships
 
@@ -69,5 +79,7 @@ Synthesis note: the three docs pages and the example repo are all Warp's voice, 
 - **Foreman agent**: the orchestrating agent the triggers wake. [[wiki/concepts/foreman-agent]]
 - **Agent evals**: scorers sample runs as part of the control plane's config. [[wiki/concepts/agent-evals]]
 - **Human in the loop**: the human merge gate is encoded in the foreman prompt. [[wiki/concepts/human-in-the-loop]]
+- **Agent skill / MCP**: Port governs skills and MCP servers as registered assets of the same layer. [[wiki/concepts/agent-skill]], [[wiki/concepts/mcp]]
+- **Knowledge graph**: Port models agents, skills, tools, teams and permissions as one dependency graph. [[wiki/concepts/knowledge-graph]]
 
 > Synthesis: One idea from two vantage points, a design vocabulary from practitioners and a shipped boundary from a vendor. The vendor side has three pages from Warp plus its example repo, which is one voice, so treat agreement as shared framing, not independent proof.

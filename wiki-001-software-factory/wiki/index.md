@@ -12,7 +12,7 @@ title: 001-software-factory — Wiki
 ## Browse
 
 - [[wiki/sources/index|Sources]] (1)
-- [[wiki/entities/index|Entities]] (6)
-- [[wiki/concepts/index|Concepts]] (12)
+- [[wiki/entities/index|Entities]] (10)
+- [[wiki/concepts/index|Concepts]] (18)
 - [[wiki/repos/index|Repos]] (2)
-- [[wiki/docs/index|Docs]] (53)
+- [[wiki/docs/index|Docs]] (97)

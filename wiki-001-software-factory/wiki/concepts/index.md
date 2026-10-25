@@ -3,14 +3,20 @@
 # Concepts
 
 - [[wiki/concepts/agent-evals|Agent evals]] — Measurement of whether AI agents do their job well, via LLM-judge scoring of production runs, fixed-task benchmarks across configurations, and eval metrics gating pipeline changes.
-- [[wiki/concepts/agent-harness|Agent harness]] — The agent runtime that wraps a model with tools and control loops, split by the podcast into an inner harness (the coding agent) and an outer harness (the workflow code around it), and exposed by W...
+- [[wiki/concepts/agent-harness|Agent harness]] — The agent runtime that wraps a model with tools and control loops, split by the podcast into an inner harness (the coding agent) and an outer harness (the workflow code around it), exposed by Warp ...
 - [[wiki/concepts/agent-skill|Agent skill]] — A version-controlled SKILL.md folder that gives an agent a repeatable procedure, loaded on demand, without changing its base prompt.
+- [[wiki/concepts/context-engineering|Context engineering]] — The practice of deliberately structuring, storing and loading the context (requirements, org knowledge, instructions) that AI agents work from, instead of relying on the model or one-off prompts.
 - [[wiki/concepts/control-plane|Control plane]] — The orchestration layer of a software factory that dispatches work, records sessions, and governs permissions and spend, kept separate from the compute that runs agents.
 - [[wiki/concepts/dev-environment|Development environment]] — The layer of a software factory where an agent actually works: runtimes, repositories, toolchain, identity and access to internal services, separate from raw compute and from the harness.
 - [[wiki/concepts/factory-as-code|Factory as code]] — A software factory declared as a versioned tree of YAML and Markdown files, rooted at factory.yaml, that the platform validates and applies as one unit.
 - [[wiki/concepts/foreman-agent|Foreman agent]] — The single coordinator agent in a Warp factory that receives work from triggers and chat, delegates to stage agents, and hands finished pull requests to a human.
-- [[wiki/concepts/human-in-the-loop|Human-in-the-loop]] — Designing an agent pipeline so people approve the decisions that matter (specs, merges, escalations) while agents do the rest.
+- [[wiki/concepts/git-worktree|Git worktree]] — Git feature that gives each concurrent agent task its own checkout and branch from one shared object store, used by Warp's Direct backend and Factory's droid exec for parallel-run isolation, but no...
+- [[wiki/concepts/human-in-the-loop|Human-in-the-loop]] — Designing an agent pipeline so people approve the decisions that matter (specs, plans, merges, escalations) while agents do the rest.
+- [[wiki/concepts/knowledge-base|Knowledge base]] — The store of curated project or engineering context that agents read and reason over in a software factory, kept current by people, automations and skills.
+- [[wiki/concepts/knowledge-graph|Knowledge graph]] — A linked model of an organization's artifacts and entities (requirements, specs, services, owners) that humans and AI agents query as a shared source of truth.
+- [[wiki/concepts/mcp|Model Context Protocol (MCP)]] — An open protocol by which agents and coding tools reach external tools, data and workflows through servers they connect to as clients.
 - [[wiki/concepts/multi-repo-development|Multi-repo development]] — Working with agents across several repositories at once, by grouping repos into one factory, opening one PR per repo, sharing skills across repos, or simulating a monorepo from a coordination direc...
-- [[wiki/concepts/secrets-management|Secrets management]] — How a factory gives agents credentials for external services by name, never by value: team-level secrets created in the platform, attached per agent or factory, and injected as environment variables.
+- [[wiki/concepts/secrets-management|Secrets management]] — How a factory gives agents credentials for external services by name, never by value: team-level secrets created in the platform, attached per agent or factory, and injected as environment variable...
 - [[wiki/concepts/self-hosting|Self-hosting]] — Running agent execution on infrastructure you operate while a vendor control plane still routes, tracks and records the work.
-- [[wiki/concepts/software-factory|Software factory]] — A system of coding agents, compute, environments and orchestration that turns work requests (issues, tickets, chat messages) into reviewed pull requests, with humans kept at key gates.
+- [[wiki/concepts/software-factory|Software factory]] — A system of coding agents, compute, context and orchestration that turns work requests into reviewed pull requests with humans at key gates; vendors frame it as an agent team, a spec layer, a board...
+- [[wiki/concepts/webhook|Webhook]] — An HTTP endpoint that an external system POSTs events to, used here as the generic intake path that turns tool events into agent runs.

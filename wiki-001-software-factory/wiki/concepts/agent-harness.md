@@ -1,7 +1,7 @@
 ---
 type: concept
 title: Agent harness
-description: The agent runtime that wraps a model with tools and control loops, split by the podcast into an inner harness (the coding agent) and an outer harness (the workflow code around it), and exposed by Warp as a per-agent setting.
+description: The agent runtime that wraps a model with tools and control loops, split by the podcast into an inner harness (the coding agent) and an outer harness (the workflow code around it), exposed by Warp as a per-agent setting, and by Factory as the Droid runtime with skills, subagents, headless mode and missions.
 aliases: []
 sources:
   - "[[wiki/sources/youtube-tGbjIvvYuHE]]"
@@ -12,6 +12,12 @@ sources:
   - "[[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]]"
   - "[[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]"
   - "[[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]"
+  - "[[wiki/docs/llms-docs-factory-com/agent-readiness-overview]]"
+  - "[[wiki/docs/llms-docs-factory-com/droid-exec-overview]]"
+  - "[[wiki/docs/llms-docs-factory-com/harness-skills]]"
+  - "[[wiki/docs/llms-docs-factory-com/harness-subagents]]"
+  - "[[wiki/docs/llms-docs-factory-com/missions-overview]]"
+  - "[[wiki/docs/llms-factory-mastra-ai/configure-sandboxes]]"
 related:
   - "[[wiki/concepts/software-factory]]"
   - "[[wiki/concepts/control-plane]]"
@@ -20,8 +26,8 @@ related:
   - "[[wiki/concepts/agent-evals]]"
   - "[[wiki/concepts/agent-skill]]"
 created: 2026-10-25T15:14:42Z
-timestamp: 2026-10-25T16:00:00Z
-source_count: 8
+timestamp: 2026-10-25T18:30:15Z
+source_count: 14
 ---
 
 # Agent harness
@@ -34,7 +40,9 @@ Podcast framing: the harness is one layer of the software-factory stack (compute
 
 Warp framing: the harness is a configurable per-agent setting, the runtime that executes an agent's prompt and model. Supported harnesses are the Warp Agent, Claude Code and Codex. It is chosen separately from model and runner. [[wiki/docs/llms-docs-warp-dev/factories-factory-agents-configuration]], [[wiki/docs/llms-docs-warp-dev/factories-factory-as-code]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
 
-The two framings differ in scope. Warp's "harness" is roughly the podcast's inner harness. The outer-harness job (staging, loops, dispatch) is done in Warp by the foreman and stage agents. [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
+Factory framing: "Harness" is a docs section for Droid's own runtime: skills, custom subagents (custom droids), headless `droid exec` and Missions. Here the harness is the product itself, not a swappable setting. [[wiki/docs/llms-docs-factory-com/harness-skills]], [[wiki/docs/llms-docs-factory-com/harness-subagents]], [[wiki/docs/llms-docs-factory-com/droid-exec-overview]]
+
+The framings differ in scope. Warp's "harness" is roughly the podcast's inner harness. The outer-harness job (staging, loops, dispatch) is done in Warp by the foreman and stage agents. [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
 
 ## Key claims
 
@@ -48,6 +56,12 @@ The two framings differ in scope. Warp's "harness" is roughly the podcast's inne
 - Warp Benchmarks compare model, harness and runner configurations for one agent on identical fixed tasks, scored for correctness and cost. [[wiki/docs/llms-docs-warp-dev/factories-benchmarks]]
 - Each agent run uses the agent's configured model and harness on Warp-hosted or self-hosted compute. [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]]
 - Skills are written to be harness-portable. Warp's common-skills library keeps them in `.agents/skills/<name>/SKILL.md`, whose `description` is the trigger text a harness matches against the request. The directory is a cross-harness convention (Claude Code reaches it by symlink). The install tooling defaults to `--agent warp`, though the underlying `skills` CLI is multi-agent. [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
+- Factory's Droid harness runs headless via `droid exec`: read-only by default, `--auto low|medium|high` tiers gate edits, local dev ops and remote writes, and `--worktree` isolates parallel jobs. Exit `0` means Droid finished, not that the task succeeded. [[wiki/docs/llms-docs-factory-com/droid-exec-overview]]
+- Droid subagents are Markdown files with their own prompt, model and tool policy. They run in a fresh context window, return one final message, cannot ask the user and cannot spawn further subagents. Org admins cap their autonomy and model. [[wiki/docs/llms-docs-factory-com/harness-subagents]]
+- Droid skills load by progressive disclosure: only `name` and `description` are read until a skill matches. Same-name skills resolve by a fixed scope precedence, and `.agents/skills/` is read as a compatibility path. [[wiki/docs/llms-docs-factory-com/harness-skills]]
+- Missions put an orchestrator agent (Mission Control) over Droid workers and validators for large multi-feature plans. The orchestrator can be paused and talked to. Mission Mode in `droid exec` needs `--auto high`. [[wiki/docs/llms-docs-factory-com/missions-overview]], [[wiki/docs/llms-docs-factory-com/droid-exec-overview]]
+- Factory's Agent Readiness Model argues agent success depends on the repository (structure, validation, operational signals) more than on the agent. Missions recommend Level 4 or above. [[wiki/docs/llms-docs-factory-com/agent-readiness-overview]], [[wiki/docs/llms-docs-factory-com/missions-overview]]
+- In Mastra Factory the harness-side environment is a per-session sandbox (platform, local or another provider) configured in TypeScript. The agent runs the repository's own test, lint and build there. [[wiki/docs/llms-factory-mastra-ai/configure-sandboxes]]
 
 ## Relationships
 
@@ -62,4 +76,6 @@ The two framings differ in scope. Warp's "harness" is roughly the podcast's inne
 
 The podcast splits the harness into inner and outer parts and says to own the outer one; Warp offers one harness field and a managed foreman pipeline instead. [[wiki/sources/youtube-tGbjIvvYuHE]], [[wiki/docs/llms-docs-warp-dev/factories-factory-agents-configuration]]
 
-> Synthesis: Seven of eight sources are one vendor voice (Warp's docs plus its two repos, factory-examples and common-skills), so their agreement is not corroboration; the repos mostly restate the docs' harness field in worked YAML. The podcast is the only independent voice, and its speakers also sell or build competing products. Treat all as design vocabulary, not neutral evidence.
+Warp treats the harness as interchangeable (Warp Agent, Claude Code or Codex per agent), while Factory documents a single built-in harness, Droid, with its own subagent and skill formats plus import from Claude Code. [[wiki/docs/llms-docs-warp-dev/factories-factory-agents-configuration]], [[wiki/docs/llms-docs-factory-com/harness-subagents]]
+
+> Synthesis: Seven sources are one vendor voice (Warp's docs plus its two repos, factory-examples and common-skills), so their agreement is not corroboration; the repos mostly restate the docs' harness field in worked YAML. Five more are Factory's docs (one origin) and one is Mastra's docs; each is a separate vendor describing its own product. The podcast is the only non-docs voice, and its speakers also sell or build competing products. Treat all as design vocabulary, not neutral evidence.

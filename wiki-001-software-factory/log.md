@@ -35,3 +35,14 @@
 - Rewrote `[[raw/llms-docs-warp-dev/...]]` citations to `[[raw/docs/llms-docs-warp-dev/...]]` across wiki pages; earlier log entries keep the old path
 - Skill updated: `fetch_llms_txt.py` default folder, `SKILL.md`, `CONVENTIONS.md`, `SOURCES.md`, `PAGES.md`, `agents/docs_writer.md`
 - `build_index_md.py` exits 0 (74 pages); `fetch_llms_txt.py --list` still sees all 52 pages as present
+
+## 2026-10-25 ingest | 4 llms.txt docs sets (Mastra Factory, 8090, Factory.ai, Port)
+
+- Catalogs: `https://factory.mastra.ai/llms.txt` (24 links), `https://docs.8090.ai/llms.txt` (158), `https://docs.factory.com/llms.txt` (120), `https://docs.port.io/llms.txt` (753); `docs_selector` picked 10 per set; 40 fetched, 0 skipped
+- Docs sets (one origin each): llms-factory-mastra-ai, llms-docs-8090-ai, llms-docs-factory-com, llms-docs-port-io; one `OVERVIEW.md` hub each (8, 12, 13, 13 areas)
+- Source pages: 40 under `wiki/docs/<set>/` (what-is-factory, using-*, configure-*, deployment; general-*, modules-*, opinions-*, codebase-overview; software-factory-*, missions-overview, environments-overview, droid-exec-overview, agent-readiness-overview, harness-*; getting-started-agentic-sdlc-pillars, glossary, context-lake-overview, workflows-concepts, solutions-*, agent-management-*, guides-all-trigger-ai-coding-assistants-from-port)
+- New pages: gitlab (entity, 2 origins), jira (entity, 3), microsoft-teams (entity, 2), sentry (entity, 2), context-engineering (concept, 3), git-worktree (concept, 2), knowledge-base (concept, 2), knowledge-graph (concept, 2), mcp (concept, 4), webhook (concept, 3)
+- Updated pages: claude-code (7 origins), codex (5), github (7), linear (4), slack (7), agent-harness (6), agent-skill (7), control-plane (4), dev-environment (4), factory-as-code (5), human-in-the-loop (8), secrets-management (3), self-hosting (3), software-factory (8)
+- Overview rewritten (95 source-like pages, 4 themes); `build_index_md.py` exits 0 (128 pages)
+- Waiting at 1 origin: mastra-factory, 8090-software-factory, port, agentops, agent-runner, agentic-merge-queue, compounding-engineering, docker, kubernetes, aws-ecr, azure-devops, vercel, baml, coderabbit, human-layer
+- Caveats: factory-as-code and github writers read only the relevant lines of older sources; factory-as-code body was rewritten, not strictly merged; agent-skill is over the 500-word budget

@@ -2,6 +2,48 @@
 
 # Docs
 
+## llms-docs-8090-ai
+
+- [[wiki/docs/llms-docs-8090-ai/codebase-overview|Codebase Connection]] — How 8090 Software Factory indexes a connected GitHub or GitLab repository for agents, keeps it synced on push, and uses Drift Bot to flag pull requests that diverge from Blueprints and Requirements.
+- [[wiki/docs/llms-docs-8090-ai/connections-connect-coding-agent|Coding Agent Connection]] — 8090 Software Factory exposes an OAuth-protected MCP server so any MCP-capable coding agent can pull Work Orders, read linked Requirements and Blueprints, and report status back.
+- [[wiki/docs/llms-docs-8090-ai/general-introduction|8090 Software Factory introduction]] — 8090's docs pitch a multiplayer, AI-native platform that keeps requirements, blueprints and work orders in one knowledge graph so teams and agents share a single source of truth.
+- [[wiki/docs/llms-docs-8090-ai/general-quickstart|Quickstart]] — 8090 Software Factory's first-run guide: set up an org and project, have the Agent write requirements and blueprints, extract work orders, and hand them to a coding agent over MCP.
+- [[wiki/docs/llms-docs-8090-ai/modules-automations|8090 Software Factory Automations]] — 8090 docs describe Automations: project-agent runs fired by events or a schedule, bounded by the creator's permissions, per-area restrictions and explicitly granted MCP Servers.
+- [[wiki/docs/llms-docs-8090-ai/modules-knowledge-base|Knowledge Base]] — The 8090 Software Factory Knowledge Base is the store of project context (uploads, meeting notes, research) that agents read when generating requirements, blueprints and work orders, kept current b...
+- [[wiki/docs/llms-docs-8090-ai/modules-skills|Skills]] — 8090 Software Factory skills are versioned, team-shared instruction sets that the project agent loads on demand, can be forced by Skill Rules before writes, and can be shared across an organization...
+- [[wiki/docs/llms-docs-8090-ai/modules-work-orders|Work Orders]] — 8090 Software Factory docs describe Work Orders as structured, traceable tasks linked to Requirements and Blueprints, planned in phases, tied to pull requests, and reachable by coding agents over MCP.
+- [[wiki/docs/llms-docs-8090-ai/opinions-agent-skill|Agent Skill]] — 8090 ships an installable agent skill that makes a coding agent execute Software Factory work orders through a fixed read, plan, implement, verify workflow, with progress kept in a per-work-order s...
+- [[wiki/docs/llms-docs-8090-ai/opinions-reverse-engineering|Reverse engineering]] — 8090 docs describe an Agent workflow that reads a connected repository and reconstructs a feature hierarchy, requirements and blueprints, flagging conflicts between old specs and the real code.
+- [[wiki/docs/llms-docs-8090-ai/OVERVIEW|Docs]] — Guides, best practices and REST API reference for 8090 Software Factory, a product that links requirements, blueprints and work orders to coding agents.
+
+## llms-docs-factory-com
+
+- [[wiki/docs/llms-docs-factory-com/agent-readiness-overview|Agent Readiness]] — Factory's Agent Readiness Model scores repositories on five gated levels and nine technical pillars to show whether autonomous agents can work in them reliably.
+- [[wiki/docs/llms-docs-factory-com/delegations-index|Delegations]] — Factory's Delegations feature lets teams hand work to Droid from Slack, Linear, Jira and Microsoft Teams, running on a shared service-account identity and compute configured once through the Apps a...
+- [[wiki/docs/llms-docs-factory-com/droid-exec-overview|Droid Exec (Headless)]] — Factory's non-interactive `droid exec` mode: one-shot, read-only by default, autonomy tiers, JSON output and JSON-RPC, worktrees, Mission Mode, and CI batch patterns.
+- [[wiki/docs/llms-docs-factory-com/environments-overview|Environments]] — Factory's Environments are saved, snapshot-based cloud dev environments that let Droids start from a prepared baseline of repositories and tools.
+- [[wiki/docs/llms-docs-factory-com/harness-skills|Skills]] — Factory's Droid agent packages reusable workflows as SKILL.md directories, loaded by progressive disclosure from many scopes with a fixed override precedence.
+- [[wiki/docs/llms-docs-factory-com/harness-subagents|Custom droids (subagents)]] — How Factory's Droid defines reusable Markdown subagents with their own prompt, model and tool policy, run through the Task tool in a fresh context window.
+- [[wiki/docs/llms-docs-factory-com/missions-overview|Factory Missions]] — Factory Missions turn a large, multi-feature project into a collaboratively planned set of milestones that an orchestrator (Mission Control) executes and validates with Droid workers.
+- [[wiki/docs/llms-docs-factory-com/OVERVIEW|Factory Documentation]] — Documentation for Factory, an agent-native software development platform built around the Droid coding agent, covering apps, automations, missions, environments, harness extensions, safety and ente...
+- [[wiki/docs/llms-docs-factory-com/software-factory-automations|Custom Automations]] — How Factory's Droid automations are created, triggered (schedule, Slack, GitHub, webhook), run, shared, monitored and paused.
+- [[wiki/docs/llms-docs-factory-com/software-factory-overview|Software Factory]] — Factory's docs overview of Software Factory, a 24/7 autonomous system and dashboard that maps automation coverage, health and metrics across six SDLC stages (Private Preview).
+- [[wiki/docs/llms-docs-factory-com/welcome-index|Welcome to Factory]] — Landing page of Factory's docs: Droid, its coding agent, runs identically in a desktop app, CLI and web/mobile, and scales from one session to an automated SDLC.
+
+## llms-docs-port-io
+
+- [[wiki/docs/llms-docs-port-io/agent-management-overview|Agent management]] — Port's agent management section frames governance of code-first, cloud-managed and Port-native AI agents, skills and MCP servers as one layer, with agents acting as platform consumers, platform com...
+- [[wiki/docs/llms-docs-port-io/agent-management-skills-overview|Skills]] — Port stores Agent Skills-spec skill packages as catalog entities that Port AI loads on demand via a load_skill tool in the Port MCP server, with built-in skills, custom overrides and GitOps sync fr...
+- [[wiki/docs/llms-docs-port-io/context-lake-overview|Context Lake]] — Port's Context Lake is the unified, queryable layer of catalog data, business context, access controls and scorecards that gives AI agents and developers organization-specific grounding.
+- [[wiki/docs/llms-docs-port-io/getting-started-agentic-sdlc-pillars|The pillars of an AI software factory]] — Port's docs name six pillars of an AI software factory: context lake, workflows, Port AI, agent management, interface builder and governance.
+- [[wiki/docs/llms-docs-port-io/glossary|Glossary]] — Port's glossary: defines its AI software factory and agentic SDLC framing, the context lake, and the Port-specific terms (blueprint, entity, scorecard, Ocean) that collide with common industry mean...
+- [[wiki/docs/llms-docs-port-io/guides-all-trigger-ai-coding-assistants-from-port|Trigger AI coding assistants from Port]] — Port guide that wires GitHub Copilot, Claude Code and Gemini CLI behind Port workflows, with GitHub Actions doing the agent run and writing execution metrics back to the catalog.
+- [[wiki/docs/llms-docs-port-io/OVERVIEW|Port Documentation]] — Documentation for Port, a platform for building an AI software factory, covering its context lake, workflows, Port AI, agent management, governance and solution playbooks.
+- [[wiki/docs/llms-docs-port-io/solutions-agentops-overview|AgentOps]] — Port's AgentOps docs frame governance of agents, skills and MCP servers (inventory, certification, enforcement, optimization) as the prerequisite for running a software factory in production.
+- [[wiki/docs/llms-docs-port-io/solutions-autonomous-ticket-resolution-agentic-initiatives|Agentic initiatives]] — Port's pattern for fanning one coding-agent instruction out across every service that needs the same change, tracked per service and governed by criticality-based approval.
+- [[wiki/docs/llms-docs-port-io/solutions-autonomous-ticket-resolution-overview|Autonomous ticket resolution]] — Port's pattern for running the SDLC (triage, plan, build, review, ship) with AI handling routed, catalog-enriched work and humans kept at defined checkpoints.
+- [[wiki/docs/llms-docs-port-io/workflows-concepts|Concepts and structure]] — Port's workflow model is a JSON graph of trigger, action, condition and input nodes joined by connections, with version-guarded concurrent edits.
+
 ## llms-docs-warp-dev
 
 - [[wiki/docs/llms-docs-warp-dev/factories-api-and-sdk-demo-sentry-monitoring-with-sdk|Demo: Sentry monitoring with SDK]] — Warp docs demo of a small TypeScript webhook service that turns filtered Sentry alerts into draft GitHub PRs via a Warp cloud agent.
@@ -57,3 +99,17 @@
 - [[wiki/docs/llms-docs-warp-dev/factories-webhooks|Triggering automations with custom webhooks]] — Warp's docs describe custom webhooks as HTTPS ingress URLs that let any system POST JSON to start factory automation runs, with three auth modes, payload filters and dedup.
 - [[wiki/docs/llms-docs-warp-dev/factories|Warp Factories overview]] — Warp's docs define a factory as a team of cloud agents that turns issues, tickets and Slack messages into reviewed pull requests, with humans approving specs and merges.
 - [[wiki/docs/llms-docs-warp-dev/OVERVIEW|Warp]] — Documentation for Warp, the agentic terminal and cloud agent platform, including Warp Factories for running software factories.
+
+## llms-factory-mastra-ai
+
+- [[wiki/docs/llms-factory-mastra-ai/configure-boards-and-rules|Boards and rules]] — Mastra Factory docs show how to turn a team process into code: boards define work-item phases, and onEnter, tool-result and transition-policy rules decide when agents run and when people must approve.
+- [[wiki/docs/llms-factory-mastra-ai/configure-custom-skills|Mastra Factory custom skills]] — Mastra Factory docs explain how to add a custom SKILL.md under src/mastra/public/factory-skills/ so Factory loads it alongside its built-in skills.
+- [[wiki/docs/llms-factory-mastra-ai/configure-github|GitHub]] — How Mastra Factory connects to GitHub (Platform-backed or self-owned GitHub App), which issues and pull requests it syncs, and the permissions, webhooks and tokens it needs.
+- [[wiki/docs/llms-factory-mastra-ai/configure-sandboxes|Sandboxes]] — Mastra Factory docs explain how each coding-agent session gets a sandbox with repo checkout, setup and teardown commands, and a choice between Mastra platform, local, or other providers.
+- [[wiki/docs/llms-factory-mastra-ai/deployment|Mastra Factory deployment]] — Mastra Factory docs describe three deployment setups, one-command deploy to Mastra platform, and a fully self-hosted path on a persistent Node.js process with PostgreSQL.
+- [[wiki/docs/llms-factory-mastra-ai/OVERVIEW|Mastra Factory]] — Documentation for Mastra Factory, a self-hosted system that takes work from intake to reviewed pull requests, covering concepts, integrations, configuration, deployment and reference.
+- [[wiki/docs/llms-factory-mastra-ai/using-intake|Intake]] — Mastra Factory intake turns synced GitHub, GitLab, Linear, Jira and incident.io issues into Work cards and pull requests into Review cards, with nothing starting automatically unless a trust policy...
+- [[wiki/docs/llms-factory-mastra-ai/using-reviews|Review items]] — Factory's Review card tracks a PR through agent review and human assessment, keeping "review run done", "PR merged" and "issue complete" as separate steps.
+- [[wiki/docs/llms-factory-mastra-ai/using-sessions|Sessions]] — Factory docs page on how to find work needing attention, inspect and steer an agent session, and keep discussion in card comments and Slack threads.
+- [[wiki/docs/llms-factory-mastra-ai/using-work-and-approvals|Work items]] — Mastra Factory docs page on how Work cards move through phases, which human decisions gate them, automation toggles, and how GitHub and Linear events change card state.
+- [[wiki/docs/llms-factory-mastra-ai/what-is-factory|What's Factory?]] — Mastra's docs introduce Mastra Factory, a web app where coding agents take an issue through investigation, planning, implementation and PR review, with people gating key steps.
