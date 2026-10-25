@@ -18,3 +18,20 @@
 - Waiting at 1 origin: warp-factories, factory-as-code, foreman-agent, agent-skill, mcp, self-hosting, agent-runner, secrets-management, webhook, git-worktree, github, slack, … (27 slugs)
 - Removed an empty Obsidian stub `wiki/wiki/sources/youtube-tGbjIvvYuHE.md` (vault opened at `wiki/` breaks `[[wiki/...]]` links)
 - Fixed unquoted `: ` in `wiki/concepts/dev-environment.md` description; `build_index_md.py` exits 0 (63 pages)
+
+## 2026-10-25 ingest | 2 Warp repos (warp-factory-examples, common-skills)
+
+- Cloned `https://github.com/warpdotdev/warp-factory-examples` @ `84e7c95` and `https://github.com/warpdotdev/common-skills` @ `8792394` into `raw/repos/` (gitignored); 2 new, 0 skipped, 0 refreshed
+- Repo pages: `wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE.md`, `wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE.md`
+- New pages: github (entity, 3 origins), linear (entity, 2), slack (entity, 3), warp-factories (entity, 2), agent-skill (concept, 3), factory-as-code (concept, 3), foreman-agent (concept, 2), secrets-management (concept, 2), self-hosting (concept, 2)
+- Updated pages: claude-code, codex, agent-evals, agent-harness, control-plane, human-in-the-loop, multi-repo-development, software-factory (now 3–4 origins each)
+- Caveat: 3 of 4 origins are Warp (docs set + 2 repos); the 9 new pages rest on Warp's voice alone, flagged in each Synthesis line
+- Overview rewritten (Repos section added); `build_index_md.py` exits 0 (74 pages)
+- Waiting at 1 mention: aws-ecr, azure-devops, baml, coderabbit, docker, gitlab, human-layer, jira, kubernetes, microsoft-teams, sentry, vercel, agent-runner, agentic-merge-queue, compounding-engineering, git-worktree, mcp, webhook
+
+## 2026-10-25 layout | docs sets move to `raw/docs/`
+
+- Moved `raw/llms-docs-warp-dev/` → `raw/docs/llms-docs-warp-dev/` (53 files, unchanged), mirroring `raw/repos/`
+- Rewrote `[[raw/llms-docs-warp-dev/...]]` citations to `[[raw/docs/llms-docs-warp-dev/...]]` across wiki pages; earlier log entries keep the old path
+- Skill updated: `fetch_llms_txt.py` default folder, `SKILL.md`, `CONVENTIONS.md`, `SOURCES.md`, `PAGES.md`, `agents/docs_writer.md`
+- `build_index_md.py` exits 0 (74 pages); `fetch_llms_txt.py --list` still sees all 52 pages as present
