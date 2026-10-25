@@ -224,3 +224,4 @@ wiki-*/raw/repos/
 
 # git worktrees (Claude Code convention)
 .claude/worktrees/
+wiki-*/wiki/.obsidian/
