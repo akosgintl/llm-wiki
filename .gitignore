@@ -218,3 +218,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# LLM wiki: repo clones are regenerable raw caches
+wiki-*/raw/repos/
