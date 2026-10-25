@@ -22,7 +22,8 @@ model of your provider). If unavailable, use the harness default.
 
    ```bash
    for f in <wiki_dir>/wiki/sources/*.md <wiki_dir>/wiki/entities/*.md \
-            <wiki_dir>/wiki/concepts/*.md <wiki_dir>/wiki/repos/*/*.md; do
+            <wiki_dir>/wiki/concepts/*.md <wiki_dir>/wiki/repos/*/*.md \
+            <wiki_dir>/wiki/docs/*/*.md; do
      awk '/^---$/{c++; next} c==1' "$f"; echo "---END---"
    done
    ```

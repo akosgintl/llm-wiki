@@ -63,7 +63,8 @@ Receipt (stdout, fetch mode):
    "authors": [], "published_date": null, "raw_path": "raw/llms-<slug>/", "catalog": "raw/llms-<slug>/llms.txt", "catalog_size",
    "hub_page": "wiki/docs/llms-<slug>/OVERVIEW.md",
    "pages": [{"id", "title", "source_url", "raw_path", "source_page", "action", "chars"}], ["warning"]}
-  action is `fetched`, `skipped` (already in raw/) or `failed`.
+  action is `fetched`, `skipped` (already in raw/) or `failed`; a failed page carries a `reason`.
+  `warning` also flags a catalog that looks cut off mid-line by the server.
 """
 
 from __future__ import annotations
@@ -187,6 +188,20 @@ def parse_llms_txt(text: str, base_url: str) -> tuple[str | None, str | None, li
     return title, summary, links
 
 
+def truncation_warning(text: str, url: str) -> str | None:
+    """Flag a catalog the server cut off mid-line: its last line starts a link that does not parse.
+
+    Byte counts and a missing final newline prove nothing — docs.port.io serves exactly
+    250,000 bytes on purpose, and docs.warp.dev bundles end without a newline, both cleanly.
+    """
+    last = text.rstrip("\n").rsplit("\n", 1)[-1]
+    if not re.match(r"^\s*[-*]\s*\[", last) or LINK_RE.match(last):
+        return None
+    warning = f"catalog looks truncated ({len(text.encode())} bytes, last line incomplete): {url}"
+    print(f"WARN: {warning}", file=sys.stderr)
+    return warning
+
+
 def link_kind(url: str) -> str:
     path = urlparse(url).path
     if DUMP_RE.search(path):
@@ -233,6 +248,7 @@ def expand_subcatalogs(links: list[dict]) -> tuple[list[dict], list[dict]]:
         except SystemExit as err:
             print(f"WARN: sub-catalog not expanded: {err}", file=sys.stderr)
             return []
+        link["warning"] = truncation_warning(text, link["url"])
         if sum(bool(CANONICAL_RE.match(l)) for l in text.splitlines()) >= 2:
             children, shape = parse_bundle(text), "bundle"
         else:
@@ -266,6 +282,7 @@ def expand_subcatalogs(links: list[dict]) -> tuple[list[dict], list[dict]]:
                     "shape": link["shape"],
                     "links": len(new),
                     "duplicates": len(kids) - len(new),  # already listed elsewhere in the catalog
+                    **({"warning": link["warning"]} if link.get("warning") else {}),
                 }
             )
         else:
@@ -419,6 +436,7 @@ def main() -> None:
     title, summary, links = parse_llms_txt(catalog, args.url)
     if not links:
         raise SystemExit(f"no `- [name](url)` links found in {args.url} — is it an llms.txt?")
+    warnings = [w for w in [truncation_warning(catalog, args.url)] if w]
     links, expanded = expand_subcatalogs(links)
     add_hints(links, keywords, phrases)
     page_slugs(links, args.url)
@@ -436,6 +454,7 @@ def main() -> None:
             "keywords": keywords,
             "phrases": [" ".join(p) for p in phrases],
             "expanded": expanded,
+            **({"warning": "; ".join(warnings)} if warnings else {}),
             "links": [
                 {k: link[k] for k in ("id", "hint", "kind", "section", "name", "notes", "url", "exists")}
                 for link in links
@@ -481,13 +500,14 @@ def main() -> None:
             body, content_type = fetch_page(link["url"])
         except SystemExit as err:
             print(f"WARN: {err}", file=sys.stderr)
-            page["action"] = "failed"
+            page.update(action="failed", reason=str(err))
             continue
         markdown, description = split_frontmatter(to_markdown(body, content_type, link["url"]))
         markdown = strip_mdx(markdown)
         notes = link["notes"] or description
         if len(markdown) < 200:
-            page["action"] = "failed"
+            # Usually a navigation page: a grid of cards or links with no prose of its own.
+            page.update(action="failed", reason=f"body under 200 chars ({len(markdown)}) — likely a navigation page")
             continue
         front = [
             "---",
@@ -526,8 +546,10 @@ def main() -> None:
     if not any(p["action"] in ("fetched", "skipped") for p in pages):
         raise SystemExit(f"every selected page failed for {args.url}: {json.dumps(pages, ensure_ascii=False)}")
     if not any(p["action"] == "fetched" for p in pages):
-        receipt["warning"] = "no new pages fetched — every selected page is already in raw/"
-        print(f"WARN: {receipt['warning']} ({args.url})", file=sys.stderr)
+        warnings.append("no new pages fetched — every selected page is already in raw/")
+        print(f"WARN: {warnings[-1]} ({args.url})", file=sys.stderr)
+    if warnings:
+        receipt["warning"] = "; ".join(warnings)
     print(json.dumps(receipt, indent=2, ensure_ascii=False))
 
 
