@@ -30,7 +30,10 @@ model of your provider). If unavailable, use the harness default.
      --url "<catalog_url>" --wiki-dir <wiki_dir> --list
    ```
 
-   Each link has `id`, `hint`, `section`, `name`, `notes`, `url`, `exists`.
+   Each link has `id`, `hint`, `kind`, `section`, `name`, `notes`, `url`, `exists`.
+   Sub-catalogs (nested indexes, multi-page bundles) are already expanded into
+   their pages; `expanded` says which. Only `kind: page` can be picked —
+   `dump` (llms-full.txt and the like) and `spec` (OpenAPI) are refused.
 2. **State the topic to yourself in one sentence** from `user_intent`, the slug,
    `topic_description` and the existing slugs — *what would a reader of this wiki
    come here to learn?* The slug is a name, not a query: a wiki called

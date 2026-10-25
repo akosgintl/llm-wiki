@@ -16,10 +16,27 @@ have nothing to do with it. So this adapter runs in two phases:
   2. `--pick 3,7,12` fetches exactly those ids. Without `--pick`, the top
      `--max-pages` links by hint are fetched (fallback for runs with no selector).
 
+Real catalogs are not always flat. Before listing, every `.txt` link is fetched
+once and expanded in place, one level deep:
+
+  - a nested index (`- [name](url)` lines, e.g. docs.port.io/llms/guides.txt)
+    contributes its links;
+  - a bundle (pages concatenated, each under `Canonical page: [..](url)`, e.g.
+    docs.warp.dev/_llms-txt/factories.txt) contributes one link per page.
+
+The expanded link replaces its parent, so ids are positions in the expanded list.
+Full-docs dumps (`llms-full.txt`, `llms-small.txt`) and API specs (`.json`,
+`.yaml`) stay listed with `kind: dump` / `kind: spec` and cannot be picked: they
+are not pages. Every other link is `kind: page`.
+
+A page link without an extension is fetched as `<url>.md` first (many doc sites
+serve markdown there), falling back to the HTML page.
+
 Layout (a tree adapter, like repos — SOURCES.md):
 
   raw/llms-<host>[-<dir>]/
-    llms.txt              # catalog snapshot, overwritten every run
+    llms.txt              # catalog snapshot, overwritten every run; expanded
+                          # sub-catalogs are appended as extra `##` sections
     <page-slug>.md        # one per fetched link; immutable, skipped if present
 
 Identity is per page: the page slug comes from the link's URL path, minus the
@@ -38,6 +55,9 @@ Usage:
   uv run --script fetch_llms_txt.py --url https://docs.example.com/llms.txt --wiki-dir wiki-<NNN>-<slug> --list
   uv run --script fetch_llms_txt.py --url ... --wiki-dir ... --pick 3,7,12
 
+`--list` prints `{"id", "hint", "kind", "section", "name", "notes", "url", "exists"}`
+per link, plus `expanded`: the sub-catalogs inlined and how many links each gave.
+
 Receipt (stdout, fetch mode):
   {"origin": "llms-txt", "original_path": <url>, "title", "subtitle", "source_url",
    "authors": [], "published_date": null, "raw_path": "raw/llms-<slug>/", "catalog": "raw/llms-<slug>/llms.txt", "catalog_size",
@@ -50,12 +70,14 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import json
 import math
 import re
 import subprocess
 import sys
 import unicodedata
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
@@ -77,6 +99,18 @@ STOPWORDS = {"a", "an", "and", "the", "of", "for", "to", "in", "on", "with", "wi
 
 LINK_RE = re.compile(r"^\s*[-*]\s*\[(?P<name>[^\]]+)\]\((?P<url>[^)\s]+)\)\s*(?::\s*(?P<notes>.*))?$")
 
+# A bullet with no link groups the links indented under it ("- Core concepts").
+GROUP_RE = re.compile(r"^(?P<indent>\s*)[-*]\s+(?P<label>[^\[].*?)\s*$")
+
+CANONICAL_RE = re.compile(r"^Canonical page:\s*\[[^\]]*\]\((?P<url>[^)\s]+)\)")
+
+DUMP_RE = re.compile(r"(^|/)llms-(full|small|ctx[\w-]*)\.txt$")
+
+SPEC_RE = re.compile(r"\.(json|ya?ml)$|openapi|swagger", re.I)
+
+# Capitalized JSX/MDX component tags (<CardGroup>, <Card title="..">); lowercase HTML stays.
+MDX_TAG_RE = re.compile(r"</?[A-Z][A-Za-z0-9.]*(?:\s[^<>]*?)?/?>", re.S)
+
 PHRASE_BONUS = 3.0
 
 
@@ -86,10 +120,10 @@ def slugify(text: str, limit: int = 60) -> str:
     return slug[:limit].rsplit("-", 1)[0] if len(slug) > limit else slug
 
 
-def fetch(url: str) -> tuple[str, str]:
-    """Return (body, content_type). Raises SystemExit on a failed or empty fetch."""
+def fetch(url: str, fail: bool = False) -> tuple[str, str]:
+    """Return (body, content_type). Raises SystemExit on a failed or empty fetch, or an HTTP error if `fail`."""
     result = subprocess.run(
-        ["curl", "-sL", "--max-time", "60", "-A", USER_AGENT, "-w", "\n%{content_type}", url],
+        ["curl", "-sL", *(["-f"] if fail else []), "--max-time", "60", "-A", USER_AGENT, "-w", "\n%{content_type}", url],
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -128,25 +162,130 @@ def topic_keywords(wiki_dir: Path, extra: str | None) -> tuple[list[str], list[l
 def parse_llms_txt(text: str, base_url: str) -> tuple[str | None, str | None, list[dict]]:
     title = summary = None
     section = ""
+    groups: list[tuple[int, str]] = []  # (indent, label) of the group bullets enclosing the current line
     links: list[dict] = []
     for line in text.splitlines():
+        indent = len(line) - len(line.lstrip())
         if line.startswith("# ") and title is None:
             title = line[2:].strip()
         elif line.startswith("> ") and summary is None:
             summary = line[2:].strip()
         elif line.startswith("## "):
-            section = line[3:].strip()
+            section, groups = line[3:].strip(), []
         elif match := LINK_RE.match(line):
+            groups = [g for g in groups if g[0] < indent]
             links.append(
                 {
-                    "id": len(links),
                     "name": match["name"].strip(),
                     "url": urljoin(base_url, match["url"]),
                     "notes": (match["notes"] or "").strip(),
-                    "section": section,
+                    "section": " / ".join([section] * bool(section) + [g[1] for g in groups]),
                 }
             )
+        elif match := GROUP_RE.match(line):
+            groups = [g for g in groups if g[0] < indent] + [(indent, match["label"].split(":")[0].strip())]
     return title, summary, links
+
+
+def link_kind(url: str) -> str:
+    path = urlparse(url).path
+    if DUMP_RE.search(path):
+        return "dump"
+    if SPEC_RE.search(path):
+        return "spec"
+    return "subcatalog" if path.endswith(".txt") else "page"
+
+
+def parse_bundle(text: str) -> list[dict]:
+    """Split a concatenated-pages bundle into one link per `Canonical page:` line.
+
+    The page's title is the H1 just above that line, its notes the blockquote just below.
+    """
+    lines = text.splitlines()
+    links = []
+    for i, line in enumerate(lines):
+        if not (match := CANONICAL_RE.match(line)):
+            continue
+        above = [l for l in lines[max(0, i - 3) : i] if l.startswith("# ")]
+        below = [l for l in lines[i + 1 : i + 4] if l.startswith("> ")]
+        url = match["url"]
+        links.append(
+            {
+                "name": above[-1][2:].strip() if above else urlparse(url).path.strip("/") or url,
+                "url": url,
+                "notes": below[0][2:].strip() if below else "",
+            }
+        )
+    return links
+
+
+def expand_subcatalogs(links: list[dict]) -> tuple[list[dict], list[dict]]:
+    """Replace each `.txt` sub-catalog link by the links it holds, one level deep.
+
+    Returns (links, expanded). A sub-catalog that fails to fetch, or holds no
+    links, stays in the list as a plain page.
+    """
+    subs = [l for l in links if link_kind(l["url"]) == "subcatalog"]
+
+    def load(link: dict) -> list[dict]:
+        try:
+            text, _ = fetch(link["url"], fail=True)
+        except SystemExit as err:
+            print(f"WARN: sub-catalog not expanded: {err}", file=sys.stderr)
+            return []
+        if sum(bool(CANONICAL_RE.match(l)) for l in text.splitlines()) >= 2:
+            children, shape = parse_bundle(text), "bundle"
+        else:
+            children, shape = parse_llms_txt(text, link["url"])[2], "index"
+        prefix = " / ".join(s for s in (link["section"], link["name"]) if s)
+        for child in children:
+            child["url"] = urljoin(link["url"], child["url"])
+            child["section"] = " / ".join(s for s in (prefix, child.get("section", "")) if s)
+            child["parent"] = link["url"]
+        link["shape"] = shape
+        return children
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        children = dict(zip((id(l) for l in subs), pool.map(load, subs)))
+    def same_page(url: str) -> str:  # `/a/b`, `/a/b/` and `/a/b.md` are one page
+        parsed = urlparse(url)
+        return parsed.netloc + re.sub(r"(\.mdx?)?/?$", "", parsed.path)
+
+    out: list[dict] = []
+    expanded = []
+    seen = {same_page(l["url"]) for l in links}
+    for link in links:
+        kids = children.get(id(link))
+        if kids:
+            new = [k for k in kids if same_page(k["url"]) not in seen and not seen.add(same_page(k["url"]))]
+            out += new
+            expanded.append(
+                {
+                    "url": link["url"],
+                    "name": link["name"],
+                    "shape": link["shape"],
+                    "links": len(new),
+                    "duplicates": len(kids) - len(new),  # already listed elsewhere in the catalog
+                }
+            )
+        else:
+            out.append(link)
+    for i, link in enumerate(out):
+        link["id"] = i
+        link["kind"] = "page" if link_kind(link["url"]) == "subcatalog" else link_kind(link["url"])
+    return out, expanded
+
+
+def catalog_appendix(links: list[dict], expanded: list[dict]) -> str:
+    """The expanded sub-catalogs as llms.txt sections, appended to the snapshot so the hub sees them."""
+    parts = []
+    for sub in expanded:
+        parts.append(f"\n## {sub['name']} (expanded from {sub['url']})\n")
+        for link in links:
+            if link.get("parent") == sub["url"]:
+                notes = f": {link['notes']}" if link["notes"] else ""
+                parts.append(f"- [{link['name']}]({link['url']}){notes}")
+    return "\n".join(parts) + "\n" if parts else ""
 
 
 def contains(seq: list[str], phrase: list[str]) -> bool:
@@ -214,6 +353,41 @@ def to_markdown(body: str, content_type: str, url: str) -> str:
     return ""
 
 
+def is_html(body: str, content_type: str) -> bool:
+    return "html" in content_type or body.lstrip().lower().startswith(("<!doctype", "<html"))
+
+
+def fetch_page(url: str) -> tuple[str, str]:
+    """Fetch a page, preferring its markdown twin: `<url>.md` for links without an extension."""
+    parsed = urlparse(url)
+    if not re.search(r"\.\w{1,5}$", parsed.path):
+        path = parsed.path.rstrip("/")
+        md_url = parsed._replace(path=f"{path}.md" if path else "/index.md", query="", fragment="").geturl()
+        try:
+            body, content_type = fetch(md_url, fail=True)
+            if not is_html(body, content_type):
+                return body, content_type
+        except SystemExit:
+            pass
+    return fetch(url)
+
+
+def strip_mdx(markdown: str) -> str:
+    """Drop MDX component tags outside code fences; a component's `title` survives as a bold line."""
+    parts = re.split(r"(^```.*?^```[^\n]*$)", markdown, flags=re.M | re.S)
+    for i in range(0, len(parts), 2):  # even parts are outside fences
+        parts[i] = MDX_TAG_RE.sub(
+            lambda m: f"**{t[1]}**" if (t := re.search(r'\btitle="([^"]+)"', m[0])) else "", parts[i]
+        )
+        parts[i] = re.sub(r"\n{3,}", "\n\n", parts[i])
+    return "".join(parts)
+
+
+def rel(path: Path, base: Path) -> str:
+    """`path` relative to `base` when inside it, else absolute — `--output` may point anywhere."""
+    return path.relative_to(base).as_posix() if path.is_relative_to(base) else path.as_posix()
+
+
 def split_frontmatter(markdown: str) -> tuple[str, str | None]:
     """Docs served as .md often carry their own frontmatter; drop it, keep its description."""
     match = re.match(r"---\n(.*?)\n---\n", markdown, re.S)
@@ -245,6 +419,7 @@ def main() -> None:
     title, summary, links = parse_llms_txt(catalog, args.url)
     if not links:
         raise SystemExit(f"no `- [name](url)` links found in {args.url} — is it an llms.txt?")
+    links, expanded = expand_subcatalogs(links)
     add_hints(links, keywords, phrases)
     page_slugs(links, args.url)
 
@@ -260,8 +435,9 @@ def main() -> None:
             "summary": summary,
             "keywords": keywords,
             "phrases": [" ".join(p) for p in phrases],
+            "expanded": expanded,
             "links": [
-                {k: link[k] for k in ("id", "hint", "section", "name", "notes", "url", "exists")}
+                {k: link[k] for k in ("id", "hint", "kind", "section", "name", "notes", "url", "exists")}
                 for link in links
             ],
         }
@@ -273,15 +449,18 @@ def main() -> None:
         unknown = [i for i in ids if not 0 <= i < len(links)]
         if unknown:
             raise SystemExit(f"unknown link ids: {unknown} (catalog has {len(links)})")
+        not_pages = [f"{i} ({links[i]['kind']})" for i in ids if links[i]["kind"] != "page"]
+        if not_pages:
+            raise SystemExit(f"not pages, cannot be picked: {', '.join(not_pages)}")
         selected = [links[i] for i in ids]
     else:
-        ranked = sorted((l for l in links if l["hint"] > 0), key=lambda l: -l["hint"])
+        ranked = sorted((l for l in links if l["hint"] > 0 and l["kind"] == "page"), key=lambda l: -l["hint"])
         selected = ranked[: args.max_pages]
     if not selected:
         raise SystemExit(f"no links selected from {args.url} — nothing written; run --list and pass --pick")
 
     folder.mkdir(parents=True, exist_ok=True)
-    (folder / "llms.txt").write_text(catalog, encoding="utf-8")
+    (folder / "llms.txt").write_text(catalog.rstrip("\n") + "\n" + catalog_appendix(links, expanded), encoding="utf-8")
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     pages = []
@@ -291,7 +470,7 @@ def main() -> None:
             "id": link["id"],
             "title": link["name"],
             "source_url": link["url"],
-            "raw_path": path.relative_to(wiki_dir).as_posix(),
+            "raw_path": rel(path, wiki_dir),
             "source_page": f"wiki/docs/{folder.name}/{link['slug']}.md",
         }
         pages.append(page)
@@ -299,12 +478,13 @@ def main() -> None:
             page["action"] = "skipped"
             continue
         try:
-            body, content_type = fetch(link["url"])
+            body, content_type = fetch_page(link["url"])
         except SystemExit as err:
             print(f"WARN: {err}", file=sys.stderr)
             page["action"] = "failed"
             continue
         markdown, description = split_frontmatter(to_markdown(body, content_type, link["url"]))
+        markdown = strip_mdx(markdown)
         notes = link["notes"] or description
         if len(markdown) < 200:
             page["action"] = "failed"
@@ -323,8 +503,8 @@ def main() -> None:
             "---",
             "",
         ]
-        # Pages from an llms.txt usually start with their own H1; add one only if missing.
-        if not markdown.lstrip().startswith("# "):
+        # Pages from an llms.txt usually carry their own H1, sometimes under a short preamble; add one only if missing.
+        if not re.search(r"^# ", "\n".join(markdown.splitlines()[:10]), re.M):
             front += [f"# {link['name']}", ""]
         path.write_text("\n".join(front) + "\n" + markdown + "\n", encoding="utf-8")
         page.update(action="fetched", chars=len(markdown))
@@ -337,8 +517,8 @@ def main() -> None:
         "source_url": args.url,
         "authors": [],
         "published_date": None,
-        "raw_path": folder.relative_to(wiki_dir).as_posix() + "/",
-        "catalog": (folder / "llms.txt").relative_to(wiki_dir).as_posix(),
+        "raw_path": rel(folder, wiki_dir) + "/",
+        "catalog": rel(folder / "llms.txt", wiki_dir),
         "catalog_size": len(links),
         "hub_page": f"wiki/docs/{folder.name}/OVERVIEW.md",
         "pages": pages,

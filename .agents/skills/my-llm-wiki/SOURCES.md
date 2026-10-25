@@ -122,11 +122,21 @@ none; the harness is already an LLM, so the selector reads titles and notes and
 judges. Without `--pick`, the script fetches the top `--max-pages` by hint — a
 fallback, not the path.
 
+**Catalogs are not always flat.** A `.txt` link is fetched and expanded in
+place, one level deep: a nested index (docs.port.io's `guides.txt`) gives its
+links; a bundle of concatenated pages, each under a `Canonical page:` line
+(docs.warp.dev's `_llms-txt/*.txt`), gives one link per page. Pages listed twice
+(`/a/b` and `/a/b.md`) keep the first. Full-docs dumps (`llms-full.txt`) and API
+specs (`.json`, `.yaml`) are listed as `kind: dump` / `spec` and cannot be
+picked. A page link with no extension is fetched as `<url>.md` first, the HTML
+page only if that fails; MDX component tags are stripped from the body.
+
 **Identity is per page**, `raw/llms-<set>/<page-slug>.md`, with the page
 slug from the link's URL path. A second run against the same catalog — a bigger
 budget, a new intent — fetches only the new picks and reports the rest
-`skipped`. `llms.txt` in the same folder is a snapshot of the catalog,
-overwritten on every run; it is not a source and no writer reads it.
+`skipped`. `llms.txt` in the same folder is a snapshot of the catalog, with
+expanded sub-catalogs appended as extra `##` sections, overwritten on every run.
+It is not a source; only `docs_writer` reads it, to map the whole set.
 
 **repo** — shallow clone, then a different writer.
 
