@@ -61,8 +61,15 @@ concepts:
   - "[[wiki/concepts/mcp]]"
 ```
 
-> **An entity or concept page exists if and only if ≥2 distinct source-like
-> pages list it.**
+> **An entity or concept page exists if and only if ≥2 distinct origins list
+> it.**
+
+An **origin** is one independent witness. A page in `wiki/sources/` is its own
+origin. All pages under one `wiki/repos/<repo>/` are one origin, and so are all
+pages under one `wiki/docs/<set>/`: an `ARCHITECTURE.md` plus five repo notes, or
+ten pages of one vendor's docs, are one voice repeating itself, and must not
+materialize a concept on their own. They still all appear in the mention lists,
+so a page writer can cite every one of them.
 
 `scripts/count_mentions.py` is the single source of truth for that count — never
 eyeball it. One note mentioning something is a fact about that note; two notes
@@ -149,7 +156,9 @@ Full per-type contracts: `PAGES.md`.
 
 ## 7. Immutability and write regimes
 
-- `raw/` is **immutable**. Re-ingesting a note does not overwrite it (§4).
+- `raw/` is **immutable**. Re-ingesting a note does not overwrite it (§4). Two
+  exceptions, both regenerable: repo clones (§11) and the `llms.txt` catalog
+  snapshot in `raw/llms-<set>/`, which is a listing, not a source.
 - `wiki/` is **LLM-owned**. A human may edit it, but the next ingest may rewrite
   what they wrote — deliberate edits belong in `raw/` or in a note the pipeline
   does not own.
@@ -162,7 +171,8 @@ Full per-type contracts: `PAGES.md`.
 Whenever a new source-like page lands, the same five steps run — this workshop
 calls them the **ingest tail**, and every layer reuses them verbatim:
 
-1. `count_mentions.py` — recount mentions across all source-like pages.
+1. `count_mentions.py` — recount mentions across all source-like pages, grouped
+   by origin (§3).
 2. Write/update every entity/concept page whose slug is now ≥2 **and** appears in
    one of the new pages. (A slug at ≥2 that no new page touched is already
    written and unchanged — skip it.)
@@ -217,7 +227,10 @@ wiki-<slug>/
 ├── raw/
 │   ├── <slug>.md                                # local note (01)
 │   ├── article-<slug>.md                        # fetched article (02)
-│   ├── youtube-<slug>.md                        # transcript (02 — skeleton adapter)
+│   ├── llms-<set>/                              # docs selected from an llms.txt (§15)
+│   │   ├── llms.txt                             # catalog snapshot, refreshed each run
+│   │   └── <page-slug>.md                       # one per selected page, immutable
+│   ├── youtube-<slug>.md                        # transcript, slug = video id
 │   └── repos/
 │       └── .github-<owner>-<repo>/              # shallow clone, --depth 1
 └── wiki/
@@ -228,7 +241,8 @@ wiki-<slug>/
 ```
 
 **Origin prefixes** keep `raw/` self-describing at a glance: no prefix = a local
-note, `article-` = fetched from the web, `youtube-` = a transcript. The prefix is
+note, `article-` = fetched from the web, `llms-` = docs selected via an llms.txt,
+`youtube-` = a transcript. The prefix is
 part of the identity, so the same slug from two origins never collides.
 
 **The clone is dot-prefixed** (`.github-…`) for one reason worth stating: Obsidian
@@ -280,6 +294,7 @@ story:
 | **ingest-owned** | `raw/`, `sources/`, `entities/`, `concepts/`, `overview.md`, `repos/*/ARCHITECTURE.md` | the ingest path | a source is added or a repo refreshed |
 | **interaction-owned** | `questions/`, `notes/`, `open-questions.md` | the query path | a question is asked or answered |
 | **repo notes** | `repos/<repo>/<question-slug>.md` | `repo_writer` in `question` mode, from the query path | never — they are appended, then flow through the ingest tail |
+| **docs pages** | `docs/<set>/<page-slug>.md`, and the set's `OVERVIEW.md` | `source_writer` / `docs_writer`, from ingest **or** the query path (§15) | pages never; the hub on every fetch, as part of the tail |
 
 The rule that follows: **query mode never edits an ingest-owned page.** Reading a
 source cannot change what the wiki says the source means, or the same question
@@ -322,3 +337,35 @@ Three rules keep this layer from turning into a chat log:
    why-this-matters, so `questions/index.md` stays cheap to scan.
 3. **One note per topic.** A repeat question enriches the existing note and adds a
    second question page pointing at it — never a second note.
+
+## 15. Docs sets (llms.txt)
+
+An llms.txt is a catalog of someone's documentation: large, changing, mostly
+irrelevant to any one wiki. It is handled like a repo — a map at ingest, and the
+detail fetched when a question needs it — not like an article.
+
+```
+wiki-<slug>/
+├── raw/llms-<set>/
+│   ├── llms.txt                        # catalog snapshot, refreshed on every fetch
+│   └── <page-slug>.md                  # one per fetched page, immutable
+└── wiki/docs/
+    ├── index.md                        # GENERATED — grouped by set
+    └── llms-<set>/
+        ├── OVERVIEW.md                 # type: docs — the map; not a witness
+        └── <page-slug>.md              # type: source, origin: llms-txt
+```
+
+`<set>` is the slugified host plus the llms.txt's directory
+(`docs.anthropic.com/llms.txt` → `llms-docs-anthropic-com`). Identity is per page,
+so fetching more from the same catalog only ever adds.
+
+- **Selection is judgment.** `agents/docs_selector.md` picks the links; the
+  script's keyword `hint` is only a cue for it (`SOURCES.md` § llms-txt).
+- **The hub is not a witness.** `OVERVIEW.md` is written from titles and notes,
+  so it carries no `entities:` / `concepts:` and `count_mentions.py` skips it.
+- **One set, one origin** toward the threshold (§3).
+- **Two ways in.** Ingest fetches the pages the wiki's topic calls for. A question
+  the wiki cannot answer may fetch more from a set it already holds (`QUERY.md`
+  Q.6b). Those pages then go through the ingest tail like any source, and the tail
+  rewrites the set's `OVERVIEW.md`.

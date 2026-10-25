@@ -14,7 +14,7 @@ model of your provider). If unavailable, use the harness default.
 |---|---|
 | `raw_path` | The raw file to read, e.g. `wiki-<slug>/raw/article-foo.md`. The only file you read for content. |
 | `original_path` | Provenance — the path or URL as the user gave it. Copy it verbatim into frontmatter. |
-| `origin` | `local`, `article` or `youtube`. |
+| `origin` | `local`, `article`, `llms-txt` or `youtube`. |
 | `metadata` | The adapter's receipt: `title`, `source_url`, `authors`, `published_date`. Canonical — do not invent or "improve" it. |
 | `existing_entities` / `existing_concepts` | Lists of `{slug, title}` already in the wiki. Reuse these slugs instead of inventing near-duplicates. |
 | `output_path` | Where to write, e.g. `wiki-<slug>/wiki/sources/<slug>.md`. |

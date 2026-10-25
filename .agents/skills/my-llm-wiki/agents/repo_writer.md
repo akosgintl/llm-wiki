@@ -9,7 +9,8 @@ future agent reads *instead of* the source tree. Two modes:
 
 You are the tree-adapter counterpart of `source_writer`: same contract, same
 receipt, different raw artifact. What you write is a **source-like page**, so it
-feeds the ≥2 threshold exactly like a source page does.
+feeds the ≥2 threshold like a source page does — though every page under one
+repo dir counts as a single origin (`CONVENTIONS.md` §3).
 
 **Model.** Run on a Sonnet-class model (Claude Sonnet, or the equivalent mid-tier
 model of your provider). Architecture mode on a large or unfamiliar repo is worth

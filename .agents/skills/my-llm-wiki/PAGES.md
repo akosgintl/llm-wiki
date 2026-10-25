@@ -80,6 +80,11 @@ demonstrates. Not a generic restatement of the topic.>
 this is what the ≥2 threshold counts. Be conservative: a passing mention is not
 an engagement.
 
+**Docs pages.** A page fetched from an llms.txt (`origin: llms-txt`) uses this
+same contract but lives at `wiki/docs/llms-<set>/<page-slug>.md`, beside its
+set's `OVERVIEW.md`, with `raw_file: raw/llms-<set>/<page-slug>.md`. All pages of
+one set count as **one** origin toward the threshold (`CONVENTIONS.md` §3).
+
 ---
 
 ## `entity` / `concept` — `wiki/entities/<slug>.md`, `wiki/concepts/<slug>.md`
@@ -257,6 +262,58 @@ commit-pinned permalinks (`.../blob/<sha>/<path>#L10-L28`).
 **Scope** `src/` + `README` + `docs/`; skip `assets/`, `tests/`, `evals/` unless a
 section is unreadable without them.
 **Receipt** identical to `§ source`, with `original_path: github://<owner>/<repo>`.
+
+---
+
+## `docs` — `wiki/docs/llms-<set>/OVERVIEW.md`
+
+The map of one llms.txt catalog, ingested pages and the rest. Written by
+`agents/docs_writer.md` from the catalog's titles and notes. **Not source-like**:
+no `entities:` / `concepts:`, no vote toward the threshold, because it never read
+a page.
+
+```markdown
+---
+type: docs
+title: <the catalog's H1>
+description: <ONE sentence — what this documentation covers>
+original_path: <llms.txt url>
+source_url: <llms.txt url>
+catalog: raw/llms-<set>/llms.txt
+catalog_size: <number of links>
+created: <ISO-8601 UTC>
+timestamp: <ISO-8601 UTC>
+---
+
+# <title> — Docs map
+
+> Catalog: <llms.txt url> · <catalog_size> links · <N> ingested
+
+## Ingested
+
+- [[wiki/docs/llms-<set>/<page-slug>|<title>]]
+- ...
+
+## Areas
+
+### <area name>
+
+<one line — what this part of the docs covers>
+
+- [<link title>](<url>) — <why this wiki might want it, ≤12 words>
+- ...
+
+### <next area>
+
+## Pulling more
+
+Ingest the catalog again with a new intent, or ask a question the pages above
+do not answer — the query path fetches from this catalog (`QUERY.md` Q.6b).
+```
+
+**Budget** ≤150 lines, 5–15 areas, ≤5 candidate links per area, none of them
+already ingested. **Describe, never claim**: the writer read titles, not pages.
+**Receipt** `{page, original_path, areas, candidates_listed}`.
 
 ---
 
