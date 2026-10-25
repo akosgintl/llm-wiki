@@ -101,7 +101,8 @@ description: <ONE sentence definition>
 aliases: []
 sources:
   - "[[wiki/sources/<slug>]]"
-  - "[[wiki/sources/<slug>]]"
+  - "[[wiki/docs/llms-<set>/<page-slug>]]"
+  - "[[wiki/repos/github-<owner>-<repo>/ARCHITECTURE]]"
 related:
   - "[[wiki/concepts/<slug>]]"
 created: <ISO-8601 UTC — preserved from the existing page>
@@ -120,7 +121,7 @@ each one — do not average them into mush.>
 
 ## Key claims
 
-- <claim>. [[wiki/sources/<slug>]], [[wiki/sources/<slug>]]
+- <claim>. [[wiki/sources/<slug>]], [[wiki/docs/llms-<set>/<page-slug>]]
 - ...
 
 ## Relationships
@@ -129,6 +130,12 @@ each one — do not average them into mush.>
 
 > Synthesis: <one line — how this fits the wiki as a whole>
 ```
+
+**`sources:`** lists the source-like pages the body cites, wherever they live:
+`wiki/sources/<slug>`, `wiki/docs/llms-<set>/<page-slug>`, or any page under
+`wiki/repos/github-<owner>-<repo>/` (`ARCHITECTURE` or a repo note). Link the
+page's real path; never a docs `OVERVIEW` hub, which is not a witness.
+`source_count` is the length of that list.
 
 **Budget** 200–500 words.
 **Updating an existing page**: preserve `created` and any human-added `aliases`;
@@ -184,7 +191,7 @@ that make the case best.>
 page reads:
 
 ```bash
-for f in wiki-<slug>/wiki/sources/*.md; do awk '/^---$/{c++; next} c==1' "$f"; echo "---END---"; done
+for f in wiki-<slug>/wiki/sources/*.md wiki-<slug>/wiki/docs/*/*.md wiki-<slug>/wiki/repos/*/*.md; do awk '/^---$/{c++; next} c==1' "$f"; echo "---END---"; done
 ```
 
 The "slugs at 1 mention" line is the wiki telling you what it is about to learn —
