@@ -1,0 +1,116 @@
+---
+title: "Troubleshooting Warp Factories"
+subtitle: "Fix factory setup problems, events that don't start work, and runs that stall or need stopping."
+authors: []
+published_date: null
+source_url: https://docs.warp.dev/factories/troubleshooting/
+origin: llms-txt
+llms_txt: https://docs.warp.dev/llms.txt
+section: "Documentation Sets / Factories"
+fetched: 2026-10-25T14:54:27Z
+---
+
+> For the complete documentation index, see [llms.txt](https://docs.warp.dev/llms.txt).
+> Markdown versions of each page are available by appending .md to any URL.
+
+# Troubleshooting Warp Factories
+
+Fix factory setup problems, events that don't start work, and runs that stall or need stopping.
+
+Fix the problems teams hit most often when setting up a factory and running their first work through it. Each entry below names the symptom you’d see in the Warp Factories web app.
+
+## Setting up a factory
+
+### You can’t create or configure a factory
+
+**Cause:** Creating a factory requires a team or workspace admin role, or the team-level Warp Factories Editor role. Configuring an existing factory requires its Editor or Admin role.
+
+**Fix:** Ask a team or workspace admin to set your team-level Warp Factories role to Editor. To configure an existing factory, ask an Admin for that factory to set your role to Editor. See [factory roles and permissions](https://docs.warp.dev/factories/infrastructure-and-security/#factory-roles-and-permissions).
+
+### A repository doesn’t appear in the picker
+
+**Cause:** The code host connection doesn’t cover the repository.
+
+**Fix:**
+
+1.  Confirm the connection includes the repository and the intended organization or group. See the [GitHub](https://docs.warp.dev/factories/integrations/github/) and [GitLab](https://docs.warp.dev/factories/integrations/gitlab/) integration guides for how each connection is scoped.
+2.  If you can’t update it yourself, ask a GitHub organization owner, a GitLab group owner, or a Warp team admin to extend the connection.
+
+### Setup stops at an agent limit
+
+**Cause:** Your team’s plan limits how many factory agents it can run.
+
+**Fix:**
+
+1.  Ask a team admin to confirm the team’s capacity.
+2.  If the team needs more agents, [contact sales](https://www.warp.dev/contact-sales).
+
+### The web app still shows the setup wizard after your agent created a factory
+
+**Cause:** Completing setup through [Factory MCP](https://docs.warp.dev/factories/factory-mcp/) doesn’t update a Warp Factories web app page that’s already open in your browser.
+
+**Fix:** Refresh the page. Once your account has a factory, the web app opens it instead of the setup wizard. The factory link your agent shares at the end of setup opens the same place.
+
+## Work isn’t starting
+
+### An event that should start work doesn’t
+
+**Cause:** A disabled or missing automation, a connection that doesn’t cover the source, an account-linking requirement, or a filter mismatch can prevent work from starting.
+
+**Fix:**
+
+1.  In the factory dashboard’s **Automations** view, confirm an enabled automation exists for the event you sent. After saving changes, send a new matching event.
+2.  Confirm the source is connected to *this* factory. A workspace-level connection alone doesn’t attach the provider to every factory.
+3.  Check that the installation or connected account can access the event’s repository, project, or channel. Complete any administrator approval or account-linking prompt from the provider.
+4.  Check every filter, including the options under **More filters**. Filters combine with AND, so one mismatched repository, label, author, or state stops routing. GitHub also skips bot events by default. See [how automation matching works](https://docs.warp.dev/factories/automations/#how-matching-works).
+5.  Open the factory’s [Runs page](https://docs.warp.dev/factories/factory-dashboard/#inspect-runs) and any work item already linked to the source thread, issue, or pull request. A follow-up can continue existing work rather than create a new work item. If a run exists but is waiting or failing, use [run troubleshooting](#runs-and-work-items) instead.
+
+Then check the causes specific to where the work came from:
+
+| Source | Common causes |
+| --- | --- |
+| [Slack](https://docs.warp.dev/factories/integrations/slack/#troubleshooting-and-reconnection) | The app isn’t in the channel, installation is pending admin approval, or your Slack account isn’t linked to a Warp team member |
+| [Microsoft Teams](https://docs.warp.dev/factories/integrations/teams/#troubleshooting) | The app isn’t added to the Teams team, the channel isn’t configured, the sender isn’t in the install’s Microsoft 365 organization, or your Microsoft account isn’t linked to Warp |
+| [GitHub](https://docs.warp.dev/factories/integrations/github/#troubleshooting) | The app installation doesn’t cover the repository, label routing doesn’t match, or the event came from a bot |
+| [GitLab](https://docs.warp.dev/factories/integrations/gitlab/#troubleshooting) | The mention was an edit rather than a new comment, or your plan doesn’t include the group webhooks that deliver events |
+| [Linear](https://docs.warp.dev/factories/integrations/linear/#troubleshooting) | The agent session needs a linked Warp account, or teams and filters don’t match |
+| [Jira](https://docs.warp.dev/factories/integrations/jira/#troubleshooting) | The Warp app isn’t connected to your workspace, the person starting the session needs a linked account, or project and keyword filters don’t match |
+| [Custom webhooks](https://docs.warp.dev/factories/webhooks/#troubleshooting) | The delivery was rejected or deduplicated (check the webhook’s **Recent deliveries**), no enabled automation selects the webhook, or the payload filter doesn’t match |
+
+If a new matching event still doesn’t reach the factory, [contact support](https://docs.warp.dev/support-and-community/troubleshooting-and-support/sending-us-feedback/). Include the factory and automation links, the source event link, its timestamp and time zone, and any run link or error message.
+
+### One action starts two runs
+
+**Cause:** Two automations match the same event — commonly an app-mention trigger and a channel-message trigger pointed at the same place.
+
+**Fix:** Narrow or remove one of the overlapping triggers so a single path owns each kind of request. See [how matching works](https://docs.warp.dev/factories/automations/#how-matching-works).
+
+## Runs and work items
+
+### You need to stop a run
+
+**Fix:** Open the run on the factory’s [Runs page](https://docs.warp.dev/factories/factory-dashboard/#inspect-runs) and click **Stop run**. It takes effect immediately, with no confirmation prompt.
+
+### A work item looks stuck
+
+**Cause:** The factory is often waiting on a person rather than failing. By default it pauses for spec approval, for answers to clarifying questions, and at the pull request.
+
+**Fix:**
+
+1.  Check your [inbox](https://docs.warp.dev/factories/factory-inbox/) for a question, spec review, or PR review tied to the work item.
+2.  Open the item to see which agent is waiting and use **View agent** to open its session, where a question waiting on a human is visible and answerable.
+3.  If the run is still active, you can steer it directly. See [Cloud agent session sharing](https://docs.warp.dev/platform/viewing-cloud-agent-runs/).
+
+### No pull request appears
+
+**Cause:** The factory can’t push, or the work never reached the implement agent.
+
+**Fix:** Confirm that the **Implement** agent is enabled on the factory, that the code host connection still grants write access to the target repository, and that the work item actually reached the building stage. Branch protection rules apply to everything the factory pushes.
+
+## Related pages
+
+-   [**Warp Factories quickstart**](https://docs.warp.dev/factories/quickstart/) - Create a factory and submit your first work item.
+-   [**Connect your factory**](https://docs.warp.dev/factories/connect-your-factory/) - Route work in from Slack threads, Linear issues, and other intake paths.
+-   [**Automations**](https://docs.warp.dev/factories/automations/) - The matching rules that decide which events start work.
+-   [**Factory inbox**](https://docs.warp.dev/factories/factory-inbox/) - See and resolve the questions, spec approvals, and PR reviews waiting on you.
+-   [**Factory dashboard**](https://docs.warp.dev/factories/factory-dashboard/) - Where to watch work items, runs, and their outputs.

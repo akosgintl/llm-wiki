@@ -1,0 +1,464 @@
+# Warp
+
+> Documentation for Warp, the agentic development environment. Covers the Warp terminal, Warp agents, the Automation Platform for cloud agents and orchestration at scale, and Warp Factories for running software factories.
+
+## Documentation Sets
+
+- [Abridged documentation](https://docs.warp.dev/llms-small.txt): a compact version of the documentation for Warp, with non-essential content removed
+- [Complete documentation](https://docs.warp.dev/llms-full.txt): the full documentation for Warp
+- [Terminal](https://docs.warp.dev/_llms-txt/terminal.txt): Warp Terminal features and configuration.
+- [Agents](https://docs.warp.dev/_llms-txt/agents.txt): Agents in Warp: capabilities, local agents, and CLI agents.
+- [Factories](https://docs.warp.dev/_llms-txt/factories.txt): Warp Factories documentation for setup, agent roles, definitions as code, integrations, measurement, and infrastructure.
+- [Warp Agent CLI](https://docs.warp.dev/_llms-txt/warp-agent-cli.txt): The Warp Agent CLI: agent conversations, shell commands, permissions, and configuration in any terminal.
+- [Automation Platform](https://docs.warp.dev/_llms-txt/automation-platform.txt): The Automation Platform: cloud agents, orchestration, triggers, integrations, environments, harnesses, and self-hosting.
+- [Code](https://docs.warp.dev/_llms-txt/code.txt): Code editor, code review, and Git worktrees.
+- [Enterprise](https://docs.warp.dev/_llms-txt/enterprise.txt): Enterprise features, SSO, team management, and security.
+- [Getting Started](https://docs.warp.dev/_llms-txt/getting-started.txt): Installation, quickstart, and migration guides.
+- [Knowledge and Collaboration](https://docs.warp.dev/_llms-txt/knowledge-and-collaboration.txt): Warp Drive, teams, and the Admin Panel.
+- [Support](https://docs.warp.dev/_llms-txt/support.txt): Troubleshooting, billing, and privacy.
+- [Guides](https://docs.warp.dev/_llms-txt/guides.txt): Task-oriented walkthroughs and tutorials.
+- [Changelog](https://docs.warp.dev/_llms-txt/changelog.txt): Warp release notes by year.
+
+## Notes
+
+- The complete documentation includes all content from the official documentation
+- The content is automatically generated from the same source as the official documentation
+
+## Optional
+
+- [Oz Agent API (OpenAPI spec, YAML)](https://docs.warp.dev/openapi.yaml): Machine-readable OpenAPI 3.2.0 specification for the Oz Agent API.
+- [Oz Agent API (OpenAPI spec, JSON)](https://docs.warp.dev/openapi.json): Machine-readable OpenAPI 3.2.0 specification (JSON format) for the Oz Agent API.
+
+## Terminal (expanded from https://docs.warp.dev/_llms-txt/terminal.txt)
+
+- [Terminal appearance overview](https://docs.warp.dev/terminal/appearance/): Customize Warp's visual appearance, including themes, fonts, prompts, app icons, input position, and pane behavior.
+- [Custom app icons](https://docs.warp.dev/terminal/appearance/app-icons/): Choose from a palette of built-in app icons to customize Warp's dock appearance on macOS.
+- [Blocks Behavior](https://docs.warp.dev/terminal/appearance/blocks-behavior/): Customize Block spacing with Compact mode and toggle Block dividers for a cleaner layout.
+- [Custom Themes](https://docs.warp.dev/terminal/appearance/custom-themes/): Warp supports custom themes, which can be created manually or downloaded from our repo.
+- [Input position](https://docs.warp.dev/terminal/appearance/input-position/): Warp gives you the ability to configure the position of your input, which includes both the prompt and the command line.
+- [Pane Dimming & Focus](https://docs.warp.dev/terminal/appearance/pane-dimming/): Warp supports dimming inactive Panes as well as allowing the focus to follow the mouse. This helps you easily see which pane is active and maintain focus.
+- [Terminal prompt](https://docs.warp.dev/terminal/appearance/prompt/): Configure Warp's native prompt with context chips or use your own Shell prompt (PS1).
+- [Size, Opacity, & Blurring](https://docs.warp.dev/terminal/appearance/size-opacity-blurring/): Configure window size, opacity, and background blurring to match your visual preferences.
+- [Tabs Behavior](https://docs.warp.dev/terminal/appearance/tabs-behavior/): Customize tab behavior in Warp, including tab indicators, tab bar visibility, and close button position.
+- [Text, Fonts, & Cursor](https://docs.warp.dev/terminal/appearance/text-fonts-cursor/): Warp supports customizing the font and how text is displayed. This can help improve readability and usability. Warp also supports disabling the blinking cursor.
+- [Terminal themes](https://docs.warp.dev/terminal/appearance/themes/): Warp includes several themes (out-of-box) and also supports setting custom themes.
+- [Terminal Blocks overview](https://docs.warp.dev/terminal/blocks/): A Block groups commands and outputs into one atomic unit.
+- [Background Blocks](https://docs.warp.dev/terminal/blocks/background-blocks/): How Blocks interact with background process output.
+- [Block Actions](https://docs.warp.dev/terminal/blocks/block-actions/): Copy, bookmark, share, search, and filter Blocks using built-in actions.
+- [Terminal Block Basics](https://docs.warp.dev/terminal/blocks/block-basics/): The basics of creating, selecting, and navigating between Blocks.
+- [Block Filtering](https://docs.warp.dev/terminal/blocks/block-filtering/): Filter Block output by text, regex, or case to focus on specific matching lines.
+- [Block Sharing](https://docs.warp.dev/terminal/blocks/block-sharing/): Share Blocks with your team as permalinks or embeddable HTML snippets.
+- [Terminal Block Find](https://docs.warp.dev/terminal/blocks/find/): Search across Blocks from the bottom up, with regex, case-sensitive, and per-Block filtering options.
+- [Sticky Command Header](https://docs.warp.dev/terminal/blocks/sticky-command-header/): Pin the running command at the top of the screen when scrolling through large Block outputs.
+- [Command completions overview](https://docs.warp.dev/terminal/command-completions/): Warp's main features for command completions and autosuggestions.
+- [Autosuggestions](https://docs.warp.dev/terminal/command-completions/autosuggestions/): Warp will automatically suggest commands as you type based on shell history and possible completions.
+- [Tab completions](https://docs.warp.dev/terminal/command-completions/completions/): Get fuzzy-matched suggestions for commands, options, and paths by pressing Tab anywhere.
+- [Command Palette](https://docs.warp.dev/terminal/command-palette/): Command Palette is a global search to quickly locate Workflows, Notebooks, keyboard shortcuts, or other actions within Warp.
+- [Terminal comparisons overview](https://docs.warp.dev/terminal/comparisons/): Compare Warp's performance and terminal feature support against other popular terminal emulators like iTerm2, Alacritty, and WezTerm.
+- [Performance benchmarks](https://docs.warp.dev/terminal/comparisons/performance/): This is a short comparison of different terminals and their performance.
+- [Terminal features](https://docs.warp.dev/terminal/comparisons/terminal-features/): Below you'll find a table showcasing different terminal features (such as text attribution) and information about which one of those are supported in Warp.
+- [Modern text editing overview](https://docs.warp.dev/terminal/editor/): Unlike other terminals, Warp’s input editor operates out of the box like a modern IDE and the text editors we’re used to.
+- [Alias Expansion](https://docs.warp.dev/terminal/editor/alias-expansion/): Warp will automatically expand your aliases as you type in the input editor.
+- [Command Inspector](https://docs.warp.dev/terminal/editor/command-inspector/): Command Inspector (also known as Command X-Ray) surfaces documentation for sub-parts of your command, directly in Warp's Input Editor.
+- [Syntax & Error Highlighting](https://docs.warp.dev/terminal/editor/syntax-error-highlighting/): Color-code commands and underline errors in real time as you type in Warp's input editor.
+- [Input editor Vim keybindings](https://docs.warp.dev/terminal/editor/vim/): Use input editor Vim keybindings (also known as Vim mode) to edit commands quickly in Warp.
+- [Command entry overview](https://docs.warp.dev/terminal/entry/): Warp's main features for Command Entry, History, Synchronized Inputs, YAML Workflows, and more.
+- [Command Corrections](https://docs.warp.dev/terminal/entry/command-corrections/): Command Corrections provides auto-correct suggestions on previously run commands to catch typos and forgotten flags, and fix general console errors.
+- [Command History](https://docs.warp.dev/terminal/entry/command-history/): Command History helps you quickly find previously run commands.
+- [Command Search](https://docs.warp.dev/terminal/entry/command-search/): Search command history, Workflows, Prompts, and agent conversations with fuzzy matching.
+- [Synchronized Inputs](https://docs.warp.dev/terminal/entry/synchronized-inputs/): Type a command once and sync it to multiple panes simultaneously.
+- [YAML Workflows](https://docs.warp.dev/terminal/entry/yaml-workflows/): Workflows are an easier way to execute and share commands within Warp.
+- [Terminal Integrations](https://docs.warp.dev/terminal/integrations-and-plugins/): Warp's terminal functionality extends and integrates with popular development tools.
+- [More features overview](https://docs.warp.dev/terminal/more-features/): Explore additional Warp terminal features beyond the essentials.
+- [Accessibility](https://docs.warp.dev/terminal/more-features/accessibility/): Warp's accessibility features include VoiceOver support, voice input, and configurable verbosity.
+- [Audible terminal bell](https://docs.warp.dev/terminal/more-features/audible-bell/): Enable an audible terminal bell in Warp that can be triggered by CLI tools like ping.
+- [Files, Links, & Scripts](https://docs.warp.dev/terminal/more-features/files-and-links/): Quickly open links and files or run scripts with your mouse.
+- [Full-screen apps](https://docs.warp.dev/terminal/more-features/full-screen-apps/): Run Vim, Emacs, and other full-screen apps with configurable mouse reporting and padding.
+- [Warp for Linux](https://docs.warp.dev/terminal/more-features/linux/): Linux-specific features including native Wayland support and crash recovery.
+- [Markdown Viewer](https://docs.warp.dev/terminal/more-features/markdown-viewer/): Open Markdown files in your terminal, run shell commands, and view rendered Mermaid diagrams.
+- [Desktop Notifications](https://docs.warp.dev/terminal/more-features/notifications/): Receive desktop notifications when long-running commands complete or need your input.
+- [Terminal quit warning](https://docs.warp.dev/terminal/more-features/quit-warning/): Warp's quit warning feature is a valuable precaution to prevent unintentional data loss or lost progress on long-running jobs.
+- [Settings Sync](https://docs.warp.dev/terminal/more-features/settings-sync/): Keep your Warp settings consistent across devices and sessions with cloud-based sync.
+- [Text selection](https://docs.warp.dev/terminal/more-features/text-selection/): Use smart selection and rectangular (column) selection to quickly highlight text in Warp.
+- [Warp URI Scheme](https://docs.warp.dev/terminal/more-features/uri-scheme/): Open windows, tabs, Tab Configs, Settings, and Warp Drive objects with warp:// deep links.
+- [Working Directory](https://docs.warp.dev/terminal/more-features/working-directory/): Set a default working directory for new Warp sessions, with options for home directory, previous session, custom path, or per-window/tab/pane configuration.
+- [Sessions overview](https://docs.warp.dev/terminal/sessions/): Navigate between sessions and automatically restore windows, tabs, and panes when you relaunch Warp.
+- [Launch Configurations (Legacy)](https://docs.warp.dev/terminal/sessions/launch-configurations/): Launch Configurations (Legacy) let you save a configuration of windows, tabs, and panes. For new setups, use Tab Configs instead.
+- [Session Navigation](https://docs.warp.dev/terminal/sessions/session-navigation/): Quickly navigate to any terminal session across Warp using the Session Navigation palette.
+- [Session Restoration](https://docs.warp.dev/terminal/sessions/session-restoration/): Restore your windows, tabs, panes, and recent Blocks automatically when you relaunch Warp.
+- [Settings file](https://docs.warp.dev/terminal/settings/): Configure Warp with a plain-text TOML settings file. Learn where it lives, how it works with the Settings panel, and see common configuration examples.
+- [All settings reference](https://docs.warp.dev/terminal/settings/all-settings/): Complete reference for every setting available in Warp's settings.toml file, organized by section with descriptions, types, defaults, and examples.
+- [File and folder locations](https://docs.warp.dev/terminal/settings/file-locations/): Reference for where Warp stores config, themes, tab configs, settings, keybindings, logs, and other files on macOS, Windows, and Linux.
+- [Warpify overview](https://docs.warp.dev/terminal/warpify/): Warp support for Warpifying, or enabling Warp's features, in local or remote sessions.
+- [SSH with Warp features](https://docs.warp.dev/terminal/warpify/ssh/): Use Warp's SSH extension on remote macOS and Linux hosts for a real file tree, code editing, code review, codebase indexing, and reliable completions over SSH.
+- [Legacy SSH wrapper](https://docs.warp.dev/terminal/warpify/ssh-legacy/): Use the legacy SSH wrapper as a fallback when skipping the SSH extension or when it can't run on a remote host.
+- [Warpify subshells](https://docs.warp.dev/terminal/warpify/subshells/): Warpify subshells in bash, zsh, and fish to get Warp features in nested sessions.
+- [Windows and tabs overview](https://docs.warp.dev/terminal/windows/): Manage Warp windows, tabs, vertical tabs, split panes, and tab configurations with global hotkeys and reusable layouts.
+- [Configurable toolbar](https://docs.warp.dev/terminal/windows/configurable-toolbar/): Reorder, hide, and move panel toggle buttons between the left and right sides of Warp's header toolbar to match your workflow.
+- [Global Hotkey](https://docs.warp.dev/terminal/windows/global-hotkey/): Show or hide Warp instantly with a global hotkey, including a dedicated Quake-style drop-down window.
+- [Split panes](https://docs.warp.dev/terminal/windows/split-panes/): The split panes feature allows you to divide a tab into multiple rectangular panes, each of which is a unique terminal session.
+- [Tab Configs](https://docs.warp.dev/terminal/windows/tab-configs/): Tab Configs let you define reusable tab setups — including directory, startup commands, pane layout, shell, and theme — in a simple TOML file.
+- [Tabs](https://docs.warp.dev/terminal/windows/tabs/): Organize terminal sessions with customizable tabs and groups, then pin important tabs and groups at the front of the tab list.
+- [Vertical Tabs](https://docs.warp.dev/terminal/windows/vertical-tabs/): The vertical tabs panel replaces the horizontal tab bar with a sidebar showing rich metadata, drag-and-drop management, and display options for tabs and panes.
+
+## Agents (expanded from https://docs.warp.dev/_llms-txt/agents.txt)
+
+- [Agents overview](https://docs.warp.dev/agents/): The Warp Agent runs commands in a real terminal, carries your context across every surface, and works interactively or in the background.
+- [Agent Memory (Research Preview)](https://docs.warp.dev/agents/agent-memory/): Agent Memory gives agents in Warp persistent memory across supported harnesses, including the Warp Agent, Claude Code, and Codex.
+- [Capabilities overview](https://docs.warp.dev/agents/capabilities/): Core capabilities and configuration options that shape how agents behave, what context they have access to, and how they execute tasks.
+- [Agent Notifications](https://docs.warp.dev/agents/capabilities/agent-notifications/): Warp surfaces notifications from coding agents, both in-app and via desktop alerts, so you know exactly when an agent needs your attention.
+- [Profiles & Permissions](https://docs.warp.dev/agents/capabilities/agent-profiles-permissions/): Agent Profiles let you customize how your Agent behaves, from its models and autonomy to the tools and permissions it can use.
+- [Codebase Context](https://docs.warp.dev/agents/capabilities/codebase-context/): Warp indexes your Git-tracked codebase to help Agents understand your code and generate accurate, context-aware responses. No code is stored on Warp servers.
+- [Computer Use for agents](https://docs.warp.dev/agents/capabilities/computer-use/): Let agents interact with desktop GUIs in sandboxed cloud environments for automated UI testing and validation.
+- [Screenshots and videos in pull requests](https://docs.warp.dev/agents/capabilities/computer-use/artifacts-in-prs/): Share Computer Use screenshots and recordings in pull requests, Slack, Linear, issue comments, and chat while controlling access.
+- [Browser use for agents](https://docs.warp.dev/agents/capabilities/computer-use/browser-use/): Computer Use environments include bundled Chromium and the Playwright CLI, so agents can test web apps and browse without extra setup.
+- [Testing with Computer Use and video recordings](https://docs.warp.dev/agents/capabilities/computer-use/testing-and-recordings/): Use Computer Use to test desktop UIs in a sandbox and capture annotated recordings for UI validation, end-to-end QA, and bug reproduction.
+- [Full Terminal Use](https://docs.warp.dev/agents/capabilities/full-terminal-use/): Full Terminal Use means agents can interact with active terminal apps to monitor live output and run commands.
+- [Model Context Protocol (MCP)](https://docs.warp.dev/agents/capabilities/mcp/): Configure MCP servers in the Warp app to extend local agents with custom tools and data sources through a standardized interface.
+- [Agent planning and execution](https://docs.warp.dev/agents/capabilities/planning/): Turn requests into structured, editable plans that agents execute step-by-step with version control.
+- [Rules for agents](https://docs.warp.dev/agents/capabilities/rules/): Create reusable Global or Project Rules to ensure agents follow your coding standards, project conventions, and personal preferences.
+- [Skills for agents](https://docs.warp.dev/agents/capabilities/skills/): Create reusable instruction sets that teach agents specific tasks and share expertise across your team.
+- [Slash Commands](https://docs.warp.dev/agents/capabilities/slash-commands/): Use Slash Commands in terminal mode or Agent Mode to quickly run built-in actions or saved prompts without leaving the input field.
+- [Agent Task Lists](https://docs.warp.dev/agents/capabilities/task-lists/): Track and manage complex Agent workflows with automatic task lists that break requests into clear, actionable steps and update progress in real time.
+- [Agent web search](https://docs.warp.dev/agents/capabilities/web-search/): Warp’s web search lets agents pull in real-time information, documentation, and cited sources whenever it improves an answer.
+- [Warp Agent CLI overview](https://docs.warp.dev/agents/cli/): Run the Warp Agent in any terminal with the Warp Agent CLI. Prompt the agent, run shell commands, and hand work off to cloud agents.
+- [Claude Code in Warp](https://docs.warp.dev/agents/cli-agents/claude-code/): Set up Claude Code in Warp with full notification support, rich input, code review, and more.
+- [Codex CLI in Warp](https://docs.warp.dev/agents/cli-agents/codex/): Set up Codex in Warp with notification support, rich input, code review, and more.
+- [OpenCode in Warp](https://docs.warp.dev/agents/cli-agents/opencode/): Set up OpenCode in Warp with notification support, rich input, code review, and more.
+- [Third-party CLI agents overview](https://docs.warp.dev/agents/cli-agents/overview/): Warp provides first-class support for third-party CLI coding agents with a rich input editor, notifications, code review, and more.
+- [Remote Control](https://docs.warp.dev/agents/cli-agents/remote-control/): Publish any third-party agent session to the cloud so you can monitor progress, steer the agent, and check in from your phone or another computer.
+- [Rich input editor](https://docs.warp.dev/agents/cli-agents/rich-input/): Warp's rich input editor gives you IDE-style editing, voice input, context attachment, and slash commands for any supported CLI coding agent.
+- [Agent conversations in the Warp Agent CLI](https://docs.warp.dev/agents/cli/agent-conversations/): Read, manage, and resume agent conversations in the Warp Agent CLI, including streamed responses, tool calls, file diffs, plans, and task lists.
+- [Cloud handoff and orchestration in the Warp Agent CLI](https://docs.warp.dev/agents/cli/cloud-and-orchestration/): Hand off Warp Agent CLI conversations to cloud agents, resume cloud runs, and run multi-agent orchestration from your terminal.
+- [Customizing the Warp Agent CLI](https://docs.warp.dev/agents/cli/configuration/): Configure Warp Agent CLI themes, the statusline, and the start screen, and give the agent context from project rules, skills, and MCP servers.
+- [Input and shell commands in the Warp Agent CLI](https://docs.warp.dev/agents/cli/input-and-shell-commands/): Compose prompts, edit input, and run shell commands in the Warp Agent CLI, including menus, history, completions, images, voice, and interactive commands.
+- [Models and usage in the Warp Agent CLI](https://docs.warp.dev/agents/cli/models-and-usage/): Choose models in the Warp Agent CLI, bring your own API key, and track usage balances and per-response cost.
+- [Oz CLI reference](https://docs.warp.dev/agents/cli/oz-cli/): Use the Oz CLI to run, configure, and manage agents from the terminal.
+- [Agent profiles](https://docs.warp.dev/agents/cli/oz-cli/agent-profiles/): Use agent profiles with the Oz CLI to control what the agent can access, how it behaves, and where it can act.
+- [API keys for the Oz CLI](https://docs.warp.dev/agents/cli/oz-cli/api-keys/): Create and manage API keys for authenticating the Oz CLI, cloud agents, and self-hosted workers.
+- [Artifacts](https://docs.warp.dev/agents/cli/oz-cli/artifacts/): Get metadata for and download files produced by an agent run using the `oz artifact` subcommands.
+- [Federated identity tokens](https://docs.warp.dev/agents/cli/oz-cli/federate/): Issue short-lived OIDC identity tokens from a running agent so it can authenticate to cloud providers without long-lived credentials.
+- [Integration setup](https://docs.warp.dev/agents/cli/oz-cli/integration-setup/): Learn how to set up environments and integrations so you can trigger agents from external tools.
+- [MCP servers (CLI reference)](https://docs.warp.dev/agents/cli/oz-cli/mcp-servers/): Connect agents to external tools like GitHub, Linear, and Sentry by passing MCP servers to the --mcp flag as a UUID, inline JSON, or file path.
+- [CLI quickstart](https://docs.warp.dev/agents/cli/oz-cli/quickstart/): Set up and run your first cloud agent via the Oz CLI in less than 5 minutes.
+- [Skills via the Oz CLI](https://docs.warp.dev/agents/cli/oz-cli/skills/): Use skills with the Oz CLI to run agents from reusable skill definitions stored in your repositories.
+- [CLI Troubleshooting](https://docs.warp.dev/agents/cli/oz-cli/troubleshooting/): Solutions for common Oz CLI errors — including authentication issues, agent failures, environments, GitHub access, and Docker image issues.
+- [Warp Drive context](https://docs.warp.dev/agents/cli/oz-cli/warp-drive/): Use saved prompts, notebooks, workflows, and rules from Warp Drive as context in CLI agent commands.
+- [Permissions and profiles in the Warp Agent CLI](https://docs.warp.dev/agents/cli/permissions-and-profiles/): Control what the agent can do in the Warp Agent CLI with permission request cards, auto-approve, and execution profiles in the settings file.
+- [Warp Agent CLI quickstart](https://docs.warp.dev/agents/cli/quickstart/): Install the Warp Agent CLI, log in, and run your first agent conversation in your own terminal in a few minutes.
+- [Warp Agent CLI reference](https://docs.warp.dev/agents/cli/reference/): Look up Warp Agent CLI command-line flags, environment variables, slash commands, keyboard shortcuts, and fixes for common issues.
+- [Frequently asked questions about agents](https://docs.warp.dev/agents/getting-started/faqs/): Frequently asked questions about Warp's AI features, including supported models, privacy practices, usage limits, billing, and common errors.
+- [Bring Your Own API Key](https://docs.warp.dev/agents/inference/bring-your-own-api-key/): Warp lets you bring your own API keys (BYOK) for OpenAI, Anthropic, and Google AI models.
+- [Connecting a ChatGPT subscription](https://docs.warp.dev/agents/inference/chatgpt-subscription/): Connect a ChatGPT subscription to use eligible OpenAI models with the Warp Agent in the Warp app.
+- [Custom inference endpoint](https://docs.warp.dev/agents/inference/custom-inference-endpoint/): Connect agents to any OpenAI-compatible inference endpoint — OpenRouter, LiteLLM, z.ai, or an internal gateway exposed at a public URL.
+- [Custom routers](https://docs.warp.dev/agents/inference/custom-routers/): Define a custom router that automatically picks the right model for each task, based on task complexity or rules you write, and use it from the model picker.
+- [SuperGrok subscription](https://docs.warp.dev/agents/inference/grok-subscription/): Connect your SuperGrok or X Premium subscription to use Grok models in Warp through your xAI account. Usage draws from the same weekly pool as Grok Build.
+- [Agent model choice](https://docs.warp.dev/agents/inference/model-choice/): Choose from a curated set of top LLMs for Warp's Agents (or let Warp auto-select the best model).
+- [Active AI Recommendations](https://docs.warp.dev/agents/local-agents/active-ai/): Active AI Recommendations proactively suggest fixes and next actions based on your command line errors, inputs, and outputs.
+- [Agent context overview](https://docs.warp.dev/agents/local-agents/agent-context/): How to attach various forms of multi-modal context directly to Warp's Agent within a prompt.
+- [Blocks as Context](https://docs.warp.dev/agents/local-agents/agent-context/blocks-as-context/): Attach blocks from your terminal as context so Warp’s Agent can understand errors, outputs, or previous commands when responding to your queries.
+- [Images as Context](https://docs.warp.dev/agents/local-agents/agent-context/images-as-context/): Attach screenshots, diagrams, or other images to your prompt so Warp’s Agent can use visual context when generating responses.
+- [Selection as Context](https://docs.warp.dev/agents/local-agents/agent-context/selection-as-context/): Attach text or diffs directly from Warp’s editor or Code Review panel as context for your Agent prompts.
+- [URLs as Context](https://docs.warp.dev/agents/local-agents/agent-context/urls-as-context/): Attach a public URL to your prompt so the agent can reference that page's content.
+- [Using @ to Add Context](https://docs.warp.dev/agents/local-agents/agent-context/using-to-add-context/): Use @ to reference files, folders, code symbols, and Warp Drive objects as agent context.
+- [Cloud-synced conversations](https://docs.warp.dev/agents/local-agents/cloud-conversations/): Sync agent conversations to the cloud to access them across devices, share with teammates, and continue past conversations from anywhere.
+- [Agent code diffs and review](https://docs.warp.dev/agents/local-agents/code-diffs/): How to review, refine, and apply code changes generated by Warp’s Agents with the built-in diff editor in Agent Conversations.
+- [Generate (Legacy)](https://docs.warp.dev/agents/local-agents/generate/): Use natural language to look up commands or input, accessible either directly from the command-line input or inside any interactive command or program.
+- [Interacting with agents](https://docs.warp.dev/agents/local-agents/interacting-with-agents/): Manage agent conversations across sessions with follow-ups, context blocks, and multi-thread support.
+- [Agent questions](https://docs.warp.dev/agents/local-agents/interacting-with-agents/agent-questions/): Learn how Warp's Agent asks questions for clarification, how to answer or skip them, and how to interact with them when the Agent asks.
+- [Conversation Forking](https://docs.warp.dev/agents/local-agents/interacting-with-agents/conversation-forking/): Branch into a new agent thread with full context to explore alternatives without altering the original conversation.
+- [Prompt queueing](https://docs.warp.dev/agents/local-agents/interacting-with-agents/prompt-queueing/): Queue follow-up prompts while an agent is still responding, then have Warp send them automatically and in order as each response finishes.
+- [Terminal and Agent modes](https://docs.warp.dev/agents/local-agents/interacting-with-agents/terminal-and-agent-modes/): Warp provides two distinct modes: a clean terminal for commands, and a dedicated conversation view for multi-turn agent workflows.
+- [Voice input for agents](https://docs.warp.dev/agents/local-agents/interacting-with-agents/voice/): Voice enables natural language interaction with Warp, letting you speak commands and queries directly to your terminal.
+- [Interactive Code Review](https://docs.warp.dev/agents/local-agents/interactive-code-review/): Review agent-generated code, leave inline comments, and have Warp's native agent or any supported third-party CLI agent apply your feedback.
+- [Agent Session Sharing](https://docs.warp.dev/agents/local-agents/session-sharing/): Share live agent sessions so collaborators can view, steer, and interact with agent activity from any device — in real time or asynchronously.
+
+## Factories (expanded from https://docs.warp.dev/_llms-txt/factories.txt)
+
+- [Warp Factories overview](https://docs.warp.dev/factories/): Warp Factories turns issues, tickets, and Slack messages into reviewed pull requests. Teams of cloud agents do the work, while people approve specs and merges.
+- [Agent & run endpoints](https://docs.warp.dev/factories/api-and-sdk/): Start, manage, and inspect cloud agent runs with the Agent and run endpoints in the Warp Platform API.
+- [Demo: Sentry monitoring with SDK](https://docs.warp.dev/factories/api-and-sdk/demo-sentry-monitoring-with-sdk/): Build a Sentry webhook handler that triggers agents to investigate errors and create draft PRs.
+- [Warp Platform API quickstart](https://docs.warp.dev/factories/api-and-sdk/quickstart/): Create and monitor your first cloud agent run with the Warp Platform API in about five minutes.
+- [API error codes](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/): Reference for all error codes returned by the Warp Platform API. Each error includes an HTTP status, machine-readable code, and actionable resolution steps.
+- [agent_process_failed](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/agent-process-failed/): The agent process exited unexpectedly during task execution. Retry the task or contact support if it recurs consistently.
+- [authentication_required](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/authentication-required/): The API key in the request is invalid, expired, or missing. Generate a new key and update your client configuration.
+- [budget_exceeded](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/budget-exceeded/): Your team's configured spending budget limit has been reached. Increase the budget or wait for the budget period to reset.
+- [Error: conflict (409)](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/conflict/): The request conflicts with the current state of the resource. Wait for the resource to reach the expected state and retry.
+- [content_policy_violation](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/content-policy-violation/): The task prompt or environment setup commands were flagged by the platform's automated content policy checks.
+- [environment_setup_failed](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/environment-setup-failed/): The cloud agent's environment failed to initialize. Check repo URLs, setup commands, and working directory paths.
+- [external_authentication_required](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/external-authentication-required/): The task requires access to an external service (GitHub, Slack, Linear, etc.) that hasn't been authorized. Follow the auth_url to grant access.
+- [feature_not_available](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/feature-not-available/): The requested feature is not included in your current plan. Upgrade your team's plan to access this capability.
+- [infrastructure_timeout](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/infrastructure-timeout/): The task was forcibly terminated because it remained active past the maximum allowed runtime. Retry the task or contact support if it persists.
+- [insufficient_credits](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/insufficient-credits/): The account billed for a run has insufficient usage. Add purchased usage, check auto-reload, or wait for included usage to reset.
+- [integration_disabled](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/integration-disabled/): The integration (Slack, Linear, etc.) is currently disabled in the Automation Platform settings. Enable it to continue.
+- [integration_not_configured](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/integration-not-configured/): The integration's setup is incomplete. Visit the setup URL to finish configuring the integration.
+- [internal_error](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/internal-error/): An unexpected server-side error occurred. The platform will automatically retry. Contact support if the issue persists.
+- [invalid_request](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/invalid-request/): The request body is malformed, missing required fields, or contains invalid parameter values.
+- [not_authorized](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/not-authorized/): The authenticated user or API key does not have permission to perform the requested operation.
+- [operation_not_supported](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/operation-not-supported/): The requested operation is not supported for this resource or its current state.
+- [resource_not_found](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/resource-not-found/): The requested resource (task, environment, schedule, agent, etc.) does not exist or has been deleted.
+- [resource_unavailable](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/resource-unavailable/): A transient infrastructure issue prevented the task from running. The platform will automatically retry. No action is needed.
+- [Factory automations](https://docs.warp.dev/factories/automations/): Configure factory automations with triggers and filters to control which events start runs and which agent handles the work.
+- [Factory benchmarks](https://docs.warp.dev/factories/benchmarks/): Warp Factories benchmarks compare agent model and runner configurations on fixed tasks so you can choose a production configuration.
+- [Connecting other code forges to your factory](https://docs.warp.dev/factories/code-forges/other-code-forges/): Connect a factory to a repository from another code forge using Agent Secrets and setup commands on the default runner.
+- [Connect your factory](https://docs.warp.dev/factories/connect-your-factory/): Route work into your factory from Slack, Microsoft Teams, GitHub, GitLab, Azure DevOps, Linear, Jira, local agents, direct runs, and schedules.
+- [Deployment patterns for Warp Factories](https://docs.warp.dev/factories/deployment-patterns/): Choose Warp-hosted or managed self-hosted execution for Warp Factories based on your network, compliance, and operational requirements.
+- [Warp Platform API & SDKs](https://docs.warp.dev/factories/developer-tools/): Use the Warp Platform API, SDKs, Factory MCP, and webhooks to integrate factories and cloud agent runs with your tools and services.
+- [About factory agents](https://docs.warp.dev/factories/factory-agents/): Every factory has a team of default agents: a foreman that coordinates the work, plus triage, spec, implement, and review agents.
+- [Configuring factory agents](https://docs.warp.dev/factories/factory-agents/configuration/): Configure a factory agent's instructions, tools, model, and harness, including authentication for Claude Code and Codex.
+- [Creating custom agents](https://docs.warp.dev/factories/factory-agents/creating-custom-agents/): Create a custom factory agent, add skills, and configure how the foreman dispatches it.
+- [Factory endpoints](https://docs.warp.dev/factories/factory-api/): Discover factories and dispatch tasks by UID with factory endpoints, without learning the foreman agent's internals.
+- [Factory definition syntax](https://docs.warp.dev/factories/factory-as-code/): Look up the file structure, configuration fields, and supported values used to define factory agents, automations, and other resources.
+- [Factory dashboard](https://docs.warp.dev/factories/factory-dashboard/): Track work items, inspect runs, read factory metrics, and manage agents, automations, webhooks, and settings from the factory dashboard.
+- [Factory inbox](https://docs.warp.dev/factories/factory-inbox/): See every question, spec approval, and pull request review waiting on you across your factories, and resolve them from one place.
+- [Factory MCP for coding agents](https://docs.warp.dev/factories/factory-mcp/): Connect any coding agent to create and operate your team's factories, send in work, continue tasks locally, and hand results back.
+- [Factory skills](https://docs.warp.dev/factories/factory-skills/): Skills give a factory's agents repeatable, version-controlled procedures that can be shared across every agent or scoped to just one.
+- [How Warp Factories work](https://docs.warp.dev/factories/how-factories-work/): A factory's foreman routes each work item through triage, planning, implementation, and review, with humans making the key decisions.
+- [About factory infrastructure and security](https://docs.warp.dev/factories/infrastructure-and-security/): Warp Factories gives you control over inference and execution hosting while Warp stores run records, transcripts, and outputs.
+- [Connecting Azure DevOps to your factory](https://docs.warp.dev/factories/integrations/azure-devops/): Connect Azure DevOps Services to a factory with dedicated identities, repository access, and event-driven automations.
+- [Connect GitHub to your factory](https://docs.warp.dev/factories/integrations/github/): Connect GitHub to your factory so issues, pull requests, reviews, and CI events start factory work and results post back to GitHub.
+- [Connect GitLab to your factory](https://docs.warp.dev/factories/integrations/gitlab/): Connect GitLab to your factory so merge request events and bot mentions start factory work and results post back as comments and merge requests.
+- [Connect Jira to your factory](https://docs.warp.dev/factories/integrations/jira/): Connect Jira Cloud to your factory so work items assigned to Warp start factory runs and return results in Jira.
+- [Connect Linear to your factory](https://docs.warp.dev/factories/integrations/linear/): Connect Linear to your factory so planned issues flow in automatically and progress flows back to the issue.
+- [Connect Slack to your factory](https://docs.warp.dev/factories/integrations/slack/): Connect Slack to your factory so your team can start work with mentions, direct messages, and automations, and get results back in the same thread.
+- [Connect Microsoft Teams to your factory](https://docs.warp.dev/factories/integrations/teams/): Connect Microsoft Teams to your factory so mentions in standard and shared channels start work and results post back in the same thread.
+- [Measure and improve a factory](https://docs.warp.dev/factories/measure-and-improve/): Read factory activity and cost metrics, then find where to configure Scorers, Self-improvement, and Benchmarks.
+- [Configuring Scorers](https://docs.warp.dev/factories/measure-and-improve/scorers/): Configure an LLM-based evaluation that checks completed factory runs from selected agents against criteria you define.
+- [Configuring and reviewing Self-improvement](https://docs.warp.dev/factories/measure-and-improve/self-improvement/): Turn on Self-improvement for a Scorer to turn its repeated failures into follow-up pull requests you review.
+- [Warp Factories quickstart](https://docs.warp.dev/factories/quickstart/): Set up a factory, connect your repositories, and take your first work item from prompt to pull request.
+- [Runners for Warp Factories](https://docs.warp.dev/factories/runners/): Runners define the OS, architecture, instance size, and sandbox image for cloud agent runs, including work from Warp Factories.
+- [Managing factory secrets](https://docs.warp.dev/factories/secrets/): Create and rotate team secrets for Warp Factories, and grant agents access through the web app or definition files.
+- [Configuring AWS ECR credentials](https://docs.warp.dev/factories/secrets/aws-ecr/): Create an IAM role-backed secret and attach it to a Warp-hosted Linux runner to pull private container images from Amazon ECR.
+- [Self-hosting overview](https://docs.warp.dev/factories/self-hosting/): Run cloud agents on your infrastructure with a managed worker or invoke the CLI from an orchestrator you control.
+- [Self-hosted agent data storage](https://docs.warp.dev/factories/self-hosting/data-storage/): Route agent transcripts, artifacts, and prompt attachments to your own cloud storage.
+- [Isolating Direct backend tasks with Git worktrees](https://docs.warp.dev/factories/self-hosting/direct-monorepo-worktrees/): Give concurrent Direct backend tasks isolated monorepo checkouts with Git worktrees and setup and teardown hooks.
+- [Running agents with an external orchestrator](https://docs.warp.dev/factories/self-hosting/external-orchestrators/): Connect an external scheduler to self-hosted agents with one-shot Direct or the Command backend.
+- [Managed: Direct backend](https://docs.warp.dev/factories/self-hosting/managed-direct/): Run the Automation Platform managed worker with the Direct backend to execute cloud agent tasks directly on the host, without Docker or Kubernetes.
+- [Managed: Docker backend](https://docs.warp.dev/factories/self-hosting/managed-docker/): Run the Automation Platform managed worker daemon with the Docker backend to execute cloud agent tasks in isolated containers on your infrastructure.
+- [Managed: Kubernetes backend](https://docs.warp.dev/factories/self-hosting/managed-kubernetes/): Deploy the Automation Platform managed worker into a Kubernetes cluster with the included Helm chart. Each agent task runs as a Kubernetes Job in your cluster.
+- [Self-hosted worker monitoring](https://docs.warp.dev/factories/self-hosting/monitoring/): Monitor self-hosted Automation Platform workers with OpenTelemetry metrics via Prometheus, OTLP, or console export.
+- [Pulling self-hosted images from a private registry](https://docs.warp.dev/factories/self-hosting/private-container-registry/): Mirror self-hosted worker images into a private registry and configure Docker or Kubernetes workers to pull from it.
+- [Self-hosting quickstart](https://docs.warp.dev/factories/self-hosting/quickstart/): Get a managed self-hosted Automation Platform worker running on Docker and route your first cloud agent run to it in under 10 minutes.
+- [Self-hosted worker reference](https://docs.warp.dev/factories/self-hosting/reference/): Complete reference for the oz-agent-worker daemon — CLI flags and config file schema for the Docker, Kubernetes, Direct, and Command backends.
+- [Self-hosting troubleshooting](https://docs.warp.dev/factories/self-hosting/troubleshooting/): Diagnose and fix common problems with self-hosted Automation Platform worker daemons across Docker, Kubernetes, and Direct backends.
+- [Troubleshooting Warp Factories](https://docs.warp.dev/factories/troubleshooting/): Fix factory setup problems, events that don't start work, and runs that stall or need stopping.
+- [Warp-hosted execution for Warp Factories](https://docs.warp.dev/factories/warp-hosting/): Run factory work on Warp-hosted infrastructure, with managed compute, isolation, networking, and capacity.
+- [Triggering automations with custom webhooks](https://docs.warp.dev/factories/webhooks/): Start factory runs from any system that can POST JSON: create a webhook, pick its authentication mode, and filter deliveries by payload.
+- [Setting up a Vercel webhook](https://docs.warp.dev/factories/webhooks/vercel/): Start factory runs from Vercel deployments: create the webhook without a secret, register its URL in Vercel, then save the secret Vercel issues.
+
+## Warp Agent CLI (expanded from https://docs.warp.dev/_llms-txt/warp-agent-cli.txt)
+
+
+## Automation Platform (expanded from https://docs.warp.dev/_llms-txt/automation-platform.txt)
+
+- [Cloud agents overview](https://docs.warp.dev/platform/): Run background agents in the cloud from events, schedules, or integrations with team-wide observability.
+- [Cloud agent accounts](https://docs.warp.dev/platform/agents/): Cloud agents are how Warp runs scheduled jobs, integration triggers, CI/CD automation, and API-driven tasks against your team's environments.
+- [Platform architecture](https://docs.warp.dev/platform/architecture/): Reference diagrams of the Warp stack, the cloud agent run lifecycle, self-hosted execution, and data boundaries.
+- [Cloud agent environments](https://docs.warp.dev/platform/environments/): Environments give cloud agents a repeatable container, repositories, and setup for every cloud agent run.
+- [Configuring cloud agent environments](https://docs.warp.dev/platform/environments/configuring-environments/): Create, configure, and manage cloud agent environments with the Oz web app, guided setup in Warp, or the Oz CLI.
+- [Troubleshooting cloud agent environments](https://docs.warp.dev/platform/environments/troubleshooting-environments/): Fix environment setup failures, authorization errors, permission problems, and incompatible Docker images for cloud agents.
+- [Security and networking](https://docs.warp.dev/platform/execution-security/): Security model, data boundaries, and network requirements for self-hosted Automation Platform cloud agents — including per-backend considerations and BYOLLM.
+- [Cloud Agent FAQs](https://docs.warp.dev/platform/faqs/): Frequently asked questions about cloud agents, including where agents run, how runs work, supported models, security, and common workflows.
+- [Handoff between local and cloud agents](https://docs.warp.dev/platform/handoff/): Understand how agent handoff moves work between local Warp sessions and cloud agent runs, including what context carries over in each direction.
+- [Handoff from cloud to cloud](https://docs.warp.dev/platform/handoff/cloud-to-cloud/): Send follow-up instructions to a finished cloud agent run. The run continues with restored workspace state, so the agent picks up where it left off.
+- [Handoff from local to cloud](https://docs.warp.dev/platform/handoff/local-to-cloud/): Move an in-progress local Warp Agent conversation into a cloud agent run for longer-running work, parallel exploration, or remote follow-up.
+- [Customizing workspace snapshots](https://docs.warp.dev/platform/handoff/snapshots/): Customize which repositories and files Warp snapshots at the end of a cloud agent run, so handoff continues to work outside the bundled cloud agent image.
+- [Harnesses in the Automation Platform](https://docs.warp.dev/platform/harnesses/): Run third-party harnesses such as Claude Code or Codex as cloud agents. They inherit the same triggers, environments, secrets, and observability as Warp Agent.
+- [Third-party cloud agent authentication](https://docs.warp.dev/platform/harnesses/authentication/): Connect Anthropic or OpenAI credentials to the Automation Platform to run Claude Code or Codex as cloud agents.
+- [Claude Code with the Automation Platform](https://docs.warp.dev/platform/harnesses/claude-code/): Run Claude Code with the Automation Platform. Strong at code review, deep bug investigation, large feature planning, and frontend or UI work.
+- [Codex with the Automation Platform](https://docs.warp.dev/platform/harnesses/codex/): Run Codex with the Automation Platform for codebase migrations, release coordination, batch test generation, and backend or DevOps automation.
+- [Warp Agent with the Automation Platform](https://docs.warp.dev/platform/harnesses/warp-agent/): Warp Agent is the default Automation Platform harness, with multi-model routing, full terminal access, and cross-harness subagent orchestration.
+- [Integrations Overview](https://docs.warp.dev/platform/integrations/): Configure Warp's first-party integrations by creating environments, connecting GitHub, and enabling agents to run your code and automate development workflows.
+- [Azure DevOps integration](https://docs.warp.dev/platform/integrations/azure-devops/): Connect cloud agents to Azure DevOps repos using personal access tokens and Warp-managed secrets.
+- [Bitbucket integration](https://docs.warp.dev/platform/integrations/bitbucket/): Connect cloud agents to Bitbucket repos using access tokens and Warp-managed secrets.
+- [Cloud providers](https://docs.warp.dev/platform/integrations/cloud-providers/): Connect cloud agents to your AWS and GCP services.
+- [GitHub integration](https://docs.warp.dev/platform/integrations/github/): Mention @warp-agent on a GitHub issue, pull request, or review comment to start a cloud agent that replies in the thread and opens pull requests.
+- [GitHub Actions](https://docs.warp.dev/platform/integrations/github-actions/): Run agents in GitHub Actions to automate code review, issue triage, and CI fixes.
+- [GitLab integration](https://docs.warp.dev/platform/integrations/gitlab/): Connect cloud agents to GitLab.com repos natively, or use access tokens and Warp-managed secrets for self-managed instances.
+- [Jira integration](https://docs.warp.dev/platform/integrations/jira/): Trigger cloud agent runs directly from Jira issues using the warp-agent label.
+- [Linear integration](https://docs.warp.dev/platform/integrations/linear/): Automate Linear issues with agents that run code in the cloud and create pull requests on your behalf.
+- [Integrations quickstart](https://docs.warp.dev/platform/integrations/quickstart/): Trigger your first agent from Slack in ~15 minutes and get results in-thread.
+- [GitHub Actions quickstart](https://docs.warp.dev/platform/integrations/quickstart-github-actions/): Set up your first agent in GitHub Actions in ~10 minutes. Run agents as workflow steps to automate code review and issue triage.
+- [Slack integration](https://docs.warp.dev/platform/integrations/slack/): Trigger agents from Slack to run cloud tasks, track progress, and create pull requests.
+- [Managing cloud agents](https://docs.warp.dev/platform/managing-cloud-agents/): Monitor and manage agent activity across your team with Warp's Agent Management Panel and the Oz web app's Runs page.
+- [MCP Servers for cloud agents](https://docs.warp.dev/platform/mcp/): Connect cloud agents to external tools, APIs, and internal services using MCP servers.
+- [Multi-agent orchestration](https://docs.warp.dev/platform/orchestration/): Coordinate parent and child agents across local and cloud runs to build supervisor/worker, fan-out, critic, DAG, and swarm workflows in Warp.
+- [Running orchestrated agents](https://docs.warp.dev/platform/orchestration/multi-agent-runs/): Start multi-agent orchestrations from the Warp app, the Oz CLI, the Oz web app, or the Warp Platform API, then inspect conversations and artifacts.
+- [Automation Platform overview](https://docs.warp.dev/platform/overview/): The Automation Platform provides shared execution, configuration, and APIs for Warp Factories and standalone cloud agents.
+- [Oz web app for cloud agents](https://docs.warp.dev/platform/oz-web-app/): Use the Oz web app to manage cloud agents, view runs, create schedules, and configure environments and integrations from any browser or mobile device.
+- [Cloud agents quickstart](https://docs.warp.dev/platform/quickstart/): Run a cloud agent from Warp, configure its environment, and inspect its commands and results.
+- [Legacy cloud agent secrets](https://docs.warp.dev/platform/secrets/): Manage team and personal secrets with the legacy Oz CLI for standalone workflows.
+- [Skills as Agents](https://docs.warp.dev/platform/skills-as-agents/): Run agents based on skills for consistent, repeatable workflows. Use skills with local or cloud agents from the CLI, Oz web app, API, or on a schedule.
+- [Access, billing, and identity permissions](https://docs.warp.dev/platform/team-access-billing-and-identity/): Manage cloud agent access, usage billing, and identity permissions for individuals and teams across integrations.
+- [Transitioning from Oz to Warp Factories](https://docs.warp.dev/platform/transitioning-from-oz/): Find current web app, CLI, SDK, and API references for existing Oz workflows. Review your setup before adopting Warp Factories.
+- [Triggers overview](https://docs.warp.dev/platform/triggers/): Configure triggers to run cloud agents automatically based on schedules or events.
+- [Scheduled Agents](https://docs.warp.dev/platform/triggers/scheduled-agents/): Run cloud agents on a cron schedule for automated maintenance and recurring tasks.
+- [Scheduled Agents quickstart](https://docs.warp.dev/platform/triggers/scheduled-agents-quickstart/): Schedule a cloud agent to run recurring tasks automatically — issue triage, dependency checks, code cleanup, and more.
+- [Unmanaged execution](https://docs.warp.dev/platform/unmanaged-execution/): Run agents in your existing CI, Kubernetes, or dev environments using the `oz agent run` CLI with Warp tracking and observability.
+- [Cloud agent session sharing](https://docs.warp.dev/platform/viewing-cloud-agent-runs/): Open, inspect, and steer remote cloud agent runs in real time from Warp or the web.
+
+## Code (expanded from https://docs.warp.dev/_llms-txt/code.txt)
+
+- [Built-in Code Editor](https://docs.warp.dev/code/code-editor/): Make in-context code edits with Warp's built-in editor, featuring syntax highlighting, tabs, and Vim keybindings.
+- [Code Editor Vim Keybindings](https://docs.warp.dev/code/code-editor/code-editor-vim-keybindings/): Use Vim keybindings in Warp's code editor for keyboard-driven navigation and editing.
+- [File Tree (Project Explorer)](https://docs.warp.dev/code/code-editor/file-tree/): Browse, open, and manage project files with Warp's native file tree and context menu actions.
+- [Find and Replace](https://docs.warp.dev/code/code-editor/find-and-replace/): Search and replace text in Warp's code editor with regex, case sensitivity, and smart case preservation.
+- [Language Server Protocol (LSP)](https://docs.warp.dev/code/code-editor/language-server-protocol/): Get hover info, go-to-definition, diagnostics, and format-on-save via built-in LSP support.
+- [Code Review panel](https://docs.warp.dev/code/code-review/): The Code Review panel lets you review, edit, and manage Git diffs in real time, with options to attach, revert, or open files directly.
+- [Git worktrees](https://docs.warp.dev/code/git-worktrees/): Warp natively supports Git worktrees, letting you work on multiple branches simultaneously with full Code Review, Codebase Context, and Agent support.
+- [Code overview](https://docs.warp.dev/code/overview/): Generate and edit code with Warp's coding agent, review inline diffs, and apply changes across your codebase.
+- [Feature support over SSH](https://docs.warp.dev/code/ssh-feature-support/): A reference for which Warp coding features are available over SSH and which are limited to local sessions.
+
+## Enterprise (expanded from https://docs.warp.dev/_llms-txt/enterprise.txt)
+
+- [Enterprise overview](https://docs.warp.dev/enterprise/): Warp Enterprise provides the security, control, and collaboration features organizations need to deploy Warp across their engineering teams at scale.
+- [Enterprise Analytics API](https://docs.warp.dev/enterprise/enterprise-features/analytics-api/): Programmatically access team-level usage data for Warp's enterprise plans — per-team summaries, per-user rollups, and message-level activity events.
+- [Architecture and deployment](https://docs.warp.dev/enterprise/enterprise-features/architecture-and-deployment/): Understand Warp's system architecture and choose the right deployment model for your organization - Warp-hosted, self-hosted, or hybrid.
+- [Bring Your Own LLM](https://docs.warp.dev/enterprise/enterprise-features/bring-your-own-llm/): BYOLLM routes Warp Agent inference through your AWS Bedrock or Google Cloud environment for billing control and data locality.
+- [BYOLLM: AWS Bedrock](https://docs.warp.dev/enterprise/enterprise-features/byollm-aws-bedrock/): Route Warp Agent inference through your AWS account with Bedrock BYOLLM, IAM credentials, and AWS-billed inference.
+- [BYOLLM: Gemini Enterprise (Vertex AI)](https://docs.warp.dev/enterprise/enterprise-features/byollm-gemini-enterprise/): Route Warp Agent inference through your Google Cloud project with Gemini Enterprise BYOLLM and short-lived WIF credentials.
+- [Connecting private services to Warp](https://docs.warp.dev/enterprise/enterprise-features/private-networking/): Connect private LLM gateways and MCP servers to Warp through cloud private endpoints, VPNs, or on-premises interconnects.
+- [Team-managed LLM API keys and endpoints](https://docs.warp.dev/enterprise/enterprise-features/team-managed-keys-and-endpoints/): Configure shared LLM provider API keys and custom endpoints for your team from the Admin Panel, including cloud agents.
+- [Enterprise FAQ](https://docs.warp.dev/enterprise/getting-started/faq/): Answers to common questions about Warp Enterprise, including login issues, SSO, and getting started.
+- [Getting started for developers](https://docs.warp.dev/enterprise/getting-started/getting-started-developers/): Download Warp, log in to your team, and start using agents, Codebase Context, and collaborative features to accelerate your development workflow.
+- [Getting started with Warp Enterprise](https://docs.warp.dev/enterprise/getting-started/getting-started-enterprise/): Set up Warp Enterprise for your organization with SSO configuration, team management, and admin controls.
+- [Enterprise quickstart](https://docs.warp.dev/enterprise/getting-started/quickstart/): Get up and running with Warp Enterprise in under 10 minutes. Log in, set up your terminal, and run your first agent.
+- [Security overview](https://docs.warp.dev/enterprise/security-and-compliance/security-overview/): Understand Warp's security architecture, data handling practices, and compliance certifications to ensure your organization's requirements are met.
+- [Single Sign-On (SSO)](https://docs.warp.dev/enterprise/security-and-compliance/sso/): Configure Single Sign-On (SSO) to authenticate and manage access to Warp across your organization.
+- [Warp Trust Center](https://docs.warp.dev/enterprise/security-and-compliance/trust-center/): Access Warp's security documentation, compliance certifications, and third-party assessment resources to complete your vendor security review.
+- [Enterprise billing](https://docs.warp.dev/enterprise/support-and-resources/billing/): Billing for Warp Enterprise: contract-specific usage pools, cloud agent costs, spending controls, and BYOLLM billing.
+- [Feedback and feature requests](https://docs.warp.dev/enterprise/support-and-resources/feedback-and-feature-requests/): Report bugs, request features, and get support as a Warp Enterprise customer.
+- [Troubleshooting login](https://docs.warp.dev/enterprise/support-and-resources/troubleshooting-login/): Resolve common login and SSO issues for Warp Enterprise users and IT admins.
+- [Admin Panel for teams](https://docs.warp.dev/enterprise/team-management/admin-panel/): Centralized management for team administrators to configure Warp settings, control agent behavior, and enforce security policies across your organization.
+- [Roles and permissions](https://docs.warp.dev/enterprise/team-management/roles-and-permissions/): Understand user roles, permissions, and access controls for managing your Warp Enterprise team.
+- [Team management in Warp](https://docs.warp.dev/enterprise/team-management/teams/): Create and manage teams in Warp to organize users, share resources, and collaborate across your engineering organization.
+- [Workspaces for Enterprise teams](https://docs.warp.dev/enterprise/team-management/workspaces/): Workspaces group teams under one Enterprise account with shared membership, billing, SSO, and company-wide settings.
+
+## Getting Started (expanded from https://docs.warp.dev/_llms-txt/getting-started.txt)
+
+- [Warp products overview](https://docs.warp.dev/): Warp combines a modern terminal, coding agents, cloud automation, and software factories for teams that build and ship software.
+- [Keyboard Shortcuts](https://docs.warp.dev/getting-started/keyboard-shortcuts/): View, customize, and remap keyboard shortcuts for all Warp features.
+- [Migrate to Warp](https://docs.warp.dev/getting-started/migrate-to-warp/): Move your settings and mental model into Warp. Pick the tool you're coming from for step-by-step guidance and Warp equivalents.
+- [Migrate to Warp from Claude Code](https://docs.warp.dev/getting-started/migrate-to-warp/migrate-to-warp-from-claude-code/): Keep using Claude Code in Warp — with rich input, code review, and notifications — or switch from Claude Code to Warp's Agent Mode as your primary coding agent.
+- [Migrate to Warp from Cursor](https://docs.warp.dev/getting-started/migrate-to-warp/migrate-to-warp-from-cursor/): Reconfigure your terminal and agent settings when switching to Warp from Cursor, or run Warp alongside Cursor as your agent terminal.
+- [Migrate to Warp from Ghostty](https://docs.warp.dev/getting-started/migrate-to-warp/migrate-to-warp-from-ghostty/): Moving to Warp from Ghostty? Here's how to bring over your themes, fonts, and keybindings, plus where to find Warp's equivalents for Ghostty's native features.
+- [Migrate to Warp from iTerm2](https://docs.warp.dev/getting-started/migrate-to-warp/migrate-to-warp-from-iterm2/): Import your iTerm2 profile into Warp to transfer themes, fonts, keybindings, hotkey windows, and more in a few clicks.
+- [Migrate to Warp from macOS Terminal](https://docs.warp.dev/getting-started/migrate-to-warp/migrate-to-warp-from-macos-terminal/): Switch from the default macOS Terminal app to Warp. Match your setup and discover what Warp adds beyond the basics.
+- [Migrate to Warp from VS Code terminal](https://docs.warp.dev/getting-started/migrate-to-warp/migrate-to-warp-from-vs-code-terminal/): Replicate your VS Code integrated terminal setup in Warp - shell, fonts, keybindings - or run Warp alongside VS Code as a richer terminal.
+- [Migrate to Warp from Windows Terminal](https://docs.warp.dev/getting-started/migrate-to-warp/migrate-to-warp-from-windows-terminal/): Switch from Windows Terminal to Warp on Windows. Reconfigure profiles, shells, fonts, keybindings, and find Warp equivalents.
+- [Coding in Warp](https://docs.warp.dev/getting-started/quickstart/coding-in-warp/): Agents can generate and edit code directly from within Warp.
+- [Customizing Warp](https://docs.warp.dev/getting-started/quickstart/customizing-warp/): A complete guide to customizing Warp: themes, vertical tabs, tab configs, prompt chips, keybindings, AI models, and more.
+- [Installation and setup](https://docs.warp.dev/getting-started/quickstart/installation-and-setup/): Install Warp on macOS, Windows, or Linux. All installation options include auto-update for new features, bug fixes, and performance improvements.
+- [Supported Shells](https://docs.warp.dev/getting-started/supported-shells/): Check which bash, zsh, fish, PowerShell, and WSL2 shells Warp supports on macOS, Windows, and Linux.
+- [Warp quickstart](https://docs.warp.dev/quickstart/): Get up and running with Warp in about 10 minutes. Install, run your first commands, talk to an agent, and discover what makes Warp different.
+
+## Knowledge and Collaboration (expanded from https://docs.warp.dev/_llms-txt/knowledge-and-collaboration.txt)
+
+- [Team Admin Panel](https://docs.warp.dev/knowledge-and-collaboration/admin-panel/): Centralized management for team administrators to configure workspace settings enforced across all team members.
+- [Session Sharing](https://docs.warp.dev/knowledge-and-collaboration/session-sharing/): Share terminal sessions with teammates for collaboration, debugging, and knowledge sharing.
+- [Team management](https://docs.warp.dev/knowledge-and-collaboration/teams/): Create or join a team to collaborate with others in Warp.
+- [Warp Drive overview](https://docs.warp.dev/knowledge-and-collaboration/warp-drive/): Warp Drive is a workspace in your terminal where you can save Workflows, Notebooks, Prompts, and Environment Variables for personal use or to share with a team.
+- [Agent Mode Context](https://docs.warp.dev/knowledge-and-collaboration/warp-drive/agent-mode-context/): Agents use your Warp Drive content—Workflows, Notebooks, Rules, MCP Servers, and Environment Variables—for context-aware responses.
+- [AI-Integrated Objects](https://docs.warp.dev/knowledge-and-collaboration/warp-drive/ai-objects/): Access Rules, MCP Servers, Skills, and Prompts in Warp Drive to give agents personalized context.
+- [Environment variables](https://docs.warp.dev/knowledge-and-collaboration/warp-drive/environment-variables/): Save or sync environment variables to load into your terminal sessions.
+- [Warp Drive Notebooks](https://docs.warp.dev/knowledge-and-collaboration/warp-drive/notebooks/): Save interactive playbooks to simplify onboarding and development.
+- [Warp Drive prompts](https://docs.warp.dev/knowledge-and-collaboration/warp-drive/prompts/): Save and reuse parameterized Agent Mode prompts to run on-demand.
+- [Warp Drive on the web](https://docs.warp.dev/knowledge-and-collaboration/warp-drive/web/): Access your Warp Drive objects and shared sessions from any browser or touch screen device, including mobile phones, tablets, and touch-enabled laptops.
+- [Warp Drive Workflows](https://docs.warp.dev/knowledge-and-collaboration/warp-drive/workflows/): Save parameterized commands as Workflows and execute them on-demand from Warp Drive.
+
+## Support (expanded from https://docs.warp.dev/_llms-txt/support.txt)
+
+- [Support & Community](https://docs.warp.dev/support-and-community/): Contact Warp support, join the community, and find help for bugs, billing, and enterprise issues.
+- [Contributing to Warp](https://docs.warp.dev/support-and-community/community/contributing/): Contribute to Warp's open source client by filing issues, opening pull requests, building themes, and sharing workflows.
+- [Refer a friend and earn rewards](https://docs.warp.dev/support-and-community/community/refer-a-friend/): Think Warp would be the ideal product for someone you know? You can invite your team or friends within the app and earn rewards.
+- [Warp Preview program](https://docs.warp.dev/support-and-community/community/warp-preview-and-alpha-program/): Warp Preview is an early-access build of Warp with experimental features. Try what's next before it ships.
+- [Plans and billing](https://docs.warp.dev/support-and-community/plans-and-billing/): Compare Warp plans, track usage costs and balances, and manage purchases and billing settings.
+- [Purchasing additional usage](https://docs.warp.dev/support-and-community/plans-and-billing/add-on-credits/): Buy Warp usage or enable auto-reload, and manage your team's shared balance and monthly spend limit.
+- [Usage and billing](https://docs.warp.dev/support-and-community/plans-and-billing/credits/): Track Warp usage, understand inference, compute, and platform costs, and distinguish accounts billed in dollars from Enterprise contracts using credits.
+- [Plans, pricing, and refunds](https://docs.warp.dev/support-and-community/plans-and-billing/plans-pricing-refunds/): Compare Warp plans, check included usage and existing balances, and review refund policies for subscriptions and usage purchases.
+- [Platform usage](https://docs.warp.dev/support-and-community/plans-and-billing/platform-credits/): Understand agent-hour charges for cloud runs and eligible local runs, including how platform usage differs from inference and compute.
+- [Pricing and billing FAQs](https://docs.warp.dev/support-and-community/plans-and-billing/pricing-faqs/): Frequently asked questions about upgrading, managing billing, refunds, and invoicing with Warp's paid plans.
+- [Warp network log](https://docs.warp.dev/support-and-community/privacy-and-security/network-log/): Logs for all network traffic (both requests and responses) originating from the current terminal session.
+- [Privacy and data control](https://docs.warp.dev/support-and-community/privacy-and-security/privacy/): Warp's approach to privacy and your control over your data
+- [Secret Redaction](https://docs.warp.dev/support-and-community/privacy-and-security/secret-redaction/): Configure Secret Redaction to mask secrets, passwords, API keys, and PII before terminal or AI content is sent to servers.
+- [Known issues and workarounds](https://docs.warp.dev/support-and-community/troubleshooting-and-support/known-issues/): Known Warp issues with workarounds, including SSH, shells, and incompatible tools.
+- [Logging out & uninstalling](https://docs.warp.dev/support-and-community/troubleshooting-and-support/logging-out-and-uninstalling/): Log out of Warp, uninstall the Warp app, or remove the Warp Agent CLI and its local files.
+- [Sending feedback and logs](https://docs.warp.dev/support-and-community/troubleshooting-and-support/sending-us-feedback/): Send Warp feedback, bug reports, and feature requests, and gather logs, crash reports, CPU samples, and AI conversation IDs to attach to them.
+- [Troubleshooting Login](https://docs.warp.dev/support-and-community/troubleshooting-and-support/troubleshooting-login-issues/): Fix common login issues including SSO, proxies, ad blockers, and auth tokens.
+- [Updating Warp](https://docs.warp.dev/support-and-community/troubleshooting-and-support/updating-warp/): Check for updates, troubleshoot auto-update permissions, and refresh signing keys.
+- [Using Warp Offline](https://docs.warp.dev/support-and-community/troubleshooting-and-support/using-warp-offline/): Using Warp offline and what features are supported.
+
+## Guides (expanded from https://docs.warp.dev/_llms-txt/guides.txt)
+
+- [Guides](https://docs.warp.dev/guides/): Step-by-step guides for Warp, the agentic development environment — from first setup to coding agent workflows, MCP integrations, and full app builds.
+- [Build a self-improving agent](https://docs.warp.dev/guides/agent-workflows/build-a-self-improving-agent/): Build an outer loop where a scheduled agent reviews past runs, learns from corrections, and proposes skill file updates.
+- [Build a triage agent for your issue backlog](https://docs.warp.dev/guides/agent-workflows/build-a-triage-agent/): Create a triage agent that reviews new GitHub issues, applies labels, and flags open questions. Your backlog stays actionable without manual effort.
+- [Share agent context in GitHub PRs](https://docs.warp.dev/guides/agent-workflows/how-to-attach-agent-session-context-to-github-prs/): Share a Warp agent session or cloud agent run link in a GitHub pull request so reviewers can inspect the context behind agent-generated changes.
+- [Edit agent code in Warp](https://docs.warp.dev/guides/agent-workflows/how-to-edit-agent-code-in-warp/): Review, edit, and refine AI-generated code diffs directly in Warp — accept, reject, or modify changes before applying them.
+- [Explain your codebase using Warp (Rust codebase)](https://docs.warp.dev/guides/agent-workflows/how-to-explain-your-codebase-using-warp-rust-codebase/): Use Warp's coding agents with semantic and symbol search to explore, understand, and modify unfamiliar codebases — demonstrated on a large Rust project.
+- [Review AI-generated code](https://docs.warp.dev/guides/agent-workflows/how-to-review-ai-generated-code/): Review AI-generated code in Warp with visual diffs and inline comments. Use this workflow with Claude Code, Codex, or any CLI agent.
+- [Review PRs like a senior dev](https://docs.warp.dev/guides/agent-workflows/how-to-review-prs-like-a-senior-dev/): Use Warp's agent to understand large pull requests, identify risky changes, and investigate potential issues before leaving review comments.
+- [Run 3 agents in parallel](https://docs.warp.dev/guides/agent-workflows/how-to-run-3-agents-in-parallel-summarize-logs-analyze-pr-modify-ui/): Run three agent tasks simultaneously in Warp — modify UI, analyze code reviews, and summarize production logs in parallel.
+- [Run multiple AI coding agents](https://docs.warp.dev/guides/agent-workflows/how-to-run-multiple-ai-coding-agents/): Run Claude Code, Codex, Warp Agent, and other coding agents across worktrees, tabs, and cloud orchestration with clear task ownership.
+- [How to run unattended agents](https://docs.warp.dev/guides/agent-workflows/how-to-run-unattended-agents/): Start unattended cloud agents from schedules, Slack, Linear, GitHub, GitHub Actions, the Oz CLI, or the Automation Platform API, then inspect every run.
+- [Use voice and images to prompt coding agents](https://docs.warp.dev/guides/agent-workflows/how-to-use-voice-and-images-to-prompt-coding-agents/): Use voice and image context to prompt coding agents faster in Warp — works with Claude Code, Codex, and any CLI agent.
+- [Run a software factory in the cloud](https://docs.warp.dev/guides/agent-workflows/run-a-software-factory-in-the-cloud/): Set up the Automation Platform-native production path for your software factory with cloud environments, secrets, triggers, and audit trails.
+- [Set up your software factory](https://docs.warp.dev/guides/agent-workflows/set-up-a-software-factory/): Add the implementation and reviewer agents to complete your software factory, then wire all four agent roles together using GitHub labels as the state machine.
+- [Understand your codebase](https://docs.warp.dev/guides/agent-workflows/understanding-your-codebase/): Use Warp's Codebase Context to search across client and server repos, generate architecture summaries, and onboard to unfamiliar features fast.
+- [Use images as context with Warp](https://docs.warp.dev/guides/agent-workflows/using-images-as-context-with-warp/): Attach screenshots and design mockups as context for Warp's agent to generate UI code, debug visual issues, and match Figma designs.
+- [5 agent workflows for product managers](https://docs.warp.dev/guides/agent-workflows/warp-for-product-managers/): Use five agent workflows to automate status updates, document drafting, Slack search, and meeting preparation for product managers.
+- [Warp vs Claude Code](https://docs.warp.dev/guides/agent-workflows/warp-vs-claude-code/): Compare Warp and Claude Code across setup, diff review, model selection, configuration, and performance.
+- [Write product and tech specs with agents](https://docs.warp.dev/guides/agent-workflows/write-product-and-tech-specs-with-agents/): Use agents to turn a ready-to-implement issue into a product spec and a tech spec — the blueprints that guide implementation and anchor code review.
+- [Build a Chrome extension (D3.js + JavaScript + HTML + CSS)](https://docs.warp.dev/guides/build-an-app-in-warp/building-a-chrome-extension-d3js-javascript-html-css/): Build a D3.js Sankey diagram Chrome extension using Warp — scaffold, debug, coordinate multiple agents, and publish to the Chrome Web Store.
+- [Build a real-time chat app (GitHub MCP + Railway)](https://docs.warp.dev/guides/build-an-app-in-warp/building-a-real-time-chat-app-github-mcp-railway/): Build and deploy a real-time chat app with Python, FastAPI, and JavaScript — from idea to production, all inside Warp.
+- [Build Warp's input with Warp](https://docs.warp.dev/guides/build-an-app-in-warp/building-warps-input-with-warp/): Watch how a Warp designer uses Warp's own agent to locate, modify, and test a UI component change in a large Rust codebase.
+- [Create Rules for agents](https://docs.warp.dev/guides/configuration/creating-rules-for-agents/): Create reusable Rules in Warp to encode team conventions — like Dockerfile patterns or dependency management — so agents follow your standards.
+- [Configure YOLO and strategic Agent Profiles](https://docs.warp.dev/guides/configuration/how-to-configure-yolo-and-strategic-agent-profiles/): Configure custom agent profiles in Warp to control planning depth, autonomy, and execution speed — demonstrated with YOLO and Strategic examples.
+- [Create project Rules for an existing project](https://docs.warp.dev/guides/configuration/how-to-create-project-rules-for-an-existing-project-astro-typescript-tailwind/): Create and maintain an AGENTS.md project rules file so coding agents always understand your project's setup, commands, architecture, and conventions.
+- [Set coding best practices](https://docs.warp.dev/guides/configuration/how-to-set-coding-best-practices/): Use Warp Rules to enforce coding style, TypeScript conventions, and documentation quality across AI-generated code.
+- [Set coding preferences with Rules](https://docs.warp.dev/guides/configuration/how-to-set-coding-preferences-with-rules/): Store your package manager, environment tool, and CLI preferences as Warp Rules so agents automatically use pnpm, miniconda, or your preferred tools.
+- [Set tech stack preferences with Rules](https://docs.warp.dev/guides/configuration/how-to-set-tech-stack-preferences-with-rules/): Define your preferred frameworks and tech stack in Warp Rules so agents consistently use Astro, SvelteKit, Vite, or your tools of choice.
+- [Set up self-serve data analytics with Skills](https://docs.warp.dev/guides/configuration/how-to-set-up-self-serve-data-analytics-with-skills/): Set up a self-serve data analytics workflow in Warp using two community Skills that map questions to dbt models and structure reproducible analyses.
+- [Sync your monorepos](https://docs.warp.dev/guides/configuration/how-to-sync-your-monorepos/): Define global Rules in Warp to keep monorepo schemas, server types, and client types automatically synchronized across repositories.
+- [Use Agent Profiles efficiently](https://docs.warp.dev/guides/configuration/how-to-use-agent-profiles-efficiently/): Compare Strategic and YOLO agent profiles side-by-side to choose the right balance of planning, safety, and speed for your project.
+- [Use tokens more efficiently with AI coding agents](https://docs.warp.dev/guides/configuration/how-to-use-tokens-efficiently-with-ai-coding-agents/): Get more out of every token your coding agents use in Warp with model choice and routing, focused context, conversation management, and Rules.
+- [Trigger reusable actions with saved prompts](https://docs.warp.dev/guides/configuration/trigger-reusable-actions-with-saved-prompts/): Save and share prompts in Warp Drive to automate commits, code reviews, and PR creation across your team.
+- [Analyze Cloud Run logs (gcloud)](https://docs.warp.dev/guides/devops/how-to-analyze-cloud-run-logs-gcloud/): Use Warp to pull, organize, and analyze Cloud Run production logs by severity with natural language prompts and automated Python scripts.
+- [Create a production-ready Docker setup](https://docs.warp.dev/guides/devops/how-to-create-a-production-ready-docker-setup/): Use Agents in Warp to generate optimized Dockerfiles, docker-compose configs, and .dockerignore files for multi-stage production deployments.
+- [Create a priority matrix for database optimization](https://docs.warp.dev/guides/devops/how-to-create-priority-matrix-for-database-optimization/): Prompt Warp to audit SQL queries, analyze execution plans, and generate a priority matrix ranking database optimizations by impact and effort.
+- [Generate unit and security tests to debug faster](https://docs.warp.dev/guides/devops/how-to-generate-unit-and-security-tests-to-debug-faster/): Prompt Warp to generate comprehensive unit and security tests for REST APIs, including SQL injection, XSS, and auth validation checks.
+- [Prevent secrets from leaking](https://docs.warp.dev/guides/devops/how-to-prevent-secrets-from-leaking/): Use Warp Rules and built-in Secret Redaction to prevent API keys and credentials from leaking in agent output, demos, and shared sessions.
+- [Write SQL commands inside a Postgres REPL](https://docs.warp.dev/guides/devops/how-to-write-sql-commands-inside-a-postgres-repl/): Use Agents in Warp inside a Postgres REPL to translate natural language into SQL queries — works with Node.js, Python, and MySQL too.
+- [Improve your Kubernetes workflow (kubectl + Helm)](https://docs.warp.dev/guides/devops/improve-your-kubernetes-workflow-kubectl-helm/): Streamline kubectl and Helm workflows with Warp's AI assistance, active suggestions, custom workflows, and synchronized panes.
+- [Build a Mattermost bot for Warp Factories](https://docs.warp.dev/guides/external-tools/build-a-mattermost-bot-for-warp-factories/): Build a Mattermost bot that discovers a Warp factory by name, dispatches tasks to it, and continues the conversation from replies in a thread.
+- [Context7 MCP: update Astro project with best practices](https://docs.warp.dev/guides/external-tools/context7-mcp-update-astro-project-with-best-practices/): Use the Context7 MCP server to give Warp agents real-time access to framework documentation for automated project upgrades.
+- [Figma remote MCP: create a website from a Figma file](https://docs.warp.dev/guides/external-tools/figma-remote-mcp-create-a-website-from-a-figma-file-from-scratch/): Connect Warp to Figma's remote MCP server via OAuth and generate front-end code directly from your design files.
+- [GitHub MCP: summarize open PRs and create GitHub issues](https://docs.warp.dev/guides/external-tools/github-mcp-summarizing-open-prs-and-creating-gh-issues/): Connect the GitHub MCP server to Warp to summarize open PRs, create issues from TODO comments, and automate repo management.
+- [Set up Claude Code](https://docs.warp.dev/guides/external-tools/how-to-set-up-claude-code/): Set up Claude Code in Warp, configure it for your project, and learn productivity tips — from voice prompting to visual code review.
+- [Set up Codex CLI](https://docs.warp.dev/guides/external-tools/how-to-set-up-codex-cli/): Set up OpenAI's Codex CLI in Warp, configure it for your project, and learn productivity tips for faster AI-assisted coding workflows in Warp.
+- [Set up Gemini CLI](https://docs.warp.dev/guides/external-tools/how-to-set-up-gemini-cli/): Set up Google's Gemini CLI in Warp, configure it for your project, and learn productivity tips for faster AI-assisted coding workflows.
+- [Set up Ollama](https://docs.warp.dev/guides/external-tools/how-to-set-up-ollama/): Install Ollama, run LLMs locally, compare model performance, and integrate local models into your apps using Warp.
+- [Set up OpenCode](https://docs.warp.dev/guides/external-tools/how-to-set-up-opencode/): Set up OpenCode in Warp, configure it for your project, and learn productivity tips for faster AI-assisted coding workflows.
+- [Linear MCP: retrieve issue data](https://docs.warp.dev/guides/external-tools/linear-mcp-retrieve-issue-data/): Add the Linear MCP server to Warp and query your issues, tasks, and assignments directly from the terminal.
+- [Linear MCP: update tickets with a lean build approach](https://docs.warp.dev/guides/external-tools/linear-mcp-updating-tickets-with-a-lean-build-approach/): Use Warp's Linear MCP integration to update ticket descriptions, propagate changes to subtasks, and maintain a lean build strategy.
+- [Puppeteer MCP: scrape Amazon web reviews](https://docs.warp.dev/guides/external-tools/puppeteer-mcp-scraping-amazon-web-reviews/): Configure the Puppeteer MCP server in Warp to automate browser tasks like navigating sites, scraping product data, and analyzing reviews.
+- [Sentry MCP: fix Sentry error in Empower website](https://docs.warp.dev/guides/external-tools/sentry-mcp-fix-sentry-error-in-empower-website/): Connect the Sentry MCP server to Warp, fetch live error data, diagnose stack traces, and auto-generate fixes for production issues.
+- [SQLite and Stripe MCP: basic queries you can make after setup](https://docs.warp.dev/guides/external-tools/sqlite-and-stripe-mcp-basic-queries-you-can-make-after-set-up/): Connect SQLite and Stripe MCP servers to Warp and run conversational queries against your local database and payment data.
+- [Connect developer tools to agents with MCP workflows](https://docs.warp.dev/guides/external-tools/using-mcp-servers-with-warp/): Use MCP servers to connect Warp agents to developer tools like GitHub, Linear, Sentry, and Figma across local and cloud agent workflows.
+- [Code UI that matches your mockup](https://docs.warp.dev/guides/frontend/how-to-actually-code-ui-that-matches-your-mockup-react-tailwind/): Prompt Warp to generate pixel-perfect React + Tailwind code from design mockups, with structured specs and iterative refinement.
+- [Replace a UI element in Warp (Rust codebase)](https://docs.warp.dev/guides/frontend/how-to-replace-a-ui-element-in-warp-rust-codebase/): Use Agent Mode in Warp to plan and execute icon replacements across a large Rust codebase — with live diffs, auto-compilation, and self-correction.
+- [10 coding features you should know](https://docs.warp.dev/guides/getting-started/10-coding-features-you-should-know/): Discover 10 essential coding features in Warp — file search, tabbed editor, find and replace, syntax highlighting, code review panel, and more.
+- [Customize Warp's appearance](https://docs.warp.dev/guides/getting-started/how-to-customize-warps-appearance/): Customize Warp's themes, input placement, AI settings, codebase indexing, team collaboration, and visual appearance to fit your workflow.
+- [How to Make Warp’s UI More Minimal](https://docs.warp.dev/guides/getting-started/how-to-make-warps-ui-more-minimal/): Reduce visual noise in Warp by disabling UI elements, switching to a minimal theme, and hiding the tab bar.
+- [Master Warp's Code Review panel](https://docs.warp.dev/guides/getting-started/how-to-master-warps-code-review-panel/): Use Warp's Code Review Panel to view file diffs, edit code inline, componentize changes, and commit directly — all without leaving the terminal.
+- [Welcome to Warp](https://docs.warp.dev/guides/getting-started/welcome-to-warp/): Get oriented with Warp's agentic terminal. Learn the basics of prompt-based coding, blending terminal and agent workflows, and navigating the interface.
+
+## Changelog (expanded from https://docs.warp.dev/_llms-txt/changelog.txt)
+
+- [Changelog](https://docs.warp.dev/changelog/): Warp ships weekly updates, typically on Thursdays.
+- [Changelog — 2021](https://docs.warp.dev/changelog/2021/): Warp release notes for 2021. Updates ship weekly, typically on Thursdays.
+- [Changelog — 2022](https://docs.warp.dev/changelog/2022/): Warp release notes for 2022. Updates ship weekly, typically on Thursdays.
+- [Changelog — 2023](https://docs.warp.dev/changelog/2023/): Warp release notes for 2023. Updates ship weekly, typically on Thursdays.
+- [Changelog — 2024](https://docs.warp.dev/changelog/2024/): Warp release notes for 2024. Updates ship weekly, typically on Thursdays.
+- [Changelog — 2025](https://docs.warp.dev/changelog/2025/): Warp release notes for 2025. Updates ship weekly, typically on Thursdays.
+- [Changelog — 2026](https://docs.warp.dev/changelog/2026/): Warp release notes for 2026. Updates ship weekly, typically on Thursdays.

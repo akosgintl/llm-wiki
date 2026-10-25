@@ -1,0 +1,249 @@
+---
+title: "Managed: Docker backend"
+subtitle: "Run the Automation Platform managed worker daemon with the Docker backend to execute cloud agent tasks in isolated containers on your infrastructure."
+authors: []
+published_date: null
+source_url: https://docs.warp.dev/factories/self-hosting/managed-docker/
+origin: llms-txt
+llms_txt: https://docs.warp.dev/llms.txt
+section: "Documentation Sets / Factories"
+fetched: 2026-10-25T14:54:27Z
+---
+
+> For the complete documentation index, see [llms.txt](https://docs.warp.dev/llms.txt).
+> Markdown versions of each page are available by appending .md to any URL.
+
+# Managed: Docker backend
+
+Run the Automation Platform managed worker daemon with the Docker backend to execute cloud agent tasks in isolated containers on your infrastructure.
+
+Run the `oz-agent-worker` daemon with the **Docker backend** — the default managed path. Each agent task runs in an isolated Docker container spawned from the worker, with full orchestration by the Automation Platform (Slack, Linear, schedules, API, `oz agent run-cloud`).
+
+## When to use the Docker backend
+
+-   You want the simplest managed setup and have Docker available on the worker host.
+-   You want per-task isolation without running a Kubernetes cluster.
+-   You’re not already deploying workloads into Kubernetes.
+
+* * *
+
+## Prerequisites
+
+-   Managed self-hosting access, network connectivity, and credentials. See the [shared managed prerequisites](https://docs.warp.dev/factories/self-hosting/#managed-prerequisites).
+-   A Linux VM, server, or workstation, or a macOS or Windows host using a native worker binary.
+-   A `linux/amd64` or `linux/arm64` Docker daemon running Linux containers. Windows containers are not supported.
+-   A glibc-based task image with the required tools and dependencies. See [custom environment images](https://docs.warp.dev/platform/environments/). Musl-based images such as Alpine Linux are not supported.
+
+### Install Docker
+
+If Docker is not already installed, follow the [official Docker installation guide](https://docs.docker.com/get-docker/) for your platform. Verify Docker is running:
+
+```bash
+docker info
+```
+
+**Expected outcome:** `docker info` prints daemon details without errors.
+
+* * *
+
+## Set your API key
+
+Export your self-hosted worker API key so the worker can authenticate to the Automation Platform:
+
+```bash
+export WARP_API_KEY="YOUR_API_KEY"
+```
+
+## Install and run the worker
+
+The `oz-agent-worker` is open source. See the [oz-agent-worker repository](https://github.com/warpdotdev/oz-agent-worker) for source code, issues, and contribution guidelines.
+
+There are three ways to install and run the worker: as a Docker container, via Homebrew, or as a prebuilt binary from GitHub Releases. Docker is the recommended default.
+
+On macOS, use [Homebrew](#option-2-homebrew) or a [release binary](#option-3-github-releases-binary). On Windows, use a [release binary](#option-3-github-releases-binary).
+
+The worker can be configured entirely via CLI flags, or via a YAML [config file](https://docs.warp.dev/factories/self-hosting/reference/#config-file) for more complex setups.
+
+### Option 1: Docker (recommended)
+
+The worker needs access to the Docker daemon to spawn task containers. For a rootful Docker daemon on Linux, mount the host socket and add its group to the worker container. This command does not apply to macOS or Windows; use the [Homebrew](#option-2-homebrew) or [release binary](#option-3-github-releases-binary) option and configure the endpoint as described in [Docker connectivity](#docker-connectivity).
+
+```bash
+export DOCKER_SOCKET_GID="$(stat -c '%g' /var/run/docker.sock)"
+
+docker run \
+  --group-add "$DOCKER_SOCKET_GID" \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e WARP_API_KEY="$WARP_API_KEY" \
+  warpdotdev/oz-agent-worker --worker-id "my-worker"
+```
+
+**Expected outcome:** The worker connects to the Automation Platform and logs that it’s listening for tasks.
+
+### Option 2: Homebrew
+
+Install the worker binary with [Homebrew](https://brew.sh/) on macOS or Linux from the [`warpdotdev/warp` tap](https://github.com/warpdotdev/homebrew-warp):
+
+```bash
+brew install warpdotdev/warp/oz-agent-worker
+```
+
+Run the binary directly. It uses the same Docker-daemon discovery described in [Docker connectivity](#docker-connectivity) below:
+
+```bash
+oz-agent-worker --api-key "$WARP_API_KEY" --worker-id "my-worker"
+```
+
+### Option 3: GitHub Releases binary
+
+Download the archive for your platform from the [oz-agent-worker releases page](https://github.com/warpdotdev/oz-agent-worker/releases), extract it, and run the binary. The example below uses Linux amd64; choose the archive that matches your OS and CPU architecture:
+
+```bash
+tar -xf oz-agent-worker-linux-amd64.tar.gz
+./oz-agent-worker --api-key "$WARP_API_KEY" --worker-id "my-worker"
+```
+
+Once started, the worker connects to the Automation Platform, waits for tasks routed to its `--worker-id`, runs each task in an isolated Docker container, and reports status and results back. The worker automatically reconnects if the connection drops.
+
+You can run multiple workers with the same `--worker-id` for redundancy — the Automation Platform distributes tasks across connected workers.
+
+* * *
+
+## Docker backend configuration
+
+The worker can take configuration either via CLI flags or via a YAML [config file](https://docs.warp.dev/factories/self-hosting/reference/#config-file). CLI flags take precedence over config file values.
+
+**Common CLI flags for a rootful Linux worker container:**
+
+```bash
+export DOCKER_SOCKET_GID="$(stat -c '%g' /var/run/docker.sock)"
+docker run \
+  --group-add "$DOCKER_SOCKET_GID" \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e WARP_API_KEY="$WARP_API_KEY" \
+  warpdotdev/oz-agent-worker \
+  --worker-id "prod-runner-1" \
+  --log-level debug \
+  --max-concurrent-tasks 4 \
+  --idle-on-complete 10m \
+  -v /opt/shared-cache:/cache:ro \
+  -e NPM_TOKEN=your_token \
+  -e GITHUB_TOKEN
+```
+
+Caution
+
+When running the worker via Docker, there are two levels of `-e` flags. Docker’s `-e` passes env vars to the **worker container** (e.g., `WARP_API_KEY`). The worker’s `-e` / `--env` flags pass env vars into the **task containers** the worker spawns. Keep these distinct:
+
+```bash
+# Docker -e: passes WARP_API_KEY to the worker container
+# Worker -e: passes MY_SECRET to task containers
+docker run \
+  -e WARP_API_KEY="$WARP_API_KEY" \
+  warpdotdev/oz-agent-worker \
+  --worker-id "my-worker" \
+  -e MY_SECRET=hunter2
+```
+
+**Equivalent config file** (`config.yaml`):
+
+```yaml
+worker_id: "prod-runner-1"
+log_level: "debug"
+max_concurrent_tasks: 4
+idle_on_complete: "10m"
+backend:
+  docker:
+    volumes:
+      - "/opt/shared-cache:/cache:ro"
+    environment:
+      - name: NPM_TOKEN
+        value: "your_token"
+      - name: GITHUB_TOKEN  # inherits from host environment
+```
+
+Pass it with `--config-file config.yaml`. See the [Self-hosted worker reference](https://docs.warp.dev/factories/self-hosting/reference/) for the full flag and config schema.
+
+* * *
+
+## Docker connectivity
+
+The worker uses the standard Docker client discovery mechanism to find the Docker daemon.
+
+1.  **`DOCKER_HOST`** environment variable (e.g., `unix:///var/run/docker.sock`, `tcp://localhost:2375`).
+2.  **Default socket** (`/var/run/docker.sock` on Linux, `~/.docker/run/docker.sock` for rootless Docker).
+3.  **Docker context** via `DOCKER_CONTEXT` environment variable.
+4.  **Config file** (`~/.docker/config.json`) for context settings.
+
+The published worker image runs as a non-root user. When you mount a rootful Linux Docker socket, pass the socket’s numeric group ID with `--group-add` as shown in the [Docker installation example](#option-1-docker-recommended). Otherwise, [run the worker binary as a host user with Docker access](#option-2-homebrew), or use a TLS-protected Docker endpoint with `DOCKER_HOST`, `DOCKER_TLS_VERIFY`, and `DOCKER_CERT_PATH`.
+
+Additional Docker environment variables the worker respects:
+
+-   `DOCKER_API_VERSION` — Specify Docker API version.
+-   `DOCKER_CERT_PATH` — Path to TLS certificates.
+-   `DOCKER_TLS_VERIFY` — Enable TLS verification.
+
+**Example: Connecting to a remote Docker daemon**
+
+```bash
+export DOCKER_HOST="tcp://remote-host:2376"
+export DOCKER_TLS_VERIFY=1
+export DOCKER_CERT_PATH="/path/to/certs"
+oz-agent-worker --api-key "$WARP_API_KEY" --worker-id "my-worker"
+```
+
+* * *
+
+## Private Docker registries
+
+The Docker backend reads task-image credentials from its Docker config. See the [private-registry Docker setup](https://docs.warp.dev/factories/self-hosting/private-container-registry/#configuring-the-docker-backend) for sidecar images and authenticated-registry limitations.
+
+Authenticate the account that runs the worker before pulling private task images:
+
+```bash
+docker login registry.internal.example.com
+```
+
+When the worker runs in a container on a rootful Linux host, create a dedicated Docker config that its non-root user can read:
+
+```bash
+export WORKER_DOCKER_CONFIG="/var/lib/oz-agent-worker/docker-config"
+
+sudo install -d -m 0700 -o 10001 "$WORKER_DOCKER_CONFIG"
+sudo docker --config "$WORKER_DOCKER_CONFIG" \
+  login registry.internal.example.com
+sudo chown 10001 "$WORKER_DOCKER_CONFIG/config.json"
+sudo chmod 0400 "$WORKER_DOCKER_CONFIG/config.json"
+```
+
+Mount the config at `/home/oz/.docker`:
+
+```bash
+export DOCKER_SOCKET_GID="$(stat -c '%g' /var/run/docker.sock)"
+docker run \
+  --group-add "$DOCKER_SOCKET_GID" \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v "$WORKER_DOCKER_CONFIG:/home/oz/.docker:ro" \
+  -e DOCKER_CONFIG=/home/oz/.docker \
+  -e WARP_API_KEY="$WARP_API_KEY" \
+  warpdotdev/oz-agent-worker --worker-id "my-worker"
+```
+
+To mirror the worker and sidecar images as well as task images, see [Pulling self-hosted images from a private registry](https://docs.warp.dev/factories/self-hosting/private-container-registry/).
+
+* * *
+
+## Routing runs to this worker
+
+Once your Docker worker is connected, route tasks to it with `--host "<your-worker-id>"`. Routing is the same across all managed backends — see [Routing runs to self-hosted workers](https://docs.warp.dev/factories/self-hosting/#routing-runs-to-self-hosted-workers) for CLI, scheduled, integration, API, and web UI examples.
+
+* * *
+
+## Related pages
+
+-   [Self-hosting quickstart](https://docs.warp.dev/factories/self-hosting/quickstart/) — ~10-minute path to a running Docker worker.
+-   [Self-hosted worker reference](https://docs.warp.dev/factories/self-hosting/reference/) — Full CLI flag and config file schema.
+-   [Environments](https://docs.warp.dev/platform/environments/) — Define the Docker image, repos, and setup commands for tasks.
+-   [Private container registry](https://docs.warp.dev/factories/self-hosting/private-container-registry/) — Mirror worker and task images and configure private-registry pulls.
+-   [Security and networking](https://docs.warp.dev/platform/execution-security/) — Data boundaries, egress, and Docker socket considerations.
+-   [Troubleshooting](https://docs.warp.dev/factories/self-hosting/troubleshooting/) — Common issues with the Docker backend.

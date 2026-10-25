@@ -1,0 +1,107 @@
+---
+title: "Factory dashboard"
+subtitle: "Track work items, inspect runs, read factory metrics, and manage agents, automations, webhooks, and settings from the factory dashboard."
+authors: []
+published_date: null
+source_url: https://docs.warp.dev/factories/factory-dashboard/
+origin: llms-txt
+llms_txt: https://docs.warp.dev/llms.txt
+section: "Documentation Sets / Factories"
+fetched: 2026-10-25T14:54:27Z
+---
+
+> For the complete documentation index, see [llms.txt](https://docs.warp.dev/llms.txt).
+> Markdown versions of each page are available by appending .md to any URL.
+
+# Factory dashboard
+
+Track work items, inspect runs, read factory metrics, and manage agents, automations, webhooks, and settings from the factory dashboard.
+
+The factory dashboard is the web app for operating a single factory. Open the [Warp Factories web app](https://platform.warp.dev), then select a factory to track its work, inspect its runs and pull requests, and manage its agents, automations, and settings.
+
+Note
+
+“Factory dashboard” names the whole surface. **Dashboard**, in bold, is one page inside it: the metrics page you land on when you open a factory.
+
+## Getting oriented
+
+Select a factory in the sidebar to open its pages. **Runs**, **MCPs and apps**, **Secrets**, and **Integrations** sit above the factory list and cover your whole team, not a single factory. **Inbox** sits there too, but it’s neither team-wide nor per-factory: there’s a single global Inbox page, and it shows only the items waiting on you personally, across every factory you have access to.
+
+To send work to a factory’s foreman, click **New Chat** in the sidebar. In the dropdown below the prompt input, choose your factory, enter a request, then click the send arrow.
+
+A factory opens on its **Dashboard** page, covered next. **Factory definition** appears only on Warp-managed factories, since a factory whose definition lives in your own repository is edited there instead.
+
+To create credentials or grant agents access, see [managing secrets for factory agents](https://docs.warp.dev/factories/secrets/).
+
+## Read metrics on the Dashboard page
+
+**Dashboard** is the factory’s landing page. It summarizes the factory over a date range you choose:
+
+-   **Autonomy** - The share of the factory’s merged PRs that needed no human code push before merging. Opening the PR counts as a push, so a human-authored PR that a factory run later revised doesn’t count as autonomous; comments, reviews, requested changes, and the merge itself don’t count as a push.
+-   **PR cycle time** - The median time the factory’s merged PRs took from run kickoff through PR, first review, and merge, with an independent median for each stage - the stage medians don’t sum to the headline.
+-   **Cost per PR** - The median cost of PRs opened in the range. A run’s cost includes its child runs and splits evenly across the PRs it produces. This is an estimate, not an invoice total. See [factory cost metrics](https://docs.warp.dev/factories/measure-and-improve/#read-metrics-on-the-dashboard-page) for limitations.
+
+The page also charts opened versus merged PRs and a breakdown of runs, and the **Cost per PR** card expands to list the most expensive PRs in the range. When Scorers are set up, Scorer cards summarize recent classification results.
+
+![The Dashboard page showing a Cost per PR chart broken down by compute, platform, and inference cost, plus two example Scorer cards.](https://docs.warp.dev/_astro/factory-dashboard-metrics.CwcuOD5P_2YTS7.webp?dpl=dpl_BNea7GQcJKrnKidNo3xP36Bn2W7E)
+
+Cost per PR and example Scorer cards on the Dashboard page.
+
+## Find what needs you in Inbox
+
+**Inbox** collects the questions, spec approvals, and pull request reviews waiting on you across every factory, so you don’t have to search **Runs** for stalled work. See the [Factory inbox](https://docs.warp.dev/factories/factory-inbox/) page for the kinds of items it shows and how to resolve them.
+
+## Inspect runs
+
+A run is a single agent execution. A single request can span several runs as different agents pick it up, and related runs group under their parent in the list. In the sidebar, click **Runs** to see the runs you have access to across your team.
+
+Open a run to see its timeline and cost, plus a **Sub-agents** tab for child runs when the agent used [multi-agent orchestration](https://docs.warp.dev/platform/orchestration/). From there you can view the agent’s full session, stop or score the run, or turn it into a benchmark task.
+
+Note
+
+Run pages don’t include a chat input, but you can still steer a run: **View session** opens its [shared agent session](https://docs.warp.dev/platform/viewing-cloud-agent-runs/), where you follow the agent in real time and send follow-up instructions while the run’s sandbox is active. After it shuts down, the same button opens the conversation transcript.
+
+## Manage agents and automations
+
+**Agents** lists the factory’s agents. [Create custom agents](https://docs.warp.dev/factories/factory-agents/creating-custom-agents/) or [configure existing agents](https://docs.warp.dev/factories/factory-agents/configuration/) to change their instructions, models, harnesses, and tools. **Automations** defines the triggers that start runs: a schedule (including custom cron expressions), a GitHub, Linear, Slack, or Jira event, or a delivery to a custom webhook. **Webhooks** is a tab within **Automations** that lists the factory’s [custom webhooks](https://docs.warp.dev/factories/webhooks/), where you create them, copy their URLs, rotate secrets, and read the delivery log.
+
+The automation editor doesn’t change execution settings; an automation only overrides them through [execution overrides in the definition files](https://docs.warp.dev/factories/factory-as-code/#execution-overrides). When the factory’s definition lives in an external repository, Agents, Automations, and Scorers are read-only; make changes there through pull requests.
+
+## Edit definitions in the Factory definition tab
+
+**Factory definition** is the factory dashboard’s view of the definition files that [definitions as code](https://docs.warp.dev/factories/factory-as-code/) describes in full. Where the definition lives decides what you get:
+
+-   **Warp-managed** - Browse and edit the definition files. Saving validates the definition and commits all changes together.
+-   **Managed in GitHub** - The tab doesn’t appear. Edit the definition through pull requests in your repository, and **Settings** links back to it.
+-   **Live-managed** - The factory is managed through the API, so there are no definition files to browse.
+
+When an agent proposes a change to a Warp-managed definition, a spec review for the branch appears in your [inbox](https://docs.warp.dev/factories/factory-inbox/). Open it to comment on the diff, use **Request changes** to send feedback back to the agent, or **Approve & merge**.
+
+## Score and benchmark
+
+**Scorers** is where you create Scorers and read their results. **Self-improvement** lists the pull requests the self-improvement flow opens after analyzing runs your Scorers mark as failing, and **Benchmarks** compares model and runner configurations against a fixed set of tasks. See [Configuring Scorers](https://docs.warp.dev/factories/measure-and-improve/scorers/), [Configuring and reviewing Self-improvement](https://docs.warp.dev/factories/measure-and-improve/self-improvement/), and [benchmarking factory agent configurations](https://docs.warp.dev/factories/benchmarks/) for what each one is and how to use it.
+
+## Change factory settings
+
+**Settings** holds the configuration the factory owns:
+
+-   **Identity** - The factory’s name, avatar, and [**Foreman name**](https://docs.warp.dev/factories/factory-as-code/#alias), the handle your team @-mentions.
+-   **Repositories** - The repos the factory works in.
+-   **Pull request authorship** - Whether pull requests are authored by the agent or the run creator (the definition’s [`credentialStrategy`](https://docs.warp.dev/factories/factory-as-code/#credentialstrategy)).
+-   **Analysis model** - The model [Self-improvement](https://docs.warp.dev/factories/measure-and-improve/self-improvement/) uses to analyze failed runs.
+-   **Runners** - The compute the factory’s runs execute on. See [factory runners](https://docs.warp.dev/factories/runners/) to choose runner configuration or [managed self-hosting](https://docs.warp.dev/factories/self-hosting/) to run factory work on your infrastructure.
+-   **Integrations** - The integrations this factory can access.
+-   **Deletion** - Deletes the factory. This cannot be undone.
+
+For a file-managed factory, `runners/*.yaml` in the repository is the source of truth. Anything managed in an external repository is read-only in Settings.
+
+## Related pages
+
+-   [Factory inbox](https://docs.warp.dev/factories/factory-inbox/) - See and resolve the questions, spec approvals, and PR reviews waiting on you
+-   [How Warp Factories work](https://docs.warp.dev/factories/how-factories-work/) - The stages work moves through and where humans stay in the loop
+-   [Definitions as code](https://docs.warp.dev/factories/factory-as-code/) - Define agents, automations, runners, and source ownership in code
+-   [About factory agents](https://docs.warp.dev/factories/factory-agents/) - Understand default agent roles
+-   [Configuring factory agents](https://docs.warp.dev/factories/factory-agents/configuration/) - Edit agent instructions and runtime settings
+-   [Measure and improve a factory](https://docs.warp.dev/factories/measure-and-improve/) - Configure Scorers and use them in an improvement loop
+-   [Benchmarking factory agent configurations](https://docs.warp.dev/factories/benchmarks/) - Create a benchmark suite and compare configurations on fixed tasks
+-   [Troubleshooting Warp Factories](https://docs.warp.dev/factories/troubleshooting/) - Fixes for setup problems, work that doesn’t start, and stuck runs

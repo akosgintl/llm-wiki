@@ -1,0 +1,201 @@
+---
+title: "Runners for Warp Factories"
+subtitle: "Runners define the OS, architecture, instance size, and sandbox image for cloud agent runs, including work from Warp Factories."
+authors: []
+published_date: null
+source_url: https://docs.warp.dev/factories/runners/
+origin: llms-txt
+llms_txt: https://docs.warp.dev/llms.txt
+section: "Documentation Sets / Factories"
+fetched: 2026-10-25T14:54:27Z
+---
+
+> For the complete documentation index, see [llms.txt](https://docs.warp.dev/llms.txt).
+> Markdown versions of each page are available by appending .md to any URL.
+
+# Runners for Warp Factories
+
+Runners define the OS, architecture, instance size, and sandbox image for cloud agent runs, including work from Warp Factories.
+
+Runners are reusable compute configurations for [cloud agent runs](https://docs.warp.dev/platform/). Each runner selects an operating system, CPU architecture, instance size, and sandbox image.
+
+An [environment](https://docs.warp.dev/platform/environments/) supplies the repositories, toolchain, and workspace setup. The execution host determines whether the work runs on [Warp-hosted](https://docs.warp.dev/factories/warp-hosting/) infrastructure or a [self-hosted worker](https://docs.warp.dev/factories/self-hosting/).
+
+Reuse a runner across workflows, or choose different instance sizes for lightweight checks and resource-intensive builds.
+
+## Defaults and overrides
+
+Factory agents inherit the factory’s default runner unless an agent or automation selects another. The factory default (`agentDefaults.runner`) must be Linux because it supplies the factory-managed environment. Individual agents and automations can select other supported operating systems.
+
+Factories manage their repositories and workspace by default, so you don’t need to create a separate environment. To use an existing one, set [`agentDefaults.environmentId`](https://docs.warp.dev/factories/factory-as-code/#agentdefaultsenvironmentid).
+
+For standalone cloud runs, a run-level runner overrides the environment’s default runner for that run only. Omitting `instanceShape` uses the workspace’s default size.
+
+## Configure runners for a factory
+
+In the [factory definition](https://docs.warp.dev/factories/factory-as-code/), `runners/*.yaml` files define runners. Set `agentDefaults.runner` to the default runner’s name, or set `runner` on an agent or automation to override it.
+
+For Warp-managed factories, edit runner files in the [factory dashboard](https://docs.warp.dev/factories/factory-dashboard/#edit-definitions-in-the-factory-definition-tab). For GitHub-backed factories, edit them through pull requests in the definition repository. See [runner file syntax](https://docs.warp.dev/factories/factory-as-code/#runnersnameyaml) for fields and a complete example.
+
+## How runners fit into cloud agent runs
+
+For Warp-hosted runs, Warp provisions a sandbox and clones the repositories before setup. The runner’s `setupCommands` run in order, followed by the environment’s setup commands, before the agent begins. A setup command that exits with a nonzero status or runs longer than 30 minutes fails the run during environment setup.
+
+Self-hosted backends apply runner settings differently, as described below.
+
+## Runner settings by execution host
+
+The execution host determines how each runner setting is used:
+
+| Setting | Warp-hosted | Direct | Kubernetes | Docker |
+| --- | --- | --- | --- | --- |
+| `platform.os`, `platform.arch`, `platform.mac.version` | Selects the sandbox OS, architecture, and macOS VM version | Does not configure the host. The worker host determines the platform. | Use Linux. The cluster and `pod_template` schedule nodes. | Use Linux. The Docker daemon determines the architecture. |
+| `platform.linux.dockerImage` | Linux sandbox image | Ignored | Task and setup container image | Task container image |
+| `platform.linux.registryCredentialSecretName` | Warp-managed private-registry credential | Ignored | Ignored. Use `imagePullSecrets`. | Ignored. Configure registry credentials on the worker, such as in its Docker config. |
+| `instanceShape` | Sandbox size, subject to plan limits. Omitted uses the workspace default. | Ignored. The task uses host resources. | Task-container requests and limits. Overrides matching `pod_template` resources. Omitted keeps template or cluster defaults. | Task-container limits. Omitted adds no limits. |
+
+Self-hosted runner settings don’t provision capacity. Worker configuration controls resources, registry authentication, volumes, placement, and backend policy. See [choosing a managed backend](https://docs.warp.dev/factories/self-hosting/#choosing-a-managed-backend) for execution options and [runner file syntax](https://docs.warp.dev/factories/factory-as-code/#runnersnameyaml) for configuration fields.
+
+## Operating systems
+
+-   [Linux](#tab-panel-691)
+-   [macOS](#tab-panel-692)
+-   [Windows](#tab-panel-693)
+
+Warp-hosted Linux runners execute the agent in a fresh Docker container. The selected image provides the agent’s base filesystem and toolchain.
+
+Warp-hosted Linux runners support x86-64 and aarch64 images. Use a public image, or a private image with a team credential. The default image is [`warpdotdev/dev-base:latest`](https://hub.docker.com/r/warpdotdev/dev-base).
+
+The image must match the runner’s architecture and include `bash` and core utilities such as `ls` and `mkdir`. See [image and container-user requirements](https://docs.warp.dev/platform/environments/configuring-environments/) for runtime compatibility.
+
+To pull a private image, choose a team-owned credential for the image’s registry in the “Private image credential” dropdown when you create or edit the runner. See [Configuring AWS ECR credentials](https://docs.warp.dev/factories/secrets/aws-ecr/) for Amazon ECR.
+
+Linux supports any combination of CPU and memory as long as both are a power of two and within your plan’s maximum resource limit.
+
+Warp-hosted Linux runners can also run Docker containers and KVM-based virtual machines, such as the Android emulator.
+
+Warp-hosted macOS runners execute the agent in a fresh VM on Apple Silicon. Choose macOS 14, 15, 26, or 27. If no version is specified, Warp uses macOS 26.
+
+The VM has Xcode and standard system tools installed, along with simulators for iOS, watchOS, and tvOS. Use setup commands to install additional dependencies. Downloads from Homebrew and popular language package managers are cached automatically.
+
+Supported resource configurations:
+
+| vCPUs | Memory |
+| --- | --- |
+| 4 | 7 GB |
+| 6 | 14 GB |
+| 8 | 14 GB |
+| 12 | 28 GB |
+| 12 | 56 GB |
+
+Windows runners are available for Warp-hosted execution and run each agent in a fresh Windows VM. They support x86-64 architecture only and don’t use Docker images or expose a custom Windows image setting.
+
+Use PowerShell-compatible setup commands to install dependencies and prepare the workspace:
+
+```yaml title="runners/windows-ci.yaml"
+description: Windows runner for builds and tests
+setupCommands:
+  - pwsh -File setup.ps1
+instanceShape:
+  vcpus: 4
+  memoryGb: 8
+platform:
+  os: windows
+  arch: x86_64
+```
+
+Both `vcpus` and `memoryGb` must be positive powers of two within your plan’s resource limit. Omit `instanceShape` to use the workspace default shape.
+
+Select a Windows runner on an individual agent or automation with `runner`. The factory’s default runner remains Linux.
+
+Self-hosted Docker and Kubernetes backends run Linux tasks, even when the worker process runs on another OS. Use [Warp-hosted execution](https://docs.warp.dev/factories/warp-hosting/) for Windows runners.
+
+## Managing runners with the legacy CLI
+
+The legacy [Oz CLI](https://docs.warp.dev/agents/cli/oz-cli/) also supports creating, listing, updating, and deleting reusable runners for standalone cloud-agent workflows.
+
+### Create a runner
+
+Name the runner and choose its compute configuration:
+
+```bash
+oz runner create \
+  --name RUNNER_NAME \
+  --os linux \
+  --docker-image IMAGE_REFERENCE \
+  --vcpus 4 \
+  --memory-gb 8 \
+  --setup-command "SETUP_COMMAND" \
+  --description "Optional description"
+```
+
+Replace `RUNNER_NAME` with a human-readable label, `IMAGE_REFERENCE` with a Linux container image, and `SETUP_COMMAND` with a sandbox setup command.
+
+| Flag | Description |
+| --- | --- |
+| `--name` (`-n`) | Required human-readable label. |
+| `--description` (`-d`) | Optional description, up to 240 characters. |
+| `--os` | `linux` (default), `macos`, or `windows`. |
+| `--arch` | `auto` (default), `x86-64`, or `aarch64`. Auto uses x86-64 on Linux and Windows, or aarch64 on macOS. |
+| `--docker-image` | Sandbox image reference. Linux only. |
+| `--macos-version` | `14`, `15`, `26`, or `27`. macOS only. |
+| `--vcpus`, `--memory-gb` | Instance size in vCPUs and GB of memory. Set both together when creating a runner. |
+| `--setup-command` (`-c`) | Command to run during sandbox setup. Repeat for additional commands. |
+| `--team`, `--personal` | Create a team runner or one private to your account. |
+
+Caution
+
+OS-specific options must match `--os`. Use `--docker-image` only with `--os linux`, and `--macos-version` only with `--os macos`. Windows doesn’t have an OS-specific option.
+
+### List runners
+
+```bash
+oz runner list
+```
+
+Add `--sort-by name` or `--sort-by last-updated` to order the results.
+
+### Update a runner
+
+Identify the runner by UID or name. Replace `RUNNER_UID` with its UID, `RUNNER_NAME` with its current name, and `NEW_RUNNER_NAME` with the new name:
+
+```bash
+# Update by UID
+oz runner update RUNNER_UID --vcpus 8 --memory-gb 16
+
+# Rename a runner (UID identifies it, --name sets the new name)
+oz runner update RUNNER_UID --name "NEW_RUNNER_NAME"
+
+# Update by name when you don't have the UID
+oz runner update --name RUNNER_NAME --docker-image node:22
+```
+
+When updating by UID, `--vcpus` and `--memory-gb` can be set independently. The value you don’t pass is preserved. Updates can change the name, description, compute size, or sandbox image without recreating the runner.
+
+### Delete a runner
+
+Replace `RUNNER_UID` with the runner’s UID:
+
+```bash
+oz runner delete RUNNER_UID
+```
+
+Add `--force` to skip the confirmation prompt.
+
+## Using a runner for a run
+
+For a standalone cloud task, pass a runner UID with `--runner`. Replace `RUNNER_UID` with the UID and `TASK_PROMPT` with the agent’s instructions:
+
+```bash
+oz agent run-cloud --runner RUNNER_UID --prompt "TASK_PROMPT"
+```
+
+You can also select a runner when [running orchestrated agents](https://docs.warp.dev/platform/orchestration/multi-agent-runs/), so child agents run on the compute shape their work requires.
+
+## Related pages
+
+-   [Cloud agent environments](https://docs.warp.dev/platform/environments/) - Define repositories, images, and workspace setup
+-   [Warp-hosted execution for Warp Factories](https://docs.warp.dev/factories/warp-hosting/) - Review hosted capacity and networking
+-   [Self-hosting overview](https://docs.warp.dev/factories/self-hosting/) - Choose a managed backend
+-   [Managing cloud agents](https://docs.warp.dev/platform/managing-cloud-agents/) - Start and monitor standalone runs
+-   [Oz CLI reference](https://docs.warp.dev/agents/cli/oz-cli/) - Install and authenticate the supported legacy CLI

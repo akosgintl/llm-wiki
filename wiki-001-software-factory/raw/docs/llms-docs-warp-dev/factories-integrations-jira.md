@@ -1,0 +1,110 @@
+---
+title: "Connect Jira to your factory"
+subtitle: "Connect Jira Cloud to your factory so work items assigned to Warp start factory runs and return results in Jira."
+authors: []
+published_date: null
+source_url: https://docs.warp.dev/factories/integrations/jira/
+origin: llms-txt
+llms_txt: https://docs.warp.dev/llms.txt
+section: "Documentation Sets / Factories"
+fetched: 2026-10-25T14:54:27Z
+---
+
+> For the complete documentation index, see [llms.txt](https://docs.warp.dev/llms.txt).
+> Markdown versions of each page are available by appending .md to any URL.
+
+# Connect Jira to your factory
+
+Connect Jira Cloud to your factory so work items assigned to Warp start factory runs and return results in Jira.
+
+Connect Jira Cloud to your factory so your team can start factory work without leaving Jira. When someone assigns or mentions **Warp** on a work item, Jira starts an agent session, a factory automation routes the request to the agent you chose, and the same session shows progress and the final result.
+
+## Prerequisites
+
+-   A Jira Cloud site. Jira Server and Data Center are not supported.
+-   A Jira site admin to install the Warp app and connect the site to your Warp workspace.
+-   A factory in the connected workspace and permission to edit its [definition](https://docs.warp.dev/factories/factory-as-code/).
+
+## Connect Jira and add an automation
+
+1.  **Open Jira setup.** Choose **Jira** while creating a factory. To connect it later, open the top-level **Integrations** page in the [Warp Factories web app](https://platform.warp.dev), find **Jira**, and click **Connect**.
+2.  **Install Warp for Jira and connect the site.** A Jira site admin installs the app on the Jira Cloud site. In Jira, open **Apps** > **Manage apps** > **Warp** > **Configure**, then click **Connect to Warp**. Once connected, Jira is available to every factory in the workspace. See the [Jira installation steps](https://docs.warp.dev/platform/integrations/jira/#setup) for the full app flow.
+
+If you aren’t a Jira site admin, choose **Someone else** during setup and email the request or copy the approval link to a site admin. The link expires after seven days, and you can resend or revoke it while the request is pending.
+
+3.  **Connect Jira to the factory.** In the factory dashboard, open **Settings** > **Integrations**, connect **Jira**, select the projects this factory works with, then click **Enable**. If you connected Jira while creating the factory, select the projects before finishing setup. Each factory opts in separately even though the Jira site is connected to the workspace.
+    
+4.  **Configure the Jira automation.** In the factory dashboard, open **Automations**. If you selected Jira projects during factory creation, edit the existing Jira automation. Otherwise, add a trigger for **Jira** > **Agent session created**. Choose the agent that handles the work, select the projects, and optionally add keywords to narrow which sessions start runs.
+    
+5.  **Test the connection.** Assign or mention **Warp** on a work item and include an instruction. Jira starts an agent session, and the run appears under the matching automation in your factory.
+    
+    The **Warp** agent must be available on your Jira site to assign or mention it. Jira lists it among Atlassian’s Rovo agents.
+    
+
+The standalone Jira integration uses the `warp-agent` label to start cloud agent runs. Factories use an automation instead.
+
+### Configure the automation as code
+
+Declare the `jira` integration in `factory.yaml` (`integrations: [{type: jira}]`), then add a file under `automations/`, such as `automations/jira-assignment/automation.md`, with an `agent_session_created` trigger:
+
+```markdown title="automations/jira-assignment/automation.md"
+---
+enabled: true
+agent: foreman
+triggers:
+  - provider: jira
+    event: agent_session_created
+    filter:
+      project_keys: [ENG]
+      keywords: [investigate, fix]
+---
+
+Handle the Jira assignment and return a concise result.
+```
+
+This automation sends Jira sessions from the `ENG` project to the agent named `foreman` when their assignment text contains `investigate` or `fix`. Commit and push the files to apply them. See [definitions as code](https://docs.warp.dev/factories/factory-as-code/) for the full syntax.
+
+## Filter which sessions start runs
+
+All Jira work reaches the factory through a single event, `agent_session_created`, which fires when someone assigns or mentions **Warp** on a work item. A session starts a run only when it matches an enabled automation. Use the trigger’s `filter` to narrow what matches:
+
+-   **`project_keys`** - Match work items in these Jira projects.
+-   **`keywords`** - Match assignment text that contains any of these words. Matching is case-insensitive.
+
+A session must match every field you set; within a field, any listed value is a match. Omit a field to match everything. For the matching rules shared by every source, see [automation filters](https://docs.warp.dev/factories/automations/).
+
+Caution
+
+A Jira event is offered to every automation in the connected workspace, so another team’s automation with a broader filter can start its own run on the same work item. Filters decide what *your* automation picks up, not who else can see the event. See [Automations](https://docs.warp.dev/factories/automations/#filters-dont-control-access).
+
+## What happens during a run
+
+The agent runs in the cloud and starts with the assignment text and the work item it came from. When the factory declares Jira as an integration, the agent can also read the work item’s details, comments, and available workflow transitions.
+
+Jira shows the task’s status as it progresses: submitted, working, waiting for input, completed, failed, or cancelled. For more than status updates, open the run under the matching automation in your factory: [cloud agent session sharing](https://docs.warp.dev/platform/viewing-cloud-agent-runs/) shows the full run, including every command, log, and output, in real time or after the run finishes.
+
+Replies in the same agent session continue the same run, even after the agent finishes a turn, so you can answer questions or add direction mid-task.
+
+When the run finishes, the result appears in the agent session. The agent doesn’t comment on the work item unless you ask it to. The agent can act in Jira when asked: update the work item, post or edit comments, change workflow status, add or remove labels, or reassign it. State the actions you want in the automation instructions or the assignment; Jira permissions and valid workflow transitions apply to everything the agent does.
+
+## Permissions
+
+-   **A connected Jira user becomes the run’s creator, not its agent** - [Connect your Jira account to Warp](https://docs.warp.dev/platform/integrations/jira/#connecting-your-jira-account-to-warp) so a session you start is attributed to you; an unconnected account gets a prompt to connect instead of a run starting. Either way, the run executes as the agent selected by the automation, not as that Jira user.
+-   **Jira access doesn’t include code access** - Connecting Jira lets agents read and update Jira work items, nothing more. Repository access comes from the factory itself.
+
+Caution
+
+Warp’s built-in Jira tools read Jira as the person who created the run; that person must link their Atlassian account to Warp in Jira under **profile** > **Personal settings** > **Warp**. To interact with Jira in runs without a human creator, such as scheduled runs or runs created by a service account or API key, add the Atlassian MCP server as a [managed MCP install](https://docs.warp.dev/platform/mcp/) instead.
+
+## Troubleshooting
+
+-   **Warp is unavailable in Jira** - Confirm the Warp app is installed on the Jira Cloud site. On the app’s **Configure** page, click **Connect to Warp** if the installation isn’t connected to a workspace. If someone else is completing setup, confirm that their setup link is still active.
+-   **No run starts** - Confirm an enabled `agent_session_created` automation exists, its agent is available, and its project and keyword filters match the assignment.
+-   **Jira asks you to connect an account** - [Link your own Jira account to Warp](https://docs.warp.dev/platform/integrations/jira/#connecting-your-jira-account-to-warp), then retry the assignment or mention. Installing the app and connecting the site doesn’t link every teammate’s account.
+-   **The session shows no result** - Open the matching automation’s run to see whether the agent is still working, waiting for input, or failed.
+-   **A Jira update fails** - Confirm the app can access the work item’s project and that the requested action or workflow transition is valid.
+
+## Related pages
+
+-   [Connect your factory](https://docs.warp.dev/factories/connect-your-factory/)
+-   [Factory troubleshooting](https://docs.warp.dev/factories/troubleshooting/#work-isnt-starting)

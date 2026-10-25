@@ -1,0 +1,92 @@
+---
+title: "Factory skills"
+subtitle: "Skills give a factory's agents repeatable, version-controlled procedures that can be shared across every agent or scoped to just one."
+authors: []
+published_date: null
+source_url: https://docs.warp.dev/factories/factory-skills/
+origin: llms-txt
+llms_txt: https://docs.warp.dev/llms.txt
+section: "Documentation Sets / Factories"
+fetched: 2026-10-25T14:54:27Z
+---
+
+> For the complete documentation index, see [llms.txt](https://docs.warp.dev/llms.txt).
+> Markdown versions of each page are available by appending .md to any URL.
+
+# Factory skills
+
+Skills give a factory's agents repeatable, version-controlled procedures that can be shared across every agent or scoped to just one.
+
+A skill gives an agent a repeatable procedure, such as a security review or incident runbook. Factory skills extend an agent’s instructions without requiring changes to its prompt.
+
+## Skill sources in a factory
+
+A factory run can use skills from three sources:
+
+-   **Role and integration skills** - Default agents have GitHub skills for repository work. The foreman also has a Slack skill. Choosing Linear or Jira during setup gives relevant agents the tracker’s skill and instructions. These skills come from roles and integrations, not files in your definition.
+-   **Warp-provided skills** - Bundled capabilities include `oz-platform` for cloud agents, `factory-files` for factory definitions, and `factory-mcp` for sending work to factories.
+-   **Custom skills** - Team-owned `SKILL.md` files live in the factory definition and are shared across the factory or scoped to one agent. They extend the built-in skills rather than replacing them.
+
+For bundled skill IDs and how to attribute team-owned skill usage, see [Skill actions in conversation data](https://docs.warp.dev/factories/api-and-sdk/#skill-actions-in-conversation-data).
+
+## When to add a custom skill
+
+Add a custom skill for procedures the built-in skills don’t cover. For example:
+
+-   Run required tests or lint checks.
+-   Follow incident-response or triage runbooks.
+-   Apply a security or compliance review checklist.
+-   Teach a custom agent its job. Custom agents have no built-in skills.
+
+Skills provide instructions, not access to tools or repositories. If a procedure requires credentials or an MCP connection, configure the agent’s [secrets](https://docs.warp.dev/factories/secrets/) and [MCP servers](https://docs.warp.dev/platform/mcp/) through its [settings](https://docs.warp.dev/factories/factory-agents/configuration/#edit-agent-settings-and-instructions). For how that access is limited, see [credential boundaries](https://docs.warp.dev/factories/infrastructure-and-security/#credential-boundaries).
+
+## Add or edit a skill
+
+Custom skills live in the factory’s [definition](https://docs.warp.dev/factories/factory-as-code/#directory-structure), not its agent settings. You need permission to edit that definition.
+
+To add or update a custom skill:
+
+1.  Open the definition where it’s managed:
+    
+    -   **Warp-managed** - In the web app sidebar, expand your factory and click **Factory definition**.
+    -   **GitHub-backed** - Open the connected definition repository. See [Where the definition lives](https://docs.warp.dev/factories/factory-as-code/#where-the-definition-lives).
+2.  Create or open the skill file for the scope you need:
+    
+    -   **Every agent** - `skills/<skill-name>/SKILL.md`, for shared procedures such as repository conventions.
+    -   **One agent** - `agents/<agent-name>/skills/<skill-name>/SKILL.md`, for a role-specific procedure such as a security review.
+    
+    Replace `<skill-name>` with the skill’s directory name and `<agent-name>` with the agent’s directory name.
+    
+    For example, this layout shares repository conventions with every agent and gives only the foreman an incident-triage skill:
+    
+    ```text
+    skills/
+      repository-conventions/
+        SKILL.md
+    agents/
+      foreman/
+        skills/
+          incident-triage/
+            SKILL.md
+    ```
+    
+3.  Write or update the skill’s instructions, name, and description. See [Skill file format](https://docs.warp.dev/agents/capabilities/skills/#skill-file-format) for frontmatter and [Skill arguments](https://docs.warp.dev/agents/capabilities/skills/#skill-arguments) for parameters.
+    
+4.  Apply the change:
+    
+    -   **Warp-managed** - Save the definition. Warp validates and commits it.
+    -   **GitHub-backed** - Open a pull request. The factory’s [pull request checks](https://docs.warp.dev/factories/factory-as-code/#pull-request-checks) validate the change, and merging to the production branch applies it.
+
+For an example of a shared skill and an agent-specific skill in one definition, see [`02-sdlc-issue-to-pr`](https://github.com/warpdotdev/warp-factory-examples/tree/main/examples/02-sdlc-issue-to-pr) in [warp-factory-examples](https://github.com/warpdotdev/warp-factory-examples).
+
+## Skills and self-improvement
+
+When a Scorer with [Self-improvement](https://docs.warp.dev/factories/measure-and-improve/self-improvement/) enabled flags a recurring failure, the factory can update the responsible skill in a follow-up run. Changes arrive as pull requests for your team to review in the web app or your Git host.
+
+## Related pages
+
+-   [About factory agents](https://docs.warp.dev/factories/factory-agents/) - Understand the agents that use factory skills
+-   [Creating custom agents](https://docs.warp.dev/factories/factory-agents/creating-custom-agents/) - Add specialized roles and skills
+-   [Factory definition syntax](https://docs.warp.dev/factories/factory-as-code/) - Look up definition files and fields
+-   [Skills for agents](https://docs.warp.dev/agents/capabilities/skills/) - Write skills with arguments and supporting files
+-   [Measure and improve a factory](https://docs.warp.dev/factories/measure-and-improve/) - Evaluate runs and propose improvements

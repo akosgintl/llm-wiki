@@ -1,0 +1,94 @@
+---
+title: "API error codes"
+subtitle: "Reference for all error codes returned by the Warp Platform API. Each error includes an HTTP status, machine-readable code, and actionable resolution steps."
+authors: []
+published_date: null
+source_url: https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/
+origin: llms-txt
+llms_txt: https://docs.warp.dev/llms.txt
+section: "Documentation Sets / Factories"
+fetched: 2026-10-25T14:54:27Z
+---
+
+> For the complete documentation index, see [llms.txt](https://docs.warp.dev/llms.txt).
+> Markdown versions of each page are available by appending .md to any URL.
+
+# API error codes
+
+Reference for all error codes returned by the Warp Platform API. Each error includes an HTTP status, machine-readable code, and actionable resolution steps.
+
+When the Warp Platform API encounters an error, it returns a structured JSON response following [RFC 7807 (Problem Details for HTTP APIs)](https://datatracker.ietf.org/doc/html/rfc7807). Every error response includes a machine-readable error code, HTTP status, human-readable message, and resolution details.
+
+## Response format
+
+All error responses share this structure:
+
+```json
+{
+  "type": "/factories/api-and-sdk/troubleshooting/errors/invalid-request/",
+  "title": "The request contains invalid or missing parameters.",
+  "status": 400,
+  "detail": "schedule_id is required",
+  "instance": "/api/v1/agent/tasks",
+  "error": "The request contains invalid or missing parameters. (schedule_id is required)",
+  "retryable": false,
+  "trace_id": "abc123def456..."
+}
+```
+
+Error responses use the `application/problem+json` content type per RFC 7807.
+
+### Field reference
+
+-   **`type`** — A URI identifying the error type. Links to the documentation page for that error.
+-   **`title`** — A short, human-readable summary of the problem.
+-   **`status`** — The HTTP status code for this response.
+-   **`detail`** — Additional context specific to this occurrence of the error. Not always present.
+-   **`instance`** — The request path that produced the error.
+-   **`error`** — A backward-compatible field combining `title` and `detail` (for older clients). When `detail` is present, formatted as `"title (detail)"`.
+-   **`retryable`** — Whether this request can be retried. If `true`, the platform may automatically retry the operation.
+-   **`trace_id`** — An OpenTelemetry trace ID, included when available. Reference this when contacting support.
+
+Some errors include additional metadata fields (for example, `auth_url`, `provider`, or `inaccessible_repos`). These are documented on each error’s page.
+
+## Error categories
+
+Errors are split into two categories based on what caused the failure:
+
+### User errors
+
+These indicate something the caller needs to fix. When a cloud agent task encounters a user error, the task transitions to the **FAILED** state.
+
+-   [`insufficient_credits`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/insufficient-credits/) — The billed account has insufficient eligible usage
+-   [`feature_not_available`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/feature-not-available/) — Feature not included in your current plan
+-   [`external_authentication_required`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/external-authentication-required/) — External service authorization needed
+-   [`not_authorized`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/not-authorized/) — Insufficient permissions for the operation
+-   [`invalid_request`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/invalid-request/) — Malformed request or invalid parameters
+-   [`resource_not_found`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/resource-not-found/) — Referenced resource does not exist
+-   [`budget_exceeded`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/budget-exceeded/) — Spending budget limit reached
+-   [`integration_disabled`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/integration-disabled/) — Integration is disabled
+-   [`integration_not_configured`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/integration-not-configured/) — Integration setup is incomplete
+-   [`operation_not_supported`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/operation-not-supported/) — Operation not supported for this resource or state
+-   [`environment_setup_failed`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/environment-setup-failed/) — Cloud agent environment failed to initialize
+-   [`content_policy_violation`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/content-policy-violation/) — Task flagged by content policy checks
+-   [`conflict`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/conflict/) — Request conflicts with the current resource state (retryable)
+
+### Platform errors
+
+These indicate a Warp-side issue. When a cloud agent task encounters a platform error, the task transitions to the **ERROR** state. Retryable errors are automatically retried before the task is marked as failed.
+
+-   [`authentication_required`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/authentication-required/) — Invalid or expired API key
+-   [`resource_unavailable`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/resource-unavailable/) — Transient infrastructure issue (retryable)
+-   [`internal_error`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/internal-error/) — Unexpected server-side error (retryable)
+-   [`infrastructure_timeout`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/infrastructure-timeout/) — Task terminated after exceeding the maximum allowed runtime
+-   [`agent_process_failed`](https://docs.warp.dev/factories/api-and-sdk/troubleshooting/errors/agent-process-failed/) — Agent process exited unexpectedly during task execution
+
+## Using the `trace_id`
+
+When an error response includes a `trace_id`, you can include it when [contacting Warp support](https://docs.warp.dev/support-and-community/troubleshooting-and-support/sending-us-feedback/) to help the team locate the specific request in internal logs. This is especially useful for `internal_error` and `resource_unavailable` errors.
+
+## Related pages
+
+-   [Warp Platform API](https://docs.warp.dev/factories/api-and-sdk/) — API reference for creating and managing agent tasks
+-   [Cloud agents overview](https://docs.warp.dev/platform/) — How cloud agents work
+-   [Access, billing, and identity permissions](https://docs.warp.dev/platform/team-access-billing-and-identity/) — Plan requirements and billing details

@@ -1,0 +1,137 @@
+---
+title: "Factory automations"
+subtitle: "Configure factory automations with triggers and filters to control which events start runs and which agent handles the work."
+authors: []
+published_date: null
+source_url: https://docs.warp.dev/factories/automations/
+origin: llms-txt
+llms_txt: https://docs.warp.dev/llms.txt
+section: "Documentation Sets / Factories"
+fetched: 2026-10-25T14:54:27Z
+---
+
+> For the complete documentation index, see [llms.txt](https://docs.warp.dev/llms.txt).
+> Markdown versions of each page are available by appending .md to any URL.
+
+# Factory automations
+
+Configure factory automations with triggers and filters to control which events start runs and which agent handles the work.
+
+An **automation** starts factory runs from a trigger and routes them to an agent. Filters narrow which events start work. For example, an automation can send newly opened pull requests to a review agent, but only for one repository’s `main` branch.
+
+## How matching works
+
+An event starts an automation only when it matches the trigger’s provider, event type, and filters:
+
+-   **Every filter must match** - A trigger that sets both a team and a label matches only events carrying both.
+-   **Any included value can match** - A **Labels** filter listing `bug` and `regression` matches an issue with either label.
+-   **Empty optional list filters don’t restrict matching** - Provider defaults still apply: [GitHub triggers skip bot events by default](https://docs.warp.dev/factories/integrations/github/#events-from-bots-dont-start-work), with `skip_bots` set to `all` when omitted.
+
+One event can match more than one automation, and each match starts its own run. If a single action starts duplicate runs, narrow or remove one of the overlapping triggers.
+
+## Filters don’t control access
+
+Filters decide when work starts, not what an integration or running agent can access. To change an integration’s access, change its permissions with the provider, not its filters.
+
+Provider account requirements still apply. See [who can start work in Slack](https://docs.warp.dev/factories/integrations/slack/#who-can-start-work) and [account linking in Microsoft Teams](https://docs.warp.dev/factories/integrations/teams/#test-the-connection). Custom webhooks instead authenticate deliveries with a [token or signature](https://docs.warp.dev/factories/webhooks/#authentication-modes); filters aren’t a substitute for that authentication.
+
+## What each source can filter on
+
+The table summarizes filter categories. Each linked integration guide lists the filters available for each event type.
+
+| Source | Filters |
+| --- | --- |
+| [Slack](https://docs.warp.dev/factories/integrations/slack/) | Conversations, people, keywords, and emoji |
+| [Microsoft Teams](https://docs.warp.dev/factories/integrations/teams/) | Team, channels, authors, and keywords |
+| [GitHub](https://docs.warp.dev/factories/integrations/github/) | Repository, branches, paths, labels, people, reviews, and workflow results |
+| [GitLab](https://docs.warp.dev/factories/integrations/gitlab/) | Project, actions, and base branch |
+| [Azure DevOps](https://docs.warp.dev/factories/integrations/azure-devops/) | Repository, branches, work item types, labels, and people |
+| [Linear](https://docs.warp.dev/factories/integrations/linear/) | Team, project, issue, labels, workflow state, and people |
+| [Jira](https://docs.warp.dev/factories/integrations/jira/) | Projects |
+| [Custom webhooks](https://docs.warp.dev/factories/webhooks/) | Webhook and JSON payload |
+
+For webhook pattern syntax, see [Payload filters for webhook triggers](#payload-filters-for-webhook-triggers).
+
+## Edit filters on an automation
+
+You can edit custom automations and the defaults Warp creates when you connect a provider. If your definition lives in an external repository, the Automations page is read-only; edit the [definition files](#filters-in-definitions-as-code) instead.
+
+To edit an existing automation’s filters:
+
+1.  In the web app sidebar, expand your factory and click **Automations**.
+2.  Click the name of the automation you want to edit to open its settings.
+3.  In the “Triggers” section, adjust the filters for the relevant trigger. Click **More filters** for additional options.
+4.  Click **Save** in the top-right corner.
+5.  Send a matching test event, such as opening a test issue, and confirm that a work item appears in the factory dashboard.
+
+## Filters in definitions as code
+
+In a factory definition, an automation’s `triggers` entries declare the provider, event, and filters. Start with the [labeled-issue example](https://docs.warp.dev/factories/factory-as-code/#automationsnameautomationmd), then look up supported keys in the [trigger filter reference](https://docs.warp.dev/factories/factory-as-code/#triggersfilter).
+
+This example reviews pull requests in `acme/api-service` targeting `main`, excluding those labeled `wip`:
+
+```markdown title="automations/pr-opened/automation.md"
+---
+enabled: true
+agent: foreman
+triggers:
+  - provider: github
+    event: pull_request_opened
+    filter:
+      repos: [acme/api-service]
+      base_branches: [main]
+      labels:
+        not_in: [wip]
+---
+A pull request was opened against the default branch. If it is a draft,
+stop silently. Otherwise review it and post your findings and verdict on
+the PR.
+```
+
+Plain lists include matching values; `not_in` excludes them. The [same matching rules](#how-matching-works) apply as in the editor. For complete definitions, see [`04-code-review-only`](https://github.com/warpdotdev/warp-factory-examples/tree/main/examples/04-code-review-only) and [`06-common-automations`](https://github.com/warpdotdev/warp-factory-examples/tree/main/examples/06-common-automations).
+
+## Payload filters for webhook triggers
+
+A webhook trigger’s optional `payload` filter matches the delivery’s JSON body. Each key names a field that must match; an array lists allowed values. Use nested objects for nested fields and `in`, `not_in`, or `exists` for explicit conditions.
+
+This trigger starts a run for opened or reopened pull requests from a GitHub webhook, skipping drafts and bot authors:
+
+```yaml
+triggers:
+  - provider: webhook
+    event: received
+    filter:
+      webhook_ids: [WEBHOOK_UID]
+      payload:
+        action: [opened, reopened]
+        pull_request:
+          draft: [false]
+        sender:
+          type:
+            not_in: [Bot]
+```
+
+Replace `WEBHOOK_UID` with the webhook’s UID. For selecting webhooks and testing patterns against stored deliveries, see [Add a Webhook trigger to an automation](https://docs.warp.dev/factories/webhooks/#add-a-webhook-trigger-to-an-automation). The [definition reference](https://docs.warp.dev/factories/factory-as-code/#triggersfilter) covers the required `webhook_ids` filter.
+
+### Payload filter reference
+
+-   **Values match by type** - Strings match exactly and case-sensitively, numbers match numerically (`1` equals `1.0`), and booleans and `null` are matchable values.
+-   **Missing keys** - A missing key fails `in` and passes `not_in`. For example, `{"env": {"not_in": ["dev"]}}` matches a delivery with no `env` field. A nested pattern object requires its key to be present.
+-   **Arrays** - For an array of objects, a nested pattern matches if any element matches. For an array of scalars, `in` matches on any overlap and `not_in` requires none.
+-   **Combined operators** - Operators on the same field must all match. For example, combining `in` and `exists: true` requires both to hold.
+-   **Limits** - A pattern nests up to 10 levels deep, holds up to 64 leaf fields, and lists up to 32 values per set.
+-   **Validation** - Warp rejects a pattern that lists the same value in both `in` and `not_in` on one field, or that combines `exists: false` with a non-empty `in`.
+-   **Fail closed** - A filter that can’t be evaluated never matches.
+
+## Troubleshooting
+
+-   **An event doesn’t start work** - Follow the [factory troubleshooting checklist](https://docs.warp.dev/factories/troubleshooting/#an-event-that-should-start-work-doesnt) to check the automation, connection, access, and filters, then inspect any existing work item.
+-   **A webhook delivery doesn’t start work** - Open the delivery in the webhook’s **Recent deliveries** to confirm it was accepted rather than rejected or deduplicated, then use **Test filter** on the automation’s **Webhook** trigger against that delivery. See [troubleshooting custom webhooks](https://docs.warp.dev/factories/webhooks/#troubleshooting).
+
+## Related pages
+
+-   [Connect your factory](https://docs.warp.dev/factories/connect-your-factory/) - Set up sources of factory work
+-   [Triggering automations with custom webhooks](https://docs.warp.dev/factories/webhooks/) - Configure senders and authentication
+-   [Factory definition syntax](https://docs.warp.dev/factories/factory-as-code/) - Manage automations as version-controlled files
+-   [Factory dashboard](https://docs.warp.dev/factories/factory-dashboard/) - Manage agents, automations, and runs
+-   [Scheduled agents](https://docs.warp.dev/platform/triggers/scheduled-agents/) - Run standalone cloud agents on a cron schedule outside a factory

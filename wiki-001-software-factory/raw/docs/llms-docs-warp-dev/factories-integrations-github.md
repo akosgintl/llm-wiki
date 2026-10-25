@@ -1,0 +1,171 @@
+---
+title: "Connect GitHub to your factory"
+subtitle: "Connect GitHub to your factory so issues, pull requests, reviews, and CI events start factory work and results post back to GitHub."
+authors: []
+published_date: null
+source_url: https://docs.warp.dev/factories/integrations/github/
+origin: llms-txt
+llms_txt: https://docs.warp.dev/llms.txt
+section: "Documentation Sets / Factories"
+fetched: 2026-10-25T14:54:27Z
+---
+
+> For the complete documentation index, see [llms.txt](https://docs.warp.dev/llms.txt).
+> Markdown versions of each page are available by appending .md to any URL.
+
+# Connect GitHub to your factory
+
+Connect GitHub to your factory so issues, pull requests, reviews, and CI events start factory work and results post back to GitHub.
+
+When you connect a factory to GitHub, repository activity starts work in your factory. Issues, pull requests, reviews, and CI events can all trigger automations, and the factory posts results back to GitHub as comments, branches, and pull requests.
+
+## Prerequisites
+
+-   The Warp GitHub App installed. See [GitHub integration setup](https://docs.warp.dev/platform/integrations/github/).
+-   At least one GitHub repository for the factory that the app can access.
+
+## Connect GitHub to a factory
+
+One GitHub App installation serves both the platform integration and factories.
+
+1.  In the [Warp Factories web app](https://platform.warp.dev), click **+** next to **Factories** to open the setup wizard, then choose **I want to use repos from GitHub** under **Connect your code host**.
+2.  Under **Select your repos**, choose the repositories to provide code and context for the factory.
+
+New factories have default automations enabled for GitHub activity:
+
+-   **Mentions and assignments** - Start work by mentioning **@warp** or assigning the factory. See [Mention the factory](#mention-the-factory) below.
+-   **Pull request closed or merged** - Completes linked work when a pull request with your factory’s label merges (which can move linked tracker issues to their completed state). An unmerged close is a no-op.
+-   **Issue labeled** and **Pull request labeled** - Start work when the factory’s label is applied to an issue or pull request.
+-   **Pull request review submitted** - Start work when a review is submitted on a pull request that carries the factory’s label.
+
+To confirm the connection works, mention **@warp** on a test issue and check that a work item starts in the factory’s [dashboard](https://docs.warp.dev/factories/factory-dashboard/).
+
+## Add a custom automation
+
+For events without a default automation, add a GitHub trigger and narrow it with the filters below. See [editing automation filters](https://docs.warp.dev/factories/automations/#edit-filters-on-an-automation).
+
+For failed CI on the default branch, adapt this automation from [`06-common-automations`](https://github.com/warpdotdev/warp-factory-examples/tree/main/examples/06-common-automations):
+
+```markdown title="automations/ci-failure-triage/automation.md"
+---
+triggers:
+  - provider: github
+    event: workflow_run_completed
+    filter:
+      repos: [acme/api-service]
+      branches: [main]
+      conclusions: [failure]
+      skip_bots: self
+---
+A workflow run failed on the default branch. Read the run's logs and find
+the failing step. If the cause is small and clear, open a fix PR. Otherwise
+open an issue with the failing step, the error, and the commit range, and
+link the run.
+```
+
+This example admits third-party bots but skips Warp-owned bots. See [bot event troubleshooting](#events-from-bots-dont-start-work) for other options.
+
+## Supported triggers
+
+| Trigger | Supported activity |
+| --- | --- |
+| Issues | Created, labeled, assigned, or agent mentioned |
+| Pull requests | Opened, marked ready, reopened, updated with commits, added to or removed from a merge queue, assigned, labeled, mentioned, closed, or merged |
+| Reviews | Review requested or review submitted |
+| Code and CI | Push, a completed check suite or workflow run |
+
+For the exact `event` value each trigger uses in a definition file, see [triggers](https://docs.warp.dev/factories/factory-as-code/#triggers).
+
+### Automation filters
+
+Every trigger names the repository it watches. The remaining filters appear only on the event types they apply to:
+
+| Filter | Matches | Appears on |
+| --- | --- | --- |
+| **Branches** | The pushed branch, or a CI run’s head branch | Push and CI triggers |
+| **Base branches** | The branch the pull request targets | Pull request triggers |
+| **Paths** | The files the change touches | Push and pull request triggers |
+| **Labels** | Labels on the issue or pull request | Issue, pull request, review submitted, and CI triggers |
+| **Authors** | Who opened the issue or pull request | Issue, pull request, and CI triggers |
+| **Assignees** | Who the issue or pull request is assigned to | Issue and pull request triggers |
+| **Mentioned users or teams** | Which user or team is @mentioned | Mention and review submitted triggers |
+| **Reviewers** and **Reviewer teams** | Who review was requested from | Review requested triggers |
+| **Review states** | Whether the review approved, requested changes, or commented | Review submitted triggers |
+| **Workflows** | The GitHub Actions workflow, by name | Workflow run triggers |
+| **Conclusions** | The run’s result: success, failure, cancelled, and so on | Check suite and workflow run triggers |
+| **Skip bot events** | Which bot senders to ignore; defaults to **All bots** | All GitHub triggers |
+
+On check suite and workflow run triggers, **Labels** and **Authors** match the pull request linked to the run rather than the run itself.
+
+## Mention the factory
+
+Add the factory’s `factory:<alias>` label to the issue or pull request, then mention **@warp** in the opening body or a new comment. The alias is the **Foreman name** in the factory dashboard’s **Identity** settings. Warp creates the label with the factory, and the factory replies in the same thread.
+
+Without the label, a linked Warp account can still route the mention:
+
+-   **One accessible factory** - Warp adds its label and starts work.
+-   **Multiple accessible factories** - Warp asks you to add the right label and mention **@warp** again.
+-   **No accessible factory** - Warp asks you to connect the repository or request access.
+
+Only new content counts as a mention. Edits and mentions inside code blocks are ignored. Bot mentions follow the trigger’s [bot policy](#events-from-bots-dont-start-work).
+
+To change what the factory answers to, edit its mentions automation’s handle and label filters. For example, use your own `@org/team` slug or remove the label requirement.
+
+## How the factory responds on GitHub
+
+The factory posts progress and links in the originating issue, pull request, or review thread. Pushes and workflow runs report on the work item instead. New activity on an existing thread continues the same work item.
+
+Issues and pull requests the factory opens or adopts carry its `factory:<alias>` label. Warp removes it when you disconnect the repository or delete the factory. Delete old labels after renaming the alias.
+
+Branches and pull requests the factory creates follow the repository’s normal rules: branch protection, required reviews, and merge requirements all still apply.
+
+## Permissions
+
+Runs authenticate with the GitHub App installation. Its repositories and permissions control access; [automation filters](https://docs.warp.dev/factories/automations/) only control when work starts.
+
+See [GitHub permissions and identity](https://docs.warp.dev/platform/integrations/github/#permissions-and-identity) for the full credential model.
+
+## Factory-definition pull request checks
+
+If the factory’s [definition is managed as code](https://docs.warp.dev/factories/factory-as-code/) in a GitHub repository, Warp reviews changes to it the way CI reviews code. Open a pull request that touches the definition files and a **warp/factory-config** check runs: it validates the head commit and dry-runs the change against your team, so it also catches a secret, runner, MCP server, or model that doesn’t exist. It passes with a summary of what merging would create, update, and delete, or fails with the specific fields to fix. If the definition lives in a subdirectory of the repository, the directory is appended to the check name, as in **warp/factory-config (factory)**. Require the check in branch protection to stop an invalid definition from merging.
+
+These checks validate configuration files only and don’t create work items. Unchanged definitions pass immediately, so requiring the check doesn’t block unrelated work. To check a definition before opening a pull request, see [Validate a definition](https://docs.warp.dev/factories/factory-as-code/#validate-a-definition).
+
+## Troubleshooting
+
+### A mention doesn’t start work
+
+Use a new **@warp** mention outside code blocks and add the factory’s `factory:<alias>` label for explicit routing. For unlabeled mentions, see [mention routing](#mention-the-factory). For bot comments, check the [bot policy](#events-from-bots-dont-start-work).
+
+If you renamed the alias or changed repositories after creating the factory, the default automation’s filters still use the original snapshot. Edit that automation so the label and repository filters match.
+
+### A GitHub event doesn’t start work
+
+Confirm the app installation covers the event’s repository, the repository belongs to the factory, and the automation includes that event. Then check each filter; a label, author, branch, workflow, conclusion, or state mismatch prevents routing.
+
+### Events from bots don’t start work
+
+GitHub triggers skip bot events by default. This includes completed GitHub Actions workflows with a bot sender.
+
+1.  In the factory dashboard, open **Automations** and edit the automation’s GitHub trigger.
+2.  Click **More filters**. In the “Skip bot events” dropdown, choose **Self (Warp-owned bots)** to admit third-party bots while excluding Warp-owned bots, or **None** to admit all bots.
+3.  Click **Save**, then generate a new matching event and check the factory’s [Runs page](https://docs.warp.dev/factories/factory-dashboard/#inspect-runs).
+
+For [definitions as code](https://docs.warp.dev/factories/factory-as-code/), set `filter.skip_bots` to `self` or `none`. Omitted `skip_bots` defaults to `all`. Admitting Warp-owned bots can cause feedback loops when the factory’s own actions match the trigger.
+
+### Filter options don’t load
+
+Select a repository first. If the automation editor shows **Connect GitHub**, complete the account connection and retry. You can enter a value manually when suggestions are unavailable.
+
+### An agent can’t push a branch or open a pull request
+
+Check that the installation still covers the target repository and grants the required write permissions. Automation filters don’t affect GitHub authorization.
+
+### A factory-definition check doesn’t appear
+
+The check runs only for factories whose [definition is managed as code](https://docs.warp.dev/factories/factory-as-code/) in a GitHub repository. Confirm the pull request targets the branch the factory runs from and that the GitHub App covers the repository.
+
+## Related pages
+
+-   [Factory automations](https://docs.warp.dev/factories/automations/) - Configure event matching
+-   [Factory troubleshooting](https://docs.warp.dev/factories/troubleshooting/#work-isnt-starting) - Diagnose events that don’t start work

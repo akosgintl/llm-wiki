@@ -1,0 +1,283 @@
+---
+title: "Self-hosted agent data storage"
+subtitle: "Route agent transcripts, artifacts, and prompt attachments to your own cloud storage."
+authors: []
+published_date: null
+source_url: https://docs.warp.dev/factories/self-hosting/data-storage/
+origin: llms-txt
+llms_txt: https://docs.warp.dev/llms.txt
+section: "Documentation Sets / Factories"
+fetched: 2026-10-25T14:54:27Z
+---
+
+> For the complete documentation index, see [llms.txt](https://docs.warp.dev/llms.txt).
+> Markdown versions of each page are available by appending .md to any URL.
+
+# Self-hosted agent data storage
+
+Route agent transcripts, artifacts, and prompt attachments to your own cloud storage.
+
+Self-hosted agent data storage lets your team keep cloud agent run data — conversation transcripts, artifacts, and prompt attachments — in cloud storage you own, instead of Warp-managed storage. The Automation Platform still orchestrates every run and routes model inference.
+
+Note
+
+Self-hosted agent data storage is only available on Enterprise plans. [Contact sales](https://www.warp.dev/contact-sales) to learn more.
+
+## Supported storage providers
+
+**AWS S3** and **Azure Blob Storage** are available. [Contact sales](https://www.warp.dev/contact-sales) to enable Azure Blob Storage for your team or workspace. Google Cloud Storage support is planned.
+
+## What data can be self-hosted
+
+Three categories of agent run data can be routed to your own storage, each configured independently:
+
+-   **Artifacts** - Files, [Computer Use](https://docs.warp.dev/agents/capabilities/computer-use/) screenshots, and other binary artifacts an agent produces during a run.
+-   **Conversation transcripts** - Saved transcripts of agent conversations, including system messages, tool calls, and tool results.
+-   **Prompt attachments** - Files uploaded when starting or continuing an agent run.
+
+A category you don’t map keeps using Warp-hosted storage. For example, you can route artifacts to your bucket while transcripts stay with Warp.
+
+Only team admins can connect, remap, or disconnect storage. See [Access, billing, and identity](https://docs.warp.dev/platform/team-access-billing-and-identity/) for more on team roles.
+
+Caution
+
+Data is not migrated when changing storage mappings. It stays in its original location, but will no longer be accessible through Warp APIs.
+
+## How data flows
+
+Mapping a category to your bucket changes where that category’s objects are written and read. Everything else about a run stays the same.
+
+Warp’s control plane accesses self-hosted storage through provider-specific permissions that you grant and can revoke at any time. The control plane writes to your storage over the course of a run, such as by updating the conversation transcript after each turn. It also reads from the bucket to provide run data, including conversation history and the display of computer use screenshots. Warp periodically accesses persisted data for background maintenance such as to run [scorers](https://docs.warp.dev/factories/measure-and-improve/scorers/).
+
+Warp never caches bucket contents. It uses presigned URLs wherever possible so that data flows directly from your bucket to the client, without transiting Warp’s backend.
+
+## Setting up AWS S3
+
+### 1\. Create an S3 bucket
+
+Create the bucket that will hold your agent data. Warp writes objects using your bucket’s own encryption settings — both SSE-S3 (the default) and SSE-KMS are supported.
+
+Configure the bucket’s Cross-Origin Resource Sharing (CORS) settings to allow `GET` requests from `https://*.warp.dev`. The Warp web interfaces need this access to load artifacts and conversation transcripts.
+
+```json title="S3 CORS configuration"
+[
+  {
+    "AllowedHeaders": [],
+    "AllowedMethods": ["GET"],
+    "AllowedOrigins": ["https://*.warp.dev"],
+    "ExposeHeaders": []
+  }
+]
+```
+
+If you prefer to list origins explicitly, replace `AllowedOrigins` with `["https://app.warp.dev", "https://platform.warp.dev", "https://oz.warp.dev"]`. See AWS’s guide to [Amazon S3 CORS configuration elements](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ManageCorsUsing.html).
+
+-   [AWS CLI](#tab-panel-694)
+-   [Terraform](#tab-panel-695)
+
+```bash
+aws s3 mb s3://YOUR_BUCKET_NAME --region YOUR_AWS_REGION
+```
+
+```hcl title="main.tf"
+resource "aws_s3_bucket" "warp_agent_data" {
+  bucket = "YOUR_BUCKET_NAME"
+}
+```
+
+See AWS’s guide on [creating a bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html) for console and CLI equivalents.
+
+### 2\. Open the connect dialog in the Admin Panel
+
+Self-hosted storage is configured in Warp’s [Admin Panel](https://docs.warp.dev/enterprise/team-management/admin-panel/). The storage connection dialog generates the exact policies that your IAM role needs. Open it before creating the role, so you can copy those values directly. It can be reopened at any time.
+
+In the Admin Panel, go to the **Platform** settings tab. Under **Agent data storage**, click **Connect external storage** and choose **AWS S3**. Enter your bucket name and region in the “Bucket” and “Region” fields, and leave the dialog open — the next two steps use the policies it displays below the form.
+
+### 3\. Create the IAM role using the trust policy Warp shows you
+
+The connect dialog already substitutes your team’s external ID into the trust policy.
+
+-   [AWS CLI](#tab-panel-696)
+-   [Terraform](#tab-panel-697)
+
+Save the trust policy from the dialog locally:
+
+```json title="trust-policy.json"
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::162908503950:role/warp-hosted-data-storage-prod" },
+      "Action": "sts:AssumeRole",
+      "Condition": {
+        "StringEquals": { "sts:ExternalId": "YOUR_TEAM_ID" }
+      }
+    }
+  ]
+}
+```
+
+Then create the role:
+
+```bash
+aws iam create-role \
+  --role-name warp-agent-data-storage \
+  --assume-role-policy-document file://trust-policy.json
+```
+
+Set your Warp team ID as a variable, and add the following IAM role resource:
+
+```hcl title="main.tf"
+resource "aws_iam_role" "warp_agent_data_storage" {
+  name = "warp-agent-data-storage"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { AWS = "arn:aws:iam::162908503950:role/warp-hosted-data-storage-prod" }
+      Action    = "sts:AssumeRole"
+      Condition = {
+        StringEquals = { "sts:ExternalId" = var.warp_team_id }
+      }
+    }]
+  })
+}
+```
+
+See AWS’s guides on [creating a role to delegate permissions](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user.html) and on [using an external ID](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html) for background on this pattern.
+
+### 4\. Attach the permissions policy
+
+This policy grants the role access to your bucket and nothing else.
+
+-   [AWS CLI](#tab-panel-698)
+-   [Terraform](#tab-panel-699)
+
+Save the permissions policy from the dialog locally, with your bucket name substituted:
+
+```json title="permissions-policy.json"
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": "arn:aws:s3:::YOUR_BUCKET_NAME"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::YOUR_BUCKET_NAME/*"
+    }
+  ]
+}
+```
+
+Then attach it to the role:
+
+```bash
+aws iam put-role-policy \
+  --role-name warp-agent-data-storage \
+  --policy-name warp-bucket-access \
+  --policy-document file://permissions-policy.json
+```
+
+```hcl title="main.tf"
+resource "aws_iam_role_policy" "warp_bucket_access" {
+  name = "warp-bucket-access"
+  role = aws_iam_role.warp_agent_data_storage.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["s3:ListBucket"]
+        Resource = aws_s3_bucket.warp_agent_data.arn
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
+        Resource = "${aws_s3_bucket.warp_agent_data.arn}/*"
+      }
+    ]
+  })
+}
+```
+
+See AWS’s [IAM policies for Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-iam-policies.html) reference for the full set of available actions and conditions.
+
+#### If the bucket uses SSE-KMS
+
+Buckets encrypted with SSE-S3, the S3 default, need no further permissions. If your bucket uses SSE-KMS, add one more statement scoped to the ARN of the key that encrypts it.
+
+-   [AWS CLI](#tab-panel-700)
+-   [Terraform](#tab-panel-701)
+
+Add this statement to the `Statement` array in `permissions-policy.json`, then reattach the policy:
+
+```json title="permissions-policy.json"
+{
+  "Effect": "Allow",
+  "Action": ["kms:Decrypt", "kms:GenerateDataKey*", "kms:DescribeKey"],
+  "Resource": "arn:aws:kms:YOUR_AWS_REGION:YOUR_ACCOUNT_ID:key/YOUR_KEY_ID",
+  "Condition": {
+    "StringLike": { "kms:ViaService": "s3.*.amazonaws.com" }
+  }
+}
+```
+
+Add this statement to the `Statement` list in `aws_iam_role_policy.warp_bucket_access`, referencing the key that encrypts the bucket:
+
+```hcl title="main.tf"
+{
+  Effect   = "Allow"
+  Action   = ["kms:Decrypt", "kms:GenerateDataKey*", "kms:DescribeKey"]
+  Resource = aws_kms_key.warp_agent_data.arn
+  Condition = {
+    StringLike = { "kms:ViaService" = "s3.*.amazonaws.com" }
+  }
+}
+```
+
+### 5\. Enter the role ARN and choose what to store
+
+Back in the connect dialog, paste your new role’s ARN into the “Role ARN” field. In the “Data to store” dropdown, select **Artifacts**, **Conversation transcripts**, or **Prompt attachments** — whichever categories this bucket should store — then click **Connect**.
+
+Warp immediately assumes the role and checks that the bucket is reachable. If the trust policy or external ID don’t match, or the permissions policy doesn’t grant the required actions, the connection is rejected with an error describing which check failed. See [Troubleshooting](#troubleshooting).
+
+**Expected outcome:** The bucket appears as an option in each mapped category’s storage dropdown, and new writes for those categories go to your bucket going forward.
+
+## Changing or removing storage
+
+Storage mappings can be changed at any time from **Manage connected storage**, under **Agent data storage** in the Admin Panel Platform section.
+
+-   **Remap a category** - Choose a different bucket, or **Warp-hosted**, from that category’s dropdown. Only new writes use the new target.
+-   **Disconnect a bucket** - Remove the connection from the manage-storage drawer. A bucket must be unmapped from every category before it can be disconnected.
+
+Caution
+
+Neither remapping nor disconnecting migrates or deletes existing data. If you disconnect storage, objects already written there remain in your cloud storage account — Warp simply stops referencing them.
+
+## Troubleshooting
+
+### ”Warp could not assume the provided IAM role”
+
+The role’s trust policy doesn’t allow Warp’s broker role as principal, or its `sts:ExternalId` condition doesn’t match your team. Recopy the trust policy from the connect dialog and confirm it’s attached to the role you entered.
+
+### ”Warp was denied access to the S3 bucket”
+
+The trust policy is correct, but the role’s permissions policy doesn’t grant the required S3 actions on the bucket. Recheck the permissions policy against the one shown in the dialog, and confirm the bucket name matches exactly.
+
+### ”Warp could not reach the S3 bucket”
+
+The bucket name or region is wrong, or the bucket doesn’t exist. Confirm both match what you created in AWS.
+
+## Related pages
+
+-   [Architecture](https://docs.warp.dev/platform/architecture/#data-security-and-boundaries) - How run data, control-plane data, and inference credentials flow through Warp’s platform
+-   [Self-hosting overview](https://docs.warp.dev/factories/self-hosting/) - Run agent compute on your own infrastructure instead of Warp-managed servers
+-   [Cloud agent secrets](https://docs.warp.dev/platform/secrets/) - Store credentials agents use during a run
+-   [Admin Panel for teams](https://docs.warp.dev/enterprise/team-management/admin-panel/) - The full reference for team settings, including the Platform section
