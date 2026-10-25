@@ -82,7 +82,7 @@ an engagement.
 
 **Docs pages.** A page fetched from an llms.txt (`origin: llms-txt`) uses this
 same contract but lives at `wiki/docs/llms-<set>/<page-slug>.md`, beside its
-set's `OVERVIEW.md`, with `raw_file: raw/llms-<set>/<page-slug>.md`. All pages of
+set's `OVERVIEW.md`, with `raw_file: raw/docs/llms-<set>/<page-slug>.md`. All pages of
 one set count as **one** origin toward the threshold (`CONVENTIONS.md` §3).
 
 ---
@@ -279,7 +279,7 @@ title: <the catalog's H1>
 description: <ONE sentence — what this documentation covers>
 original_path: <llms.txt url>
 source_url: <llms.txt url>
-catalog: raw/llms-<set>/llms.txt
+catalog: raw/docs/llms-<set>/llms.txt
 catalog_size: <number of links>
 created: <ISO-8601 UTC>
 timestamp: <ISO-8601 UTC>

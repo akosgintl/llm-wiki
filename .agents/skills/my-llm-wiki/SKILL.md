@@ -115,7 +115,7 @@ Match every input against the routing table in `SOURCES.md`, first match wins:
 | `github.com/<owner>/<repo>` or `*.git` | `repo` | `raw/repos/.github-<owner>-<repo>/` | `repo_writer` |
 | `youtube.com/playlist?list=…` | `youtube` | `raw/youtube-<id>.md` per video | `fetch_youtube.py --list`, then `source_writer` per video |
 | `youtube.com` / `youtu.be` | `youtube` | `raw/youtube-<slug>.md` | `source_writer` |
-| URL path ends in `/llms.txt` | `llms-txt` | `raw/llms-<set>/<page-slug>.md` | `docs_selector`, then `source_writer` per page + `docs_writer` |
+| URL path ends in `/llms.txt` | `llms-txt` | `raw/docs/llms-<set>/<page-slug>.md` | `docs_selector`, then `source_writer` per page + `docs_writer` |
 | any other `http(s)://` | `article` | `raw/article-<slug>.md` | `source_writer` |
 
 The YouTube slug is the video id, verbatim (`raw/youtube-<id>.md`). If the adapter
@@ -142,7 +142,7 @@ from `<owner>-<repo>`.
 Then split the inputs (this is the whole of dedup — see `CONVENTIONS.md` §4):
 
 ```bash
-ls wiki-<slug>/raw/ wiki-<slug>/raw/repos/     # everything already ingested, by identity
+ls wiki-<slug>/raw/ wiki-<slug>/raw/docs/ wiki-<slug>/raw/repos/    # everything already ingested, by identity
 ```
 
 - raw path exists → **skipped**. Report the input by name plus the
@@ -151,7 +151,7 @@ ls wiki-<slug>/raw/ wiki-<slug>/raw/repos/     # everything already ingested, by
 - raw path free → **new**.
 - **repo that already exists → refreshed, not skipped** (`CONVENTIONS.md` §7).
 - **llms.txt already held → never skipped as a whole.** Dedup is per page, inside
-  the script: picked pages already in `raw/llms-<set>/` come back `skipped`.
+  the script: picked pages already in `raw/docs/llms-<set>/` come back `skipped`.
 
 There is **no cap in this layer.** Layer 01 capped a run at 10 notes because one
 context had to hold all of them; here each raw file is read by its own subagent
@@ -301,7 +301,7 @@ Read the file, pass its body as the prompt, collect one JSON receipt.
 | Agent | Reads | Writes |
 |---|---|---|
 | `agents/docs_selector.md` | one llms.txt catalog, via `fetch_llms_txt.py --list` | nothing — returns the link ids to fetch |
-| `agents/docs_writer.md` | one catalog snapshot `raw/llms-<set>/llms.txt` | one `wiki/docs/llms-<set>/OVERVIEW.md` hub |
+| `agents/docs_writer.md` | one catalog snapshot `raw/docs/llms-<set>/llms.txt` | one `wiki/docs/llms-<set>/OVERVIEW.md` hub |
 | `agents/source_writer.md` | one `raw/` file — the only agent that may | one `wiki/sources/<slug>.md` |
 | `agents/repo_writer.md` | one clone under `raw/repos/` | one page under `wiki/repos/<repo>/` |
 | `agents/page_writer.md` | the source-like pages for one slug | one `wiki/entities/` or `wiki/concepts/` page |
@@ -319,7 +319,7 @@ the first run. You run them; the user never does. Paths below are relative to th
 | `scripts/build_index_md.py` | `uv run --script .agents/skills/my-llm-wiki/scripts/build_index_md.py --wiki-dir wiki-<slug>` | Regenerates `wiki/index.md` and each `wiki/<subdir>/index.md` from frontmatter, then checks OKF conformance. Deterministic: same input, same bytes. |
 | `scripts/clone_repo.py` | `--url <url> --wiki-dir wiki-<slug>` | Shallow-clones into `raw/repos/.github-<owner>-<repo>/`, or refreshes it. JSON receipt with `commit_sha` and `action`. |
 | `scripts/fetch_article.py` | `--url <url> --wiki-dir wiki-<slug>` | `curl` → body isolation → markdown at `raw/article-<slug>.md`. Warns when the body looks like a paywall. |
-| `scripts/fetch_llms_txt.py` | `--url <url> --wiki-dir wiki-<slug> (--list \| --pick <ids>) [--keywords a,b]` | `--list` prints the catalog with ids and keyword hints, writes nothing. `--pick` fetches those links, one `raw/llms-<set>/<page>.md` each; already-present pages are skipped. The receipt names each page's `source_page` and the set's `hub_page`. |
+| `scripts/fetch_llms_txt.py` | `--url <url> --wiki-dir wiki-<slug> (--list \| --pick <ids>) [--keywords a,b]` | `--list` prints the catalog with ids and keyword hints, writes nothing. `--pick` fetches those links, one `raw/docs/llms-<set>/<page>.md` each; already-present pages are skipped. The receipt names each page's `source_page` and the set's `hub_page`. |
 | `scripts/fetch_youtube.py` | `--url <url> --wiki-dir wiki-<slug> [--list [--limit N]]` | yt-dlp metadata + caption track → timestamped markdown at `raw/youtube-<id>.md`. Fails when the video has no captions. `--list` expands a playlist into its videos with a `new`/`skipped`/`unavailable` status each, and writes nothing. |
 
 No script writes wiki content. They fetch, they count, they render — every word in

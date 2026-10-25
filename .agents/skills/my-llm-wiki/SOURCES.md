@@ -63,7 +63,7 @@ Match the user's input top to bottom; first match wins.
 | `github.com/<owner>/<repo>`, or any `*.git` | `scripts/clone_repo.py` | `raw/repos/.github-<owner>-<repo>/` | `repo_writer` (mode `architecture`) |
 | `youtube.com/playlist?list=…` | `scripts/fetch_youtube.py --list`, then the video recipe per `new` video | `raw/youtube-<id>.md` per video | `source_writer` per video |
 | `youtube.com/watch?v=…`, `youtu.be/…` | `scripts/fetch_youtube.py` | `raw/youtube-<slug>.md` | `source_writer` |
-| a URL whose path ends in `/llms.txt` | `docs_selector`, then `scripts/fetch_llms_txt.py --pick` | `raw/llms-<set>/<page-slug>.md` | `source_writer` per page, plus `docs_writer` for the hub |
+| a URL whose path ends in `/llms.txt` | `docs_selector`, then `scripts/fetch_llms_txt.py --pick` | `raw/docs/llms-<set>/<page-slug>.md` | `source_writer` per page, plus `docs_writer` for the hub |
 | any other `http(s)://` | `scripts/fetch_article.py` | `raw/article-<slug>.md` | `source_writer` |
 
 Dedup happens **before** the adapter runs: compute the raw path, `ls` it, skip if
@@ -131,7 +131,7 @@ specs (`.json`, `.yaml`) are listed as `kind: dump` / `spec` and cannot be
 picked. A page link with no extension is fetched as `<url>.md` first, the HTML
 page only if that fails; MDX component tags are stripped from the body.
 
-**Identity is per page**, `raw/llms-<set>/<page-slug>.md`, with the page
+**Identity is per page**, `raw/docs/llms-<set>/<page-slug>.md`, with the page
 slug from the link's URL path. A second run against the same catalog — a bigger
 budget, a new intent — fetches only the new picks and reports the rest
 `skipped`. `llms.txt` in the same folder is a snapshot of the catalog, with

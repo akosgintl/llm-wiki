@@ -158,7 +158,7 @@ Full per-type contracts: `PAGES.md`.
 
 - `raw/` is **immutable**. Re-ingesting a note does not overwrite it (§4). Two
   exceptions, both regenerable: repo clones (§11) and the `llms.txt` catalog
-  snapshot in `raw/llms-<set>/`, which is a listing, not a source.
+  snapshot in `raw/docs/llms-<set>/`, which is a listing, not a source.
 - `wiki/` is **LLM-owned**. A human may edit it, but the next ingest may rewrite
   what they wrote — deliberate edits belong in `raw/` or in a note the pipeline
   does not own.
@@ -227,10 +227,11 @@ wiki-<slug>/
 ├── raw/
 │   ├── <slug>.md                                # local note (01)
 │   ├── article-<slug>.md                        # fetched article (02)
-│   ├── llms-<set>/                              # docs selected from an llms.txt (§15)
-│   │   ├── llms.txt                             # catalog snapshot, refreshed each run
-│   │   └── <page-slug>.md                       # one per selected page, immutable
 │   ├── youtube-<slug>.md                        # transcript, slug = video id
+│   ├── docs/
+│   │   └── llms-<set>/                          # docs selected from an llms.txt (§15)
+│   │       ├── llms.txt                         # catalog snapshot, refreshed each run
+│   │       └── <page-slug>.md                   # one per selected page, immutable
 │   └── repos/
 │       └── .github-<owner>-<repo>/              # shallow clone, --depth 1
 └── wiki/
@@ -346,7 +347,7 @@ detail fetched when a question needs it — not like an article.
 
 ```
 wiki-<slug>/
-├── raw/llms-<set>/
+├── raw/docs/llms-<set>/
 │   ├── llms.txt                        # catalog snapshot, refreshed on every fetch
 │   └── <page-slug>.md                  # one per fetched page, immutable
 └── wiki/docs/

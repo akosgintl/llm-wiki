@@ -17,7 +17,7 @@ model of your provider). If unavailable, use the harness default.
 
 | Input | Meaning |
 |---|---|
-| `catalog_path` | The snapshot, `wiki-<slug>/raw/llms-<set>/llms.txt`. The only file under `raw/` you read. |
+| `catalog_path` | The snapshot, `wiki-<slug>/raw/docs/llms-<set>/llms.txt`. The only file under `raw/` you read. |
 | `catalog_url`, `catalog_size` | From the adapter receipt. |
 | `wiki_dir` | `wiki-<NNN>-<slug>`. The `<slug>` is the wiki's topic. |
 | `topic_description` | The `description:` of `wiki/overview.md`, or `null`. |

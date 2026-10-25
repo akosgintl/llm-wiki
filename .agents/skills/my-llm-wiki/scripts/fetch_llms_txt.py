@@ -34,7 +34,7 @@ serve markdown there), falling back to the HTML page.
 
 Layout (a tree adapter, like repos — SOURCES.md):
 
-  raw/llms-<host>[-<dir>]/
+  raw/docs/llms-<host>[-<dir>]/
     llms.txt              # catalog snapshot, overwritten every run; expanded
                           # sub-catalogs are appended as extra `##` sections
     <page-slug>.md        # one per fetched link; immutable, skipped if present
@@ -60,7 +60,7 @@ per link, plus `expanded`: the sub-catalogs inlined and how many links each gave
 
 Receipt (stdout, fetch mode):
   {"origin": "llms-txt", "original_path": <url>, "title", "subtitle", "source_url",
-   "authors": [], "published_date": null, "raw_path": "raw/llms-<slug>/", "catalog": "raw/llms-<slug>/llms.txt", "catalog_size",
+   "authors": [], "published_date": null, "raw_path": "raw/docs/llms-<slug>/", "catalog": "raw/docs/llms-<slug>/llms.txt", "catalog_size",
    "hub_page": "wiki/docs/llms-<slug>/OVERVIEW.md",
    "pages": [{"id", "title", "source_url", "raw_path", "source_page", "action", "chars"}], ["warning"]}
   action is `fetched`, `skipped` (already in raw/) or `failed`; a failed page carries a `reason`.
@@ -422,7 +422,7 @@ def main() -> None:
     parser.add_argument("--list", action="store_true", help="Print every link with id and hint; write nothing.")
     parser.add_argument("--pick", default=None, help="Comma-separated link ids to fetch (from --list).")
     parser.add_argument("--max-pages", type=int, default=10, help="Without --pick: fetch the top N by hint (default 10).")
-    parser.add_argument("--output", default=None, help="Override the raw folder (default: raw/llms-<slug>/).")
+    parser.add_argument("--output", default=None, help="Override the raw folder (default: raw/docs/llms-<slug>/).")
     args = parser.parse_args()
     for stream in (sys.stdout, sys.stderr):  # Windows consoles default to cp1252
         stream.reconfigure(encoding="utf-8")
@@ -443,7 +443,7 @@ def main() -> None:
 
     parsed = urlparse(args.url)
     folder_slug = slugify(f"{parsed.netloc} {parsed.path.rsplit('/', 1)[0]}")
-    folder = Path(args.output).expanduser().resolve() if args.output else wiki_dir / "raw" / f"llms-{folder_slug}"
+    folder = Path(args.output).expanduser().resolve() if args.output else wiki_dir / "raw" / "docs" / f"llms-{folder_slug}"
     for link in links:
         link["exists"] = (folder / f"{link['slug']}.md").exists()
 
