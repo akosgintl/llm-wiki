@@ -1,27 +1,29 @@
 ---
 type: concept
 title: Git worktree
-description: Git feature that gives each concurrent agent task its own checkout and branch from one shared object store, used by Warp's Direct backend and Factory's droid exec for parallel-run isolation, but not a security boundary.
+description: Git feature that gives each concurrent agent task its own checkout and branch from one shared object store, used by Warp's Direct backend and Factory's droid exec for parallel-run isolation and recommended in a Claude Code podcast for per-task multi-repo work, but not a security boundary.
 aliases: []
 sources:
   - "[[wiki/docs/llms-docs-factory-com/droid-exec-overview]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-factory-mcp]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-self-hosting-direct-monorepo-worktrees]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-self-hosting-managed-direct]]"
+  - "[[wiki/sources/youtube-b5O6gb_Zuk8]]"
 related:
   - "[[wiki/concepts/self-hosting]]"
   - "[[wiki/concepts/agent-runner]]"
   - "[[wiki/concepts/secrets-management]]"
   - "[[wiki/concepts/agent-harness]]"
   - "[[wiki/concepts/mcp]]"
+  - "[[wiki/concepts/multi-repo-development]]"
 created: 2026-10-25T18:30:11Z
-timestamp: 2026-10-25T18:30:11Z
-source_count: 4
+timestamp: 2026-10-26T07:15:24Z
+source_count: 5
 ---
 
 # Git worktree
 
-> Two origins: Warp docs (three pages, one voice) and Factory docs (one page).
+> Three origins: Warp docs (three pages, one voice), Factory docs (one page) and a Boundary podcast episode (one page).
 
 ## Definition
 
@@ -36,6 +38,7 @@ A Git worktree is an extra working directory and branch linked to one repository
 - Fetch runs outside the setup hook so concurrent tasks do not update the same remote-tracking refs. Both hooks run `git worktree prune` to recover from interrupted tasks. Teardown deletes only the local branch. [[wiki/docs/llms-docs-warp-dev/factories-self-hosting-direct-monorepo-worktrees]]
 - Factory: `-w, --worktree` runs each `droid exec` job in an isolated worktree so parallel runs avoid file conflicts. Clean worktrees are removed on exit; dirty ones are kept. [[wiki/docs/llms-docs-factory-com/droid-exec-overview]]
 - Warp Factory MCP: `get_task` with `start_working=true` returns suggested Git commands for an isolated worktree, so a developer or local agent can continue a cloud task. It never modifies local files. Picking up a task does not lock it. [[wiki/docs/llms-docs-warp-dev/factories-factory-mcp]]
+- Boundary podcast (Claude Code): for work spanning many repos, a coordination repo whose `settings.json` lists additional directories and whose CLAUDE.md describes each repo, with per-task worktrees. Submodules and symlinks are called unergonomic for models. [[wiki/sources/youtube-b5O6gb_Zuk8]]
 - Security limit: worktrees isolate files and branches, not the host. Direct tasks share filesystem, network, processes and object store; the Direct backend gives no container isolation. [[wiki/docs/llms-docs-warp-dev/factories-self-hosting-direct-monorepo-worktrees]], [[wiki/docs/llms-docs-warp-dev/factories-self-hosting-managed-direct]]
 - Git credentials: Direct sets `GIT_CONFIG_GLOBAL` to a task-local file, so credentials must come from an SSH key, a system helper, or the base clone's config. [[wiki/docs/llms-docs-warp-dev/factories-self-hosting-direct-monorepo-worktrees]]
 
@@ -45,6 +48,7 @@ A Git worktree is an extra working directory and branch linked to one repository
 - **Agent runner**: worktree creation is a runner-side hook, not a harness feature. [[wiki/concepts/agent-runner]]
 - **Secrets management**: credential handling differs per task because of the task-local Git config. [[wiki/concepts/secrets-management]]
 - **Agent harness**: Factory's `droid exec` harness offers the flag directly. [[wiki/concepts/agent-harness]]
+- **Multi-repo development**: the podcast pairs worktrees with a coordination repo as the way to work across repos. [[wiki/concepts/multi-repo-development]]
 - **MCP**: Factory MCP hands cloud tasks to local worktrees. [[wiki/concepts/mcp]]
 
 ## Tensions
@@ -53,4 +57,4 @@ Where the worktree is created differs. Warp has the operator script it in runner
 
 Cleanup differs too. Factory keeps dirty worktrees; Warp's teardown removes the worktree and branch unless `--no-cleanup` is set. [[wiki/docs/llms-docs-factory-com/droid-exec-overview]], [[wiki/docs/llms-docs-warp-dev/factories-self-hosting-direct-monorepo-worktrees]]
 
-> Synthesis: Four pages, two vendors. The three Warp pages are one voice, so their agreement is not corroboration. Factory independently confirms only the core idea: worktrees give cheap per-run isolation for parallel agents. Both are vendor docs, and only Warp states the limit that worktrees are not a host boundary.
+> Synthesis: Five pages, three origins. The three Warp pages are one voice, so their agreement is not corroboration. Factory independently confirms only the core idea: worktrees give cheap per-run isolation for parallel agents. The podcast adds an independent, non-vendor mention, but only in passing and for a different use (per-task checkouts across repos, not parallel-run isolation); it gives no recipe. Only Warp states the limit that worktrees are not a host boundary.

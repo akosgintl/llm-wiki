@@ -8,11 +8,14 @@ title: 001-software-factory — Wiki
 # 001-software-factory — Wiki
 
 - [[wiki/overview|Overview]]
+- [[wiki/open-questions|Open questions]]
 
 ## Browse
 
-- [[wiki/sources/index|Sources]] (1)
+- [[wiki/sources/index|Sources]] (3)
 - [[wiki/entities/index|Entities]] (10)
 - [[wiki/concepts/index|Concepts]] (18)
+- [[wiki/questions/index|Questions]] (1)
+- [[wiki/notes/index|Notes]] (1)
 - [[wiki/repos/index|Repos]] (2)
 - [[wiki/docs/index|Docs]] (97)

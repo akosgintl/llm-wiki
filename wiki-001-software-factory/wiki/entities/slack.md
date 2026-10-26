@@ -32,6 +32,7 @@ sources:
   - "[[wiki/docs/llms-factory-mastra-ai/what-is-factory]]"
   - "[[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]"
   - "[[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]"
+  - "[[wiki/sources/youtube-XUEfIxkdT2Q]]"
 related:
   - "[[wiki/entities/warp-factories]]"
   - "[[wiki/entities/microsoft-teams]]"
@@ -42,8 +43,8 @@ related:
   - "[[wiki/concepts/human-in-the-loop]]"
   - "[[wiki/concepts/software-factory]]"
 created: 2026-10-25T15:20:00Z
-timestamp: 2026-10-25T18:31:00Z
-source_count: 28
+timestamp: 2026-10-26T07:12:42Z
+source_count: 29
 ---
 
 # Slack
@@ -56,7 +57,7 @@ No source defines Slack itself. They describe how it plugs into factory products
 
 A second, smaller use appears in Warp's skills repo: Slack as a sink for agent feedback. [[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]
 
-> Synthesis: The 28 pages come from five vendor doc sets (Warp, Factory, 8090, Port, Mastra) and two Warp-authored repos. Each docs set or repo is one origin, so Warp's 23 pages count as one voice. Across vendors, Slack is consistently an intake and interaction surface, which is real cross-vendor agreement on its role. Details below are mostly single-vendor claims.
+> Synthesis: The 29 pages come from five vendor doc sets (Warp, Factory, 8090, Port, Mastra), two Warp-authored repos and one podcast. Each docs set or repo is one origin, so Warp's 23 pages count as one voice. The podcast guest is Warp's CEO, so it is not independent of the Warp docs. Across vendors, Slack is consistently an intake and interaction surface, which is real cross-vendor agreement on its role. Details below are mostly single-vendor claims.
 
 ## Key claims
 
@@ -96,6 +97,10 @@ A second, smaller use appears in Warp's skills repo: Slack as a sink for agent f
 - The foreman talks to people through the tool where the request started, such as Slack. [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]]
 - Slack is the chat counterpart to Teams. [[wiki/docs/llms-docs-warp-dev/factories-integrations-teams]]
 
+**Podcast view (Warp CEO)**
+- DIY software factories commonly stitch together Docker plus a web portal or a Slack bot. [[wiki/sources/youtube-XUEfIxkdT2Q]]
+- Advice to onboard everyone by letting them prompt the cloud loop directly, via Slack, Jira or MCP, because that makes work tracked and measurable; automation then takes a growing share. [[wiki/sources/youtube-XUEfIxkdT2Q]]
+
 **Troubleshooting**
 - Common cause of a missed event: the app is not in the channel, or admin approval is pending. [[wiki/docs/llms-docs-warp-dev/factories-troubleshooting]]
 
@@ -106,6 +111,8 @@ A second, smaller use appears in Warp's skills repo: Slack as a sink for agent f
 
 - **Identity on Slack.** Warp requires a linked Slack account on an active team member to start work by mention or DM, and automation runs use the chosen factory agent. [[wiki/docs/llms-docs-warp-dev/factories-integrations-slack]] Factory runs channel delegations as a shared service account but DMs as the sender. [[wiki/docs/llms-docs-factory-com/delegations-index]] Different models of whose authority a Slack request carries.
 - **Trigger scope.** Warp lists mentions, DMs, channel messages, reactions and member joins as triggers. [[wiki/docs/llms-docs-warp-dev/factories-automations]] Factory's Slack automations fire only on top-level messages. [[wiki/docs/llms-docs-factory-com/software-factory-automations]]
+
+- **Slack as entry versus Slack as bot.** The podcast lists a Slack bot as a typical DIY factory front end. [[wiki/sources/youtube-XUEfIxkdT2Q]] The vendor docs treat Slack as a managed, identity-checked intake. This is a framing difference, not a conflict of fact.
 
 ## Relationships
 

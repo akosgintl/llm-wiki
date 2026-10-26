@@ -53,3 +53,15 @@
 - pages used: 5 (agent-harness, control-plane, software-factory, youtube-tGbjIvvYuHE, claude-code)
 - saved: wiki/questions/2026-10-25-inner-and-outer-loop.md + wiki/notes/inner-and-outer-harness.md
 - open question logged: general dev-tooling "inner loop / outer loop" terms not covered by any source
+
+## 2026-10-26 ingest | 2 YouTube videos (Boundary channel)
+
+- Ingested 2 videos; skipped 0: `https://www.youtube.com/watch?v=XUEfIxkdT2Q` ("How to Build an AI Software Factory That Ships Faster", 52:27, auto-en) and `https://www.youtube.com/watch?v=b5O6gb_Zuk8` ("Agents, Subagents, Skills and Commands", 1:00:05, auto-en)
+- Source pages: youtube-XUEfIxkdT2Q, youtube-b5O6gb_Zuk8
+- New pages: none (every touched slug was already qualifying)
+- Updated pages (first video): warp-factories (54 pages), slack (29), software-factory (19), factory-as-code (37), agent-evals (13), human-in-the-loop (37), agent-skill (27)
+- Updated pages (second video): claude-code (14), agent-skill (28), agent-harness (15), context-engineering (5), multi-repo-development (5), git-worktree (5), human-in-the-loop (38), software-factory (20), mcp (17)
+- Overview rewritten (97 source-like pages, 4 themes); `build_index_md.py` exits 0 (132 pages)
+- Suggested slugs not yet linked from any page: risk-based-code-review, factory-yield-metrics, subagent, slash-command, coordination-repo
+- Waiting at 1 origin: agent-runner, agentops, agentic-merge-queue, compounding-engineering, docker, kubernetes, aws-ecr, azure-devops, vercel, 8090-software-factory, mastra-factory, port, baml, coderabbit, human-layer
+- Caveats: page writers merged only the new source into existing pages; mcp lists 17 sources against 31 mentioning pages (pre-existing gap); agent-evals is likely over the 500-word budget; both videos and youtube-tGbjIvvYuHE share the Boundary channel and hosts, and XUEfIxkdT2Q features Warp's CEO, so writers marked them as not independent

@@ -2,4 +2,6 @@
 
 # Sources
 
+- [[wiki/sources/youtube-b5O6gb_Zuk8|Agents, Subagents, Skills and Commands]] — A one-hour podcast whiteboard of how slash commands, subagents and skills evolved in Claude Code, arguing that instruction modules and context isolation are separate jobs.
 - [[wiki/sources/youtube-tGbjIvvYuHE|How to Build a Software Factory for AI Coding Agents]] — Dex (Human Layer) and Vaibhav (Boundary) split the software factory into compute, dev environment, harness and control plane, argue each layer should be buy-or-build, and show Boundary's in-house f...
+- [[wiki/sources/youtube-XUEfIxkdT2Q|How to Build an AI Software Factory That Ships Faster]] — Warp's CEO and two podcast hosts define the software factory as a measurable, cloud-hosted, code-defined agent loop and argue the hard parts are yield metrics, risk-based review and org culture.

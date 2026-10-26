@@ -5,6 +5,8 @@ description: A system of coding agents, compute, context and orchestration that 
 aliases: []
 sources:
   - "[[wiki/sources/youtube-tGbjIvvYuHE]]"
+  - "[[wiki/sources/youtube-XUEfIxkdT2Q]]"
+  - "[[wiki/sources/youtube-b5O6gb_Zuk8]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-connect-your-factory]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-factory-agents]]"
@@ -35,8 +37,8 @@ related:
   - "[[wiki/concepts/self-hosting]]"
   - "[[wiki/entities/warp-factories]]"
 created: 2026-10-25T15:14:44Z
-timestamp: 2026-10-25T18:32:38Z
-source_count: 18
+timestamp: 2026-10-26T07:15:28Z
+source_count: 20
 ---
 
 # Software factory
@@ -50,6 +52,7 @@ No shared definition exists. Each origin sells a different slice, so the framing
 | Origin | What "software factory" means |
 |---|---|
 | Boundary podcast | A stack of layers: compute, dev environment, harness (inner/outer), control plane. Build, buy or mix each layer. [[wiki/sources/youtube-tGbjIvvYuHE]] |
+| Warp CEO on Boundary podcast | An agentic loop from issue through triage, optional spec, implementation, review, QA, CI/CD and monitoring; cloud-hosted, highly measurable, defined declaratively in code. The developer's job becomes "building, maintaining, and tuning this loop". [[wiki/sources/youtube-XUEfIxkdT2Q]] |
 | Warp (docs, repos) | A team of cloud agents on your repos. Work from Slack, GitHub, Linear or Jira goes through triage, planning, implementation, review; a PR returns to the originating thread. A "foreman" agent coordinates. [[wiki/docs/llms-docs-warp-dev/factories]], [[wiki/docs/llms-docs-warp-dev/factories-factory-agents]] |
 | Mastra Factory | A web app and board: connect a repo, pull issues in as Work items, guide each through investigate, plan, implement, PR review. Each session runs in an isolated sandbox; it never edits the local checkout. [[wiki/docs/llms-factory-mastra-ai/what-is-factory]] |
 | 8090 | A spec-and-context layer. Requirements, Blueprints and Work Orders live in a Knowledge Graph; external coding agents (Cursor, Claude Code, Codex) are the build step, reached over MCP. [[wiki/docs/llms-docs-8090-ai/general-introduction]], [[wiki/docs/llms-docs-8090-ai/general-quickstart]] |
@@ -61,7 +64,9 @@ Readings of the table:
 - Runner-centred: Warp and Mastra describe agents that do the work and a path from issue to PR. Warp centres on a foreman agent; Mastra centres on a board with approval gates.
 - Context-centred: 8090 and Port treat shared knowledge as the core. For 8090, requirements and blueprints, not code, are the source of truth. For Port, the catalog is the core and agents sit on top.
 - Observability-centred: Factory's product page is a coverage map over the SDLC, not an agent runner. [[wiki/docs/llms-docs-factory-com/software-factory-overview]]
-- Layered: the podcast describes the infrastructure beneath any of these. [[wiki/sources/youtube-tGbjIvvYuHE]]
+- Loop-centred: the Warp CEO talk defines the factory as the loop plus its measurement; hosts agree on the loop shape and differ only on step order (for example QA before or after review). [[wiki/sources/youtube-XUEfIxkdT2Q]]
+- Layered: the first podcast describes the infrastructure beneath any of these. [[wiki/sources/youtube-tGbjIvvYuHE]]
+- Sceptical: a second Boundary episode (harness mechanics) names the "lights-off software factory" as a risk rather than a goal. [[wiki/sources/youtube-b5O6gb_Zuk8]]
 
 Port notes its sense differs from the older "outsourced development shop" meaning. [[wiki/docs/llms-docs-port-io/glossary]]
 
@@ -88,20 +93,27 @@ Port notes its sense differs from the older "outsourced development shop" meanin
 
 ### Observability and measurement
 
+- Warp's stated default metrics: human interactions per PR (automation proxy), DORA metrics, cost per engineer and per stage, and online evals such as a judge model scoring redundant tests. Yield is hard to define and differs per business, rising from PRs to features to customer outcomes. [[wiki/sources/youtube-XUEfIxkdT2Q]]
+- With the factory stored as code, improvement agents can propose diffs to its Markdown files from failed runs; real tasks can become private benchmarks; online evals for dead ends, verbosity and relearning feed skill improvement. [[wiki/sources/youtube-XUEfIxkdT2Q]]
 - Factory.ai's dashboard shows four headline metrics (Tickets Triaged, PR Validations, PRs Merged, Incidents Processed), stage health, repository and integration coverage, and setup gaps. [[wiki/docs/llms-docs-factory-com/software-factory-overview]]
 - Warp lists dashboards, scorers and benchmarks; its examples attach sampled LLM-judge scorers to agents. Boundary requires eval metrics with every pipeline change. [[wiki/docs/llms-docs-warp-dev/factories]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]], [[wiki/sources/youtube-tGbjIvvYuHE]]
 - Mastra shows progress in an Overview page, session transcripts and an Audit log. [[wiki/docs/llms-factory-mastra-ai/what-is-factory]]
 
 ### Human gates (where all origins agree on the shape)
 
+- Warp CEO talk: review is risk management. Owners-file rules force human review of risky files (for example env var changes); a policy of merging small, non-core PRs without human review raised the qualifying share from about 10% to 80%. [[wiki/sources/youtube-XUEfIxkdT2Q]]
 - Warp: the factory never merges; the example foreman prompt says never to merge or approve a spec for a human. [[wiki/docs/llms-docs-warp-dev/factories]], [[wiki/docs/llms-docs-warp-dev/factories-factory-agents]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
 - Mastra: four steps always wait for a person: starting a run, accepting a non-bug task, approving a plan, merging a PR. Auto-start and auto-approve toggles relax the first and third. [[wiki/docs/llms-factory-mastra-ai/what-is-factory]]
 - Boundary: a loop fixes CodeRabbit comments, stops after 3 iterations to ask a human, and a human presses merge. Aim for 95% automatic, not fully automatic. [[wiki/sources/youtube-tGbjIvvYuHE]]
 - Port: at the "AI-autonomous" level agents triage, code, review and handle incidents while humans approve key decisions; its glossary has people set intent, review and own the deploy decision. [[wiki/docs/llms-docs-port-io/solutions-agentops-overview]], [[wiki/docs/llms-docs-port-io/glossary]]
+- Boundary harness-mechanics episode: not bullish on agent teams, because the bottleneck is humans reviewing design, not output volume. [[wiki/sources/youtube-b5O6gb_Zuk8]]
 - 8090: work orders are reviewed, assigned and grouped into phases by people before agents build. [[wiki/docs/llms-docs-8090-ai/general-quickstart]]
 
 ## Tensions
 
+- How to adopt. Dexter (Human Layer): remove humans from your existing loop, then pipeline your best engineers' workflow. Zach (Warp): onboard everyone to the cloud loop even by direct prompt, so work is tracked, then automate a growing share. [[wiki/sources/youtube-XUEfIxkdT2Q]]
+- How far to automate. The Boundary harness episode warns that companies leaning hard into a lights-off, human-free factory risk a 3 AM break that nobody can debug because no one read the code in months. Vendor docs and the Warp CEO talk instead aim for a growing automated share with human gates kept. [[wiki/sources/youtube-b5O6gb_Zuk8]], [[wiki/sources/youtube-XUEfIxkdT2Q]], [[wiki/docs/llms-docs-warp-dev/factories]]
+- Organisation vs technology. The talk argues factories fail on people problems, for example split product and engineering orgs ("you cannot have a factory if you have two companies two separate orgs"). Product docs mostly treat it as a tooling problem. [[wiki/sources/youtube-XUEfIxkdT2Q]]
 - What the factory is. Warp and Mastra: agents that carry an issue to a PR. 8090: a spec layer that hands tasks to someone else's coding agents. Port: a catalog and governance platform. Factory.ai: a coverage dashboard. These are different products sharing a label, not one concept implemented five ways. [[wiki/docs/llms-docs-warp-dev/factories]], [[wiki/docs/llms-factory-mastra-ai/what-is-factory]], [[wiki/docs/llms-docs-8090-ai/general-introduction]], [[wiki/docs/llms-docs-port-io/glossary]], [[wiki/docs/llms-docs-factory-com/software-factory-overview]]
 - Where the source of truth lives. 8090: requirements and blueprints, kept in sync with code by drift detection. Port: the Context Lake catalog. Warp: definition files in a git repo. Mastra: the target repo plus the Factory project, kept separate. [[wiki/docs/llms-docs-8090-ai/general-quickstart]], [[wiki/docs/llms-docs-port-io/glossary]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]], [[wiki/docs/llms-factory-mastra-ai/what-is-factory]]
 - Who coordinates. Warp: an agent (the foreman) is the only default agent that talks to humans. Mastra: a board with explicit human approval gates, no foreman. Boundary: hard-coded while loops, not an agent. [[wiki/docs/llms-docs-warp-dev/factories-factory-agents]], [[wiki/docs/llms-factory-mastra-ai/what-is-factory]], [[wiki/sources/youtube-tGbjIvvYuHE]]
@@ -120,4 +132,4 @@ Port notes its sense differs from the older "outsourced development shop" meanin
 - **Context engineering / knowledge graph / knowledge base**: the centre of 8090 and Port's framings. [[wiki/concepts/context-engineering]], [[wiki/concepts/knowledge-graph]], [[wiki/concepts/knowledge-base]]
 - **Self-hosting**: Mastra and Warp differ in how open it is. [[wiki/concepts/self-hosting]]
 
-> Synthesis: Corroboration is thin and mostly vendor-to-vendor. The 18 sources come from 7 origins. Warp is 6 of them (four docs pages, two Warp repos); the Warp pages are one voice. Mastra, 8090, Factory.ai and Port are each one voice, and all sell products. The podcast (Human Layer, Boundary) is the only outside voice. What they agree on is the shape: work request in, reviewed PR out, and a human at merge or approval. What they disagree on is what the factory is. Nothing here shows that any of it works.
+> Synthesis: Corroboration is thin and mostly vendor-to-vendor. The 20 sources come from 7 origins. Warp is 6 of them (four docs pages, two Warp repos); the Warp pages are one voice. Mastra, 8090, Factory.ai and Port are each one voice, and all sell products. The three podcast episodes (Human Layer and Boundary hosts) are the only outside voices, but they are one series with shared hosts, and the second features Warp's CEO, so it adds Warp-side detail (metrics, yield, risk-routed review) rather than independent confirmation of Warp docs. The third episode (Claude Code skills and subagents) adds only a sceptical note on "lights-off" factories and a human-review-bottleneck argument, from the same hosts, so it counts as a counterweight, not a separate corroborating voice. What they agree on is the shape: work request in, reviewed PR out, and a human at merge or approval. What they disagree on is what the factory is. Nothing here shows that any of it works.
