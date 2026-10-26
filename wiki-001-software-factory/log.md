@@ -46,3 +46,10 @@
 - Overview rewritten (95 source-like pages, 4 themes); `build_index_md.py` exits 0 (128 pages)
 - Waiting at 1 origin: mastra-factory, 8090-software-factory, port, agentops, agent-runner, agentic-merge-queue, compounding-engineering, docker, kubernetes, aws-ecr, azure-devops, vercel, baml, coderabbit, human-layer
 - Caveats: factory-as-code and github writers read only the relevant lines of older sources; factory-as-code body was rewritten, not strictly merged; agent-skill is over the 500-word budget
+
+## 2026-10-25 query | inner and outer loop
+
+- question: "what is inner and outer loop?"
+- pages used: 5 (agent-harness, control-plane, software-factory, youtube-tGbjIvvYuHE, claude-code)
+- saved: wiki/questions/2026-10-25-inner-and-outer-loop.md + wiki/notes/inner-and-outer-harness.md
+- open question logged: general dev-tooling "inner loop / outer loop" terms not covered by any source
