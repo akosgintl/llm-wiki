@@ -16,6 +16,7 @@ sources:
   - "[[wiki/docs/llms-docs-warp-dev/factories-infrastructure-and-security]]"
   - "[[wiki/repos/github-warpdotdev-common-skills/ARCHITECTURE]]"
   - "[[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]"
+  - "[[wiki/sources/youtube-b5O6gb_Zuk8]]"
   - "[[wiki/sources/youtube-tGbjIvvYuHE]]"
 related:
   - "[[wiki/entities/codex]]"
@@ -23,11 +24,14 @@ related:
   - "[[wiki/entities/warp-factories]]"
   - "[[wiki/concepts/agent-harness]]"
   - "[[wiki/concepts/agent-skill]]"
+  - "[[wiki/concepts/context-engineering]]"
+  - "[[wiki/concepts/git-worktree]]"
   - "[[wiki/concepts/human-in-the-loop]]"
   - "[[wiki/concepts/mcp]]"
+  - "[[wiki/concepts/multi-repo-development]]"
 created: 2026-10-25T15:14:44Z
-timestamp: 2026-10-25T18:31:00Z
-source_count: 13
+timestamp: 2026-10-26T07:15:23Z
+source_count: 14
 ---
 
 # Claude Code
@@ -55,6 +59,10 @@ Sources treat Claude Code as the agent runtime that does the coding, not as the 
 - Port's guide runs Claude Code through `anthropics/claude-code-base-action@beta` in a GitHub Actions backend workflow, with a restricted tool list (`Bash,Edit,Write,GlobTool,GrepTool,BatchTool`) and a prompt forbidding changes to main except via a PR on a new branch. Auth uses `ANTHROPIC_API_KEY`. [[wiki/docs/llms-docs-port-io/guides-all-trigger-ai-coding-assistants-from-port]]
 - Port records Claude runs as `claudeCodeExecution` catalog entities with prompt, status, time, tokens and USD cost. It is the only one of three assistants in that guide (Copilot, Claude Code, Gemini CLI) with token and cost tracking. [[wiki/docs/llms-docs-port-io/guides-all-trigger-ai-coding-assistants-from-port]]
 - Port names Claude Code as the example "code-first" agent, as a consumer of the Port MCP server, and as a target for Jira ticket delegation in autonomous ticket resolution. Port measures skill adoption in Cursor and Claude. [[wiki/docs/llms-docs-port-io/agent-management-overview]] [[wiki/docs/llms-docs-port-io/solutions-autonomous-ticket-resolution-overview]]
+- Boundary's "Agents, Subagents, Skills and Commands" episode traces Claude Code's extension points as successive patches: slash commands (user-invoked prompt wrappers), subagents (fresh context window), custom subagents (misused to bundle instructions), then skills (instructions loadable into any context). [[wiki/sources/youtube-b5O6gb_Zuk8]]
+- Same episode: subagents are for context isolation (30-50k tokens of searching returned as a ~500-token answer) and skills are for instruction modules; the two are orthogonal, so custom instructions do not belong in agents. Skills load as a user message and can bundle a `references/` folder. [[wiki/sources/youtube-b5O6gb_Zuk8]]
+- Every subagent, skill and MCP tool description is advertised each session and spends the instruction budget. Claude Code now switches to a tool-search step past roughly 10K of tool text, and `disable-model-invocation: true` hides a skill from the model. [[wiki/sources/youtube-b5O6gb_Zuk8]]
+- For many repos the speaker suggests a mono repo, or a coordination repo whose `settings.json` lists additional directories and whose CLAUDE.md describes each repo, with per-task worktrees. [[wiki/sources/youtube-b5O6gb_Zuk8]]
 
 ## Relationships
 
@@ -64,10 +72,13 @@ Sources treat Claude Code as the agent runtime that does the coding, not as the 
 - **Agent skill**: consumes `.agents/skills/` via symlink. [[wiki/concepts/agent-skill]]
 - **MCP**: Claude Code consumes MCP servers such as Factory MCP, the 8090 server and the Port MCP server. [[wiki/concepts/mcp]]
 - **GitHub**: runs under GitHub Actions in Port's recipe; PRs link back to 8090 Work Orders. [[wiki/entities/github]]
-- **Human in the loop**: 8090 confirmation gates apply to its MCP actions. [[wiki/concepts/human-in-the-loop]]
+- **Human in the loop**: 8090 confirmation gates apply to its MCP actions; the Boundary episode argues human design review is the bottleneck. [[wiki/concepts/human-in-the-loop]] [[wiki/sources/youtube-b5O6gb_Zuk8]]
+- **Context engineering**: subagent isolation and skill loading are its main levers in Claude Code. [[wiki/concepts/context-engineering]]
+- **Multi-repo development**: coordination-repo pattern. [[wiki/concepts/multi-repo-development]]
+- **Git worktree**: per-task worktrees. [[wiki/concepts/git-worktree]]
 
 ## Tensions
 
-Warp's pages show Claude Code as a first-class, swappable harness. The podcast shows it embedded inside a self-built loop with no vendor control plane. No source evaluates Claude Code's quality. Port adds a different framing: a code-first agent governed from outside by a catalog, not a harness swapped inside a factory.
+Warp's pages show Claude Code as a first-class, swappable harness. The podcast shows it embedded inside a self-built loop with no vendor control plane. The Boundary harness-mechanics episode is sceptical of "lights-off" factories and agent teams, while Warp and Port docs build automation around Claude Code runs. No source evaluates Claude Code's quality. Port adds a different framing: a code-first agent governed from outside by a catalog, not a harness swapped inside a factory.
 
-> Synthesis: Corroboration is thin and partly false. The four Warp docs pages and the two Warp repos are one vendor voice (Warp), so six pages count as one origin. 8090, Factory, Port (three pages, one voice) and the Boundary podcast are each separate origins, giving five in all. Across them Claude Code is consistently a harness slot, MCP client or dispatch target: 8090 and Port both treat it as one of several interchangeable agents (Cursor, Codex, Copilot, Gemini CLI). Claims resting on a single origin: Warp auth options and `claude`/`claude-code` type, 8090 connection steps, Port's base-action recipe, Factory's import path.
+> Synthesis: Corroboration is thin and partly false. The four Warp docs pages and the two Warp repos are one vendor voice (Warp), so six pages count as one origin. 8090, Factory, Port (three pages, one voice) and the Boundary podcast are each separate origins, giving five in all. The two Boundary episodes (tGbjIvvYuHE, b5O6gb_Zuk8) share a channel and hosts, so they are one voice, not two. Across them Claude Code is consistently a harness slot, MCP client or dispatch target: 8090 and Port both treat it as one of several interchangeable agents (Cursor, Codex, Copilot, Gemini CLI). Claims resting on a single origin: Warp auth options and `claude`/`claude-code` type, 8090 connection steps, Port's base-action recipe, Factory's import path.

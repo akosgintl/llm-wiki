@@ -57,6 +57,7 @@ sources:
   - "[[wiki/docs/llms-docs-warp-dev/factories-webhooks]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories]]"
   - "[[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]"
+  - "[[wiki/sources/youtube-XUEfIxkdT2Q]]"
 related:
   - "[[wiki/concepts/software-factory]]"
   - "[[wiki/concepts/foreman-agent]]"
@@ -68,9 +69,11 @@ related:
   - "[[wiki/concepts/control-plane]]"
   - "[[wiki/entities/claude-code]]"
   - "[[wiki/entities/codex]]"
+  - "[[wiki/entities/slack]]"
+  - "[[wiki/concepts/human-in-the-loop]]"
 created: 2026-10-25T00:00:00Z
-timestamp: 2026-10-25T00:00:00Z
-source_count: 53
+timestamp: 2026-10-26T07:12:41Z
+source_count: 54
 ---
 
 # Warp Factories
@@ -81,7 +84,9 @@ source_count: 53
 
 Warp's docs define a factory as a team of cloud agents connected to your repositories. A foreman agent coordinates stage agents through triage, spec, implement and review. Humans decide at spec approval, questions and merge. [[wiki/docs/llms-docs-warp-dev/factories]], [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]]
 
-Every source here is Warp's own voice: the docs set plus the `warp-factory-examples` repo. Treat agreement across them as one vendor's account, not independent corroboration. Warp's other repo, `common-skills`, was not among the pages aggregated here.
+In a podcast, Warp's founder-CEO frames the underlying idea as an agentic loop from issue through triage, optional spec, implementation, review, QA, CI/CD and monitoring. The loop lives in the cloud, is highly measurable, and is defined in code, so a developer's job becomes building and tuning it. [[wiki/sources/youtube-XUEfIxkdT2Q]]
+
+Every source here is Warp's own voice: the docs set, the `warp-factory-examples` repo and a talk by Warp's CEO. Treat agreement across them as one vendor's account, not independent corroboration. Warp's other repo, `common-skills`, was not among the pages aggregated here.
 
 ## Key claims
 
@@ -114,7 +119,18 @@ Every source here is Warp's own voice: the docs set plus the `warp-factory-examp
 **Evals**
 - Scorers (LLM judges), Benchmarks and Self-improvement form the improvement loop; failures become follow-up PRs. [[wiki/docs/llms-docs-warp-dev/factories-measure-and-improve]], [[wiki/docs/llms-docs-warp-dev/factories-measure-and-improve-scorers]], [[wiki/docs/llms-docs-warp-dev/factories-benchmarks]], [[wiki/docs/llms-docs-warp-dev/factories-measure-and-improve-self-improvement]]
 
+**Metrics, review and adoption (talk)**
+- Default factory metrics: human interactions per PR as an automation proxy, DORA metrics, cost per engineer and per stage, and online evals (e.g. a judge scoring redundant tests) over recorded runs. [[wiki/sources/youtube-XUEfIxkdT2Q]]
+- With the factory stored as code, improvement agents propose diffs to its markdown files from failed-run patterns; real tasks become private benchmarks. Online evals flag dead ends and "relearning something that should be a skill". [[wiki/sources/youtube-XUEfIxkdT2Q]]
+- Review is risk management: owners-file rules force human review of risky files, and merging small non-core PRs without human review raised the qualifying share from about 10% to 80%. [[wiki/sources/youtube-XUEfIxkdT2Q]]
+- Adoption advice: onboard everyone to prompt the cloud loop directly (Slack, Jira, MCP) so work is tracked, then automate a growing share. [[wiki/sources/youtube-XUEfIxkdT2Q]]
+
 Getting started and fixes: [[wiki/docs/llms-docs-warp-dev/factories-quickstart]], [[wiki/docs/llms-docs-warp-dev/factories-troubleshooting]], [[wiki/docs/llms-docs-warp-dev/factories-self-hosting-troubleshooting]].
+
+## Tensions
+
+- Docs describe humans deciding at spec approval, questions and merge. [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]] The CEO talk describes raising the share of small PRs merged with no human review to about 80%, with human review reserved for risky files. [[wiki/sources/youtube-XUEfIxkdT2Q]] These may be defaults versus a mature policy, but sources do not reconcile them.
+- Docs list a default team of foreman, triage, spec, implement, review. The talk's loop also names QA, CI/CD and monitoring stages. [[wiki/docs/llms-docs-warp-dev/factories-factory-agents]], [[wiki/sources/youtube-XUEfIxkdT2Q]]
 
 ## Relationships
 
@@ -122,6 +138,8 @@ Getting started and fixes: [[wiki/docs/llms-docs-warp-dev/factories-quickstart]]
 - **Foreman agent**: the single entry agent that receives all work. [[wiki/concepts/foreman-agent]]
 - **Factory as code**: definition-in-git model. [[wiki/concepts/factory-as-code]]
 - **Self-hosting / control plane**: execution-plane split. [[wiki/concepts/self-hosting]], [[wiki/concepts/control-plane]]
+- **Human-in-the-loop**: the talk treats human review as a risk-routed policy, not a fixed stage. [[wiki/concepts/human-in-the-loop]], [[wiki/sources/youtube-XUEfIxkdT2Q]]
+- **Slack**: one entry channel for prompting the loop. [[wiki/entities/slack]], [[wiki/sources/youtube-XUEfIxkdT2Q]]
 - **Claude Code, Codex**: supported harnesses. [[wiki/entities/claude-code]], [[wiki/entities/codex]]
 
-> Synthesis: one vendor, two kinds of voice (docs and an examples repo), so the product is well documented but uncorroborated by any independent source.
+> Synthesis: one vendor, three kinds of voice (docs, an examples repo, a founder talk), so the product is well documented but uncorroborated by any independent source; the talk adds metrics and review policy the docs lack.

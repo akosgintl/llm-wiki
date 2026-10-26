@@ -5,6 +5,7 @@ description: The agent runtime that wraps a model with tools and control loops, 
 aliases: []
 sources:
   - "[[wiki/sources/youtube-tGbjIvvYuHE]]"
+  - "[[wiki/sources/youtube-b5O6gb_Zuk8]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-benchmarks]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-factory-agents-configuration]]"
   - "[[wiki/docs/llms-docs-warp-dev/factories-factory-agents-creating-custom-agents]]"
@@ -26,8 +27,8 @@ related:
   - "[[wiki/concepts/agent-evals]]"
   - "[[wiki/concepts/agent-skill]]"
 created: 2026-10-25T15:14:42Z
-timestamp: 2026-10-25T18:30:15Z
-source_count: 14
+timestamp: 2026-10-26T07:15:29Z
+source_count: 15
 ---
 
 # Agent harness
@@ -42,11 +43,16 @@ Warp framing: the harness is a configurable per-agent setting, the runtime that 
 
 Factory framing: "Harness" is a docs section for Droid's own runtime: skills, custom subagents (custom droids), headless `droid exec` and Missions. Here the harness is the product itself, not a swappable setting. [[wiki/docs/llms-docs-factory-com/harness-skills]], [[wiki/docs/llms-docs-factory-com/harness-subagents]], [[wiki/docs/llms-docs-factory-com/droid-exec-overview]]
 
+Claude Code mechanics framing (second Boundary episode): the harness is the set of extension points around the model (slash commands, subagents, skills, MCP tools). Its design rule is to keep instruction modules (skills) and context isolation (subagents) as separate jobs. [[wiki/sources/youtube-b5O6gb_Zuk8]]
+
 The framings differ in scope. Warp's "harness" is roughly the podcast's inner harness. The outer-harness job (staging, loops, dispatch) is done in Warp by the foreman and stage agents. [[wiki/docs/llms-docs-warp-dev/factories-how-factories-work]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
 
 ## Key claims
 
 - Boundary's factory runs Claude Code or Codex in headless mode as the inner harness, with hard-coded while loops as the outer harness. One loop fixes CodeRabbit comments until mergeable, or stops after 3 iterations and asks a human. [[wiki/sources/youtube-tGbjIvvYuHE]]
+- Subagents isolate context: a task may burn 30-50k tokens of searching and return about 500 tokens. Result quality depends on the parent's prompt, which can be incomplete, so the speaker sometimes forks a session instead. [[wiki/sources/youtube-b5O6gb_Zuk8]]
+- Skills load instructions as a user message, which follows instructions better than a file read or tool result. Custom instructions belong in skills, not agents; "playing house" subagents (back-end engineer, growth marketer) do not work. [[wiki/sources/youtube-b5O6gb_Zuk8]]
+- Harness cost: every subagent, skill and MCP tool description is advertised each session and spends the instruction budget. Claude Code switches to a tool-search step past roughly 10K of tool text, and `disable-model-invocation: true` hides a skill from the model. [[wiki/sources/youtube-b5O6gb_Zuk8]]
 - Team-wide corrections fed back into the outer harness are part of the control plane's "compounding engineering" duty. [[wiki/sources/youtube-tGbjIvvYuHE]]
 - Each Warp factory agent has its own harness, model and runner. Review should use a different model or harness than implement, so the two do not share blind spots. [[wiki/docs/llms-docs-warp-dev/factories-factory-agents-configuration]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
 - Harness `type` accepts `oz`, `claude`, `codex` or `claude-code`. It is set via `agentDefaults.harness` or a per-agent override. `agentDefaults` must set exactly one of `model` or `harness`. [[wiki/docs/llms-docs-warp-dev/factories-factory-as-code]], [[wiki/docs/llms-docs-warp-dev/factories-factory-agents-configuration]], [[wiki/repos/github-warpdotdev-warp-factory-examples/ARCHITECTURE]]
@@ -78,4 +84,6 @@ The podcast splits the harness into inner and outer parts and says to own the ou
 
 Warp treats the harness as interchangeable (Warp Agent, Claude Code or Codex per agent), while Factory documents a single built-in harness, Droid, with its own subagent and skill formats plus import from Claude Code. [[wiki/docs/llms-docs-warp-dev/factories-factory-agents-configuration]], [[wiki/docs/llms-docs-factory-com/harness-subagents]]
 
-> Synthesis: Seven sources are one vendor voice (Warp's docs plus its two repos, factory-examples and common-skills), so their agreement is not corroboration; the repos mostly restate the docs' harness field in worked YAML. Five more are Factory's docs (one origin) and one is Mastra's docs; each is a separate vendor describing its own product. The podcast is the only non-docs voice, and its speakers also sell or build competing products. Treat all as design vocabulary, not neutral evidence.
+The podcast's first episode treats the factory (outer harness included) as something to own, while the second episode is sceptical of agent teams and "lights-off" factories: human design review, not output volume, is the bottleneck. [[wiki/sources/youtube-tGbjIvvYuHE]], [[wiki/sources/youtube-b5O6gb_Zuk8]]
+
+> Synthesis: Seven sources are one vendor voice (Warp's docs plus its two repos, factory-examples and common-skills), so their agreement is not corroboration; the repos mostly restate the docs' harness field in worked YAML. Five more are Factory's docs (one origin) and one is Mastra's docs; each is a separate vendor describing its own product. The two podcast sources are the only non-docs voices and come from one channel (Boundary), so they are not independent of each other; the speakers also sell or build competing products. Treat all as design vocabulary, not neutral evidence.
